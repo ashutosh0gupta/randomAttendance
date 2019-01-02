@@ -1,0 +1,21 @@
+{% if student_list %}
+<h2>Status of all students</h2>
+  <table style="border: 1px solid black">
+    <tr><th>Name</th> <th>Roll No</th> <th>Absent</th> <th>Sleepy</th> <th>Awake</th> </tr>
+    {% for student in student_list %}
+    <tr>
+      <td>{{ student.name }}</td>
+      <td>{{ student.rollno }}</td>
+      <td><img border="0"  src="/images/{{student.imagePath}}" WIDTH=100></td>
+      <td>{{ student.absentCount }}</td>
+      <td>{{ student.presentCount }}</td>
+      <td>{{ student.awakeCount }}</td>
+    </tr>
+    {% endfor %}
+  <tr>
+  </tr>
+</table> 
+{% else %}
+    <p>No students are available.</p>
+{% endif %}
+
