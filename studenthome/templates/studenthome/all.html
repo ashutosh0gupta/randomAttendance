@@ -1,7 +1,7 @@
 {% if student_list %}
 <h2>Status of all students</h2>
   <table style="border: 1px solid black">
-    <tr><th>Name</th> <th>Roll No</th> <th>Absent</th> <th>Sleepy</th> <th>Awake</th> </tr>
+    <tr><th>Name</th> <th>Roll No</th> <th>Photo</th> <th>Absent</th> <th>Sleepy</th> <th>Awake</th> </tr>
     {% for student in student_list %}
     <tr>
       <td>{{ student.name }}</td>

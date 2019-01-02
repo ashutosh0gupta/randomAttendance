@@ -3,7 +3,7 @@
 <p>Absent: {{ student.absentCount }} Sleepy: {{ student.presentCount }} Awake: {{ student.awakeCount }} </>
 <div><img border="0"  src="/images/{{student.imagePath}}" WIDTH=300><div>
     {% if getstatus %}
-      <form action="/{{student.id}}/" method="post">
+      <form action="/{{student.rollno}}/" method="post">
         {% csrf_token %}
         <input type="submit" name="status" value="Absent" />
         <input type="submit" name="status" value="Sleepy" />
