@@ -8,6 +8,5 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('all/', views.all_status, name='all'),
     path('import/', views.db_import, name='import'),
-    # path('<int:student_id>/', views.status, name='status'),
     re_path(r'^(?P<rollno>\d\d[0-9D]\d+)/$', views.status, name='status'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
