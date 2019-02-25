@@ -3,17 +3,28 @@
   <h1>Apna time aayega</h1>
   {% endif %}
     <h2>{{ student.name }} ({{ student.rollno }})</h2>
-<p>Absent: {{ student.absentCount }} Sleepy: {{ student.presentCount }} Awake: {{ student.awakeCount }} </>
-<div><img border="0"  src="/images/{{student.imagePath}}" WIDTH=300><div>
-    {% if getstatus %}
-      <form action="/{{student.rollno}}/" method="post">
-        {% csrf_token %}
-        <input type="submit" name="status" value="Absent" />
-        <input type="submit" name="status" value="Sleepy" />
-        <input type="submit" name="status" value="Awake" />      
-      </form>
-    {% endif %}
+<div >
+  <table>  
+  <tr> <td><img border="0"  src="/images/{{student.imagePath}}" WIDTH=300></td> <td>
+  {% if getstatus %}
+  <form action="/{{student.rollno}}/" method="post" style="display: inline;vertical-align:top">
+    {% csrf_token %}
+    <input type="submit" name="status" value="Absent" style="color:white;font-size:30px;background-color:red;width:150px;height:150px;"/><br>
+    <input type="submit" name="status" value="Present" style="color:white;font-size:30px;background-color:green;width:150px;height:150px;" />
+  </form>
+  {% endif %}
+  </td> </tr>
+  </table> 
+  <div>
     <div><a href="/">Next student</a></div>
+    <p>Absent: {{ student.absentCount }} Present: {{ student.presentCount }} </p>
+     {% if getstatus == False %}
+  <table style="border: 1px solid black">
+    {% for c in call_list %}
+    <tr> <td>{{ c.created_on|date:"c" }}</td> <td>{{ c.status }}</td> </tr>
+    {% endfor %} 
+    {% endif %}
+  </table> 
 {% else %}
     <p>No student found.</p>
 {% endif %}

@@ -2,6 +2,11 @@
 For taking random attendance in the class
 
 
+# dependencies
+  # python package dependencies
+  apt-get install pip
+
+
 # setting up this
   - Needs Django
   - db needs to be initialized

@@ -1,3 +1,4 @@
+{% load mathfilters %}
 {% if student_list %}
 <h2>Status of all students</h2>
 <div>
@@ -20,21 +21,17 @@
         </svg>{{ present_count }}
       </td>
     </tr>
-    <tr>
-      <td>Awake</td>
-      <td>
-        <svg width="200" height="25">
-          <rect width="{{ awake_count }}" height="20" style="fill:rgb(0,0,255)" />
-        </svg>{{ awake_count }}
-      </td>
-    </tr>
   </table> 
   Call counts:
   <table style="border: 1px solid black">
     <tr>
-      <td># of calls</td>
-      {% for idx in called_idxs %}
-      <td>{{ idx }}</td>
+      <td></td>
+      {% for count in called_counts %}
+      <td>
+        <svg width="25" height="200">
+          <rect y="{{ 200|sub:count }}" width="20" height="{{ count }}" style="fill:rgb(0,0,255)" />
+        </svg>
+      </td>
       {% endfor %}
     </tr>
     <tr>
@@ -46,38 +43,58 @@
       {% endfor %}
     </tr>
     <tr>
-      <td></td>
-      {% for count in called_counts %}
-      <td>
-        <svg width="25" height="200">
-          <rect y="-0" width="20" height="{{ count }}" style="fill:rgb(0,0,255)" />
-        </svg>
-      </td>
+      <td># of calls</td>
+      {% for idx in called_idxs %}
+      <td>{{ idx }}</td>
       {% endfor %}
     </tr>
   </table> 
 </div>
   <table style="border: 1px solid black">
-    <tr><th>Name</th> <th>Roll No</th>
+    <tr>
+      {% if show_photo %}
+      <th>Name</th>
+      {% endif %}
+      <th>Roll No</th>
       {% if show_photo %}
       <th>Photo</th>
       {% endif %}
-      <th>Absent</th> <th>Sleepy</th> <th>Awake</th> </tr>
+      <th>Absent</th> <th>Present</th>
+    </tr>
     {% for student in student_list %}
     <tr>
-      <td>{{ student.name }}</td>
+      {% if show_photo %}
+      <td><a href="/{{ student.rollno }}">{{ student.name }}</a></td>
+      {% endif %}
       <td>{{ student.rollno }}</td>
       {% if show_photo %}
       <td><img border="0"  src="/images/{{student.imagePath}}" WIDTH=100></td>
       {% endif %}      
       <td>{{ student.absentCount }}</td>
       <td>{{ student.presentCount }}</td>
-      <td>{{ student.awakeCount }}</td>
     </tr>
     {% endfor %}
-  <tr>
-  </tr>
-</table> 
+    <tr>
+    </tr>
+  </table>
+  <table style="border: 1px solid black">
+    <tr>
+      <th>Roll No</th>
+      <th>Events</th>
+    </tr>
+    {% for rollno, cs in print_calls.items %}
+    <tr>
+      <td>
+        {{ rollno }}
+      </td>
+      <td>
+        {% for c in cs %}
+          {{ c.created_on|date:"Y-m-d" }} {{ c.status }}
+        {% endfor %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table> 
 {% else %}
     <p>No students are available.</p>
 {% endif %}
