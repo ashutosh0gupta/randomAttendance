@@ -1,3 +1,5 @@
 db.sqlite3
 studenthome/images
 studenthome/migrations
+attendance/__pycache__/
+studenthome/__pycache__/
