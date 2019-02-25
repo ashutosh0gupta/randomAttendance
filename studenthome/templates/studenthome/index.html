@@ -1,4 +1,7 @@
 {% if student %}
+  {% if ata %}
+  <h1>Apna time aayega</h1>
+  {% endif %}
     <h2>{{ student.name }} ({{ student.rollno }})</h2>
 <p>Absent: {{ student.absentCount }} Sleepy: {{ student.presentCount }} Awake: {{ student.awakeCount }} </>
 <div><img border="0"  src="/images/{{student.imagePath}}" WIDTH=300><div>

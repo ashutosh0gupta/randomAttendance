@@ -1,9 +1,9 @@
 {% if student_list %}
 <h2>Status of all students</h2>
 <div>
-  Attendence count:
+  Attendance count:
   <table style="border: 1px solid black">
-    <tr><th> Calls result </th> <th># of students</th></tr>
+    <tr><th> Calls result </th> <th># of calls</th></tr>
     <tr>
       <td>Absent</td>
       <td>
@@ -13,7 +13,7 @@
       </td>
     </tr>
     <tr>
-      <td>Present</td>
+      <td>Sleepy</td>
       <td>
         <svg width="200" height="25">
           <rect width="{{ present_count }}" height="20" style="fill:rgb(0,0,255)" />
@@ -31,17 +31,30 @@
   </table> 
   Call counts:
   <table style="border: 1px solid black">
-    <tr><th># of calls</th> <th># of students</th></tr>
-    {% for count,value in count_list.items %}
     <tr>
-      <td>{{ count }}</td>
-      <td>
-        <svg width="200" height="25">
-          <rect width="{{ value }}" height="20" style="fill:rgb(0,0,255)" />
-        </svg>{{ value }}
-      </td>
+      <td># of calls</td>
+      {% for idx in called_idxs %}
+      <td>{{ idx }}</td>
+      {% endfor %}
     </tr>
-    {% endfor %}
+    <tr>
+      <td># of students</td>
+      {% for count in called_counts %}
+      <td>
+        {{ count }}
+      </td>
+      {% endfor %}
+    </tr>
+    <tr>
+      <td></td>
+      {% for count in called_counts %}
+      <td>
+        <svg width="25" height="200">
+          <rect y="-0" width="20" height="{{ count }}" style="fill:rgb(0,0,255)" />
+        </svg>
+      </td>
+      {% endfor %}
+    </tr>
   </table> 
 </div>
   <table style="border: 1px solid black">

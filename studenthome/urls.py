@@ -6,6 +6,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('ata/', views.ata, name='ata'),
     path('all/', views.all_status, name='all'),
     path('import/', views.db_import, name='import'),
     re_path(r'^(?P<rollno>\d\d[0-9D]\d+)/$', views.status, name='status'),
