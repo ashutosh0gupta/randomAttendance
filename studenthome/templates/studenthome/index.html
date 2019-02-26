@@ -18,13 +18,35 @@
   <div>
     <div><a href="/">Next student</a></div>
     <p>Absent: {{ student.absentCount }} Present: {{ student.presentCount }} </p>
-     {% if getstatus == False %}
-  <table style="border: 1px solid black">
-    {% for c in call_list %}
-    <tr> <td>{{ c.created_on|date:"c" }}</td> <td>{{ c.status }}</td> </tr>
-    {% endfor %} 
+    {% if getstatus == False %}
+    <table style="border: 1px solid black">
+      {% for c in call_list %}
+      <tr> <td>{{ c.created_on|date:"c" }}</td> <td>{{ c.status }}</td> 
+        <td>
+          <form action="/{{student.rollno}}/" method="post" style="display: inline;">
+            {% csrf_token %}
+            <input type="hidden" name="event" value={{c.created_on|date:"c"}}>
+            <input type="submit" name="status" value="Delete" />
+          </form>
+        </td>
+        <td>
+          <form action="/{{student.rollno}}/" method="post" style="display: inline;">
+            {% csrf_token %}
+            <input type="hidden" name="event" value={{c.created_on|date:"c"}}>
+            <input type="submit" name="status" value="Flip Attendance" />
+          </form>
+        </td>
+      </tr>
+      {% endfor %} 
+    </table>
+    Add an attendance
+    <form action="/{{student.rollno}}/" method="post">
+      {% csrf_token %}
+      <input type="submit" name="status" value="Absent" style="color:white;font-size:30px;background-color:red;width:150px;height:150px;"/>
+      <input type="submit" name="status" value="Present" style="color:white;font-size:30px;background-color:green;width:150px;height:150px;" />
+    </form>    
     {% endif %}
-  </table> 
+
 {% else %}
     <p>No student found.</p>
 {% endif %}

@@ -15,7 +15,17 @@ def index(request):
     if len(student_list) == 0:
         return HttpResponse("No students in the class!!")
     else:
+        # choose a random student
         student = random.choice( student_list )
+        if student.presentCount + student.absentCount > 1:
+            # retry two times if the student has at least two calls
+            r_count = 0
+            while random.random() > 0.3 and r_count < 2:
+                studentp = random.choice( student_list )
+                if studentp.presentCount + studentp.absentCount < 2:
+                    student = studentp
+                    break
+                r_count += 1
         context = RequestContext(request)
         context.push( {'student': student, 'getstatus' : True, } )
         return render( request, 'studenthome/index.html', context.flatten() )
@@ -45,11 +55,50 @@ def status(request, rollno):
             student.absentCount += 1
         if st == 'Present':
             student.presentCount += 1
-        student.calls = Call.objects.create(
-            rollno=student.rollno,
-            status=st,
-            prevCall=student.calls)
-        student.save()
+        if st == 'Absent' or st == 'Present':
+            student.calls = Call.objects.create(
+                rollno=student.rollno,
+                status=st,
+                prevCall=student.calls)
+            student.save()
+        if st == 'Delete' or st == 'Flip Attendance':
+            time = request.POST['event']
+            c = student.calls
+            i = 0
+            next_call = None
+            while c != None:
+                if c.created_on.isoformat() == time:
+                    break
+                i = i + 1
+                next_call = c
+                c = c.prevCall
+            if c != None:
+                if st == 'Flip Attendance':
+                    if c.status == 'Absent':
+                        c.status = 'Present'
+                        student.absentCount += -1
+                        student.presentCount += 1
+                    elif c.status == 'Present':
+                        c.status = 'Absent'
+                        student.absentCount += 1
+                        student.presentCount += -1
+                    c.save()
+                    student.save()
+                elif st == 'Delete':
+                    if c.status == 'Absent':
+                        student.absentCount += -1
+                    elif c.status == 'Present':
+                        student.presentCount += -1                      
+                    if i == 0:
+                        student.calls = c.prevCall
+                    else:
+                        next_call.prevCall = c.prevCall
+                        next_call.save()
+                    c.prevCall = None
+                    c.delete()
+                    student.save()
+            else:
+                return HttpResponse("no call found for time " + time)
     call_list = []
     calls = student.calls
     while calls != None:

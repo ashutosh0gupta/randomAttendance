@@ -85,7 +85,7 @@
     {% for rollno, cs in print_calls.items %}
     <tr>
       <td>
-        {{ rollno }}
+        <a href="/{{ rollno }}">{{ rollno }}</a>
       </td>
       <td>
         {% for c in cs %}
