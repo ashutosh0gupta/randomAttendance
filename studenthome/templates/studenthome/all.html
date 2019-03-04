@@ -52,6 +52,28 @@
 </div>
   <table style="border: 1px solid black">
     <tr>
+      <th>Roll No</th>
+      <th>Events</th>
+    </tr>
+    {% for rollno, cs in print_calls.items %}
+    <tr>
+      <td>
+        <a href="/{{ rollno }}">{{ rollno }}</a>
+      </td>
+      <td>
+        {% for c in cs %}
+          {% if c.status == 'Absent' %}
+            <font color="red">{{ c.created_on|date:"Y-m-d" }}</font> 
+          {% else %}
+            <font color="green">{{ c.created_on|date:"Y-m-d" }}</font> 
+          {% endif %}
+        {% endfor %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table> 
+  <table style="border: 1px solid black">
+    <tr>
       {% if show_photo %}
       <th>Name</th>
       {% endif %}
@@ -77,24 +99,6 @@
     <tr>
     </tr>
   </table>
-  <table style="border: 1px solid black">
-    <tr>
-      <th>Roll No</th>
-      <th>Events</th>
-    </tr>
-    {% for rollno, cs in print_calls.items %}
-    <tr>
-      <td>
-        <a href="/{{ rollno }}">{{ rollno }}</a>
-      </td>
-      <td>
-        {% for c in cs %}
-          {{ c.created_on|date:"Y-m-d" }} {{ c.status }}
-        {% endfor %}
-      </td>
-    </tr>
-    {% endfor %}
-  </table> 
 {% else %}
     <p>No students are available.</p>
 {% endif %}
