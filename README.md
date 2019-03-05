@@ -2,13 +2,12 @@
 For taking random attendance in the class
 
 # setting up
-  1. Install dependencies: Django and the others
-  2. db needs to be initialized
-  3. import student data
-  4. Using attendance
+  * Install dependencies: Django and the others
+  * db needs to be initialized
+  * import student data
+  * Using attendance
 
 1. Install dependencies
-  # python package dependencies
   sudo apt update
   apt-get install python3 python3-pip
   pip3 install Django
