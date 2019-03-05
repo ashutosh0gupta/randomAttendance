@@ -8,10 +8,11 @@ For taking random attendance in the class
   * Using attendance
 
 1. Install dependencies
-  sudo apt update
-  apt-get install python3 python3-pip
-  pip3 install Django
-  pip3 install django-mathfilters
+
+  $sudo apt update
+  $apt-get install python3 python3-pip
+  $pip3 install Django
+  $pip3 install django-mathfilters
 
   -- the above list may not be exaustive (let us know the missing dependencies)
 
@@ -43,6 +44,7 @@ For taking random attendance in the class
      http://127.0.0.1:8000/
 
   - Special pages
+
      To see the details of a student     
      http://127.0.0.1:8000/<student rollno>
 
@@ -59,10 +61,13 @@ For taking random attendance in the class
 # other notes for devlopment (should not be relavant to a user)
 
 - Django help
+
   https://docs.djangoproject.com/en/2.1/intro/tutorial02/
+  
   https://www.youtube.com/watch?v=UmljXZIypDc&index=1&list=PL-osiE80TeTtoQCKZ03TU5fNfx2UY6U4p
 
 - to create a app inside a new project
-   python manage.py startapp
+
+   $python manage.py startapp
 
 
