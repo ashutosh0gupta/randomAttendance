@@ -2,7 +2,7 @@
 For taking random attendance in the class
 
 # setting up
-  1. Install dependencies: Django and the others
+  1. __Install dependencies: Django and the others__
   
    ```
    $sudo apt update
@@ -13,13 +13,13 @@ For taking random attendance in the class
 
   -- the above list may not be exaustive (let us know the missing dependencies)
 
-  2. db needs to be initialized
+  2. __db needs to be initialized__
 
   ```
   $python3 manage.py migrate
   ```
   
-  3. import student data
+  3. __import student data into the db__
 
  * Goto ASC webpage with the list of students with pictures and without CPIs
  * Save the page from the browser (tested only on Firefox) to ~/downloads folder
@@ -34,7 +34,7 @@ For taking random attendance in the class
 
     http://127.0.0.1:8000/import/
 
-  4. Using attendance
+  4. __Using attendance__
 
   - Start server of the application
 
