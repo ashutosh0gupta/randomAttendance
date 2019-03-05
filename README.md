@@ -4,12 +4,12 @@ For taking random attendance in the class
 # setting up
   1. Install dependencies: Django and the others
   
-   ''''
+   ```
    $sudo apt update
    $apt-get install python3 python3-pip
    $pip3 install Django
    $pip3 install django-mathfilters
-   '''
+   ```
 
   -- the above list may not be exaustive (let us know the missing dependencies)
 
