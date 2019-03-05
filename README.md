@@ -13,32 +13,34 @@ For taking random attendance in the class
 
   -- the above list may not be exaustive (let us know the missing dependencies)
 
-  1. db needs to be initialized
-  1. import student data
-  1. Using attendance
+  2. db needs to be initialized
 
-2. initialize data base
-
+  ```
   $python3 manage.py migrate
+  ```
+  
+  3. import student data
 
-3. importing students in the DB
+ * Goto ASC webpage with the list of students with pictures and without CPIs
+ * Save the page from the browser (tested only on Firefox) to ~/downloads folder
+ * Run ./scripts/asc-import.csv which generates /tmp/output.csv and /tmp/<rollno>.jpeg files
+ * Start server of the application
 
- - Goto ASC webpage with the list of students with pictures and without CPIs
- - Save the page from the browser (tested only on Firefox) to ~/downloads folder
- - Run ./scripts/asc-import.csv which generates /tmp/output.csv and /tmp/<rollno>.jpeg files
- - Start server of the application
-
-    $python3 manage.py runserver
+   ```
+   $python3 manage.py runserver
+   ```
     
- - Now go to the following webpage in a browser
+ * Now go to the following webpage in a browser
 
     http://127.0.0.1:8000/import/
 
-4. Using attendance
+  4. Using attendance
 
   - Start server of the application
 
-     $python3 manage.py runserver
+   ```
+   $python3 manage.py runserver
+   ```
 
   - For attendance, go to the following webpage in a browser
 
