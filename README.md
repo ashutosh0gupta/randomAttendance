@@ -1,8 +1,8 @@
-# randomAttendance
+# Random Attendance
 For taking random attendance in the class
 
-# setting up
-  1. __copy this code to the following folder__
+# Setting up
+  1. __Copy this code to the following folder__
 
    ```
    ~/randomAttendance
@@ -19,14 +19,14 @@ For taking random attendance in the class
 
   -- the above list may not be exaustive (let us know the missing dependencies)
 
-  3. __db needs to be initialized__
+  3. __Initialize db__
 
   ```
   $cd ~/randomAttendance
   $python3 manage.py migrate
   ```
   
-  4. __import student data into the db__
+  4. __Import student data into the db__
 
  * Goto IITB ASC webpage with the list of students with pictures and without CPIs
  * Save the page from the browser (tested only on Firefox) to ~/downloads folder
@@ -46,7 +46,7 @@ For taking random attendance in the class
    $python3 manage.py runserver
    ```
     
- * Now go to the following webpage in a browser
+ * Go to the following webpage in a browser
 
     http://127.0.0.1:8000/import/
 
@@ -78,7 +78,9 @@ For taking random attendance in the class
      http://127.0.0.1:8000/import
 
 
-# other notes for devlopment (should not be relavant to a user)
+# Other notes for devlopment
+
+(should not be relavant to a user)
 
 - Django help
 
