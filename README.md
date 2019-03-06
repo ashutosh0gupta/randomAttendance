@@ -29,7 +29,7 @@ For taking random attendance in the class
 
  * Goto IITB ASC webpage with the list of students with pictures and without CPIs
  * Save the page from the browser (tested only on Firefox) to ~/downloads folder
- * Run ./scripts/asc-import.csv which generates /tmp/output.csv and /tmp/<rollno>.jpeg files
+ * Run ./scripts/asc-import.csv which generates /tmp/output.csv and /tmp/[student rollno].jpeg files
  * Start server of the application
 
    ```
@@ -55,7 +55,7 @@ For taking random attendance in the class
   - Special pages
 
      To see the details of a student     
-     http://127.0.0.1:8000/<student rollno>
+     http://127.0.0.1:8000/[student rollno]
 
      Find a student who was never called
      http://127.0.0.1:8000/never
