@@ -46,9 +46,11 @@ For taking random attendance in the class
    $python3 manage.py runserver
    ```
     
- * Go to the following webpage in a browser
+ * Go to the following webpage in a browser. It will import the students from the csv file.
 
     http://127.0.0.1:8000/import/
+
+  If the studnet list is long, it will take some 10s of seconds.
 
   5. __Using attendance__
 
