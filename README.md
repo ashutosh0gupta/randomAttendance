@@ -5,7 +5,7 @@ For taking random attendance in the class
   1. __copy this code to the following folder__
 
    ```
-   ~/py3/randomAttendance
+   ~/randomAttendance
    ```
 
   2. __Install dependencies: Django and the others__
@@ -22,7 +22,7 @@ For taking random attendance in the class
   3. __db needs to be initialized__
 
   ```
-  $cd ~/py3/randomAttendance
+  $cd ~/randomAttendance
   $python3 manage.py migrate
   ```
   
@@ -30,11 +30,19 @@ For taking random attendance in the class
 
  * Goto IITB ASC webpage with the list of students with pictures and without CPIs
  * Save the page from the browser (tested only on Firefox) to ~/downloads folder
- * Run ./scripts/asc-import.csv which generates /tmp/output.csv and /tmp/[student rollno].jpeg files
+ * Run ./scripts/asc-import.py which generates /tmp/output.csv in the following format
+
+ ```
+ 1,[rollno1],STUDENT NAME1,[rollno1].jpeg
+ 2,[rollno2],STUDENT NAME2,[rollno2].jpeg
+ ....
+ ```
+  and for each student generates /tmp/[rollno*].jpeg.
+ 
  * Start server of the application
 
    ```
-   $cd ~/py3/randomAttendance
+   $cd ~/randomAttendance
    $python3 manage.py runserver
    ```
     
@@ -47,7 +55,7 @@ For taking random attendance in the class
   - Start server of the application
 
    ```
-   $cd ~/py3/randomAttendance
+   $cd ~/randomAttendance
    $python3 manage.py runserver
    ```
 
