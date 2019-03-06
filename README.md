@@ -29,7 +29,7 @@ For taking random attendance in the class
   4. __Import student data into the db__
 
  * Goto IITB ASC webpage with the list of students with pictures and without CPIs
- * Save the page from the browser (tested only on Firefox) to ~/downloads folder
+ * Save the page from the browser (tested only on Firefox) to /tmp folder
  * Run ./scripts/asc-import.py which generates /tmp/output.csv in the following format
 
  ```

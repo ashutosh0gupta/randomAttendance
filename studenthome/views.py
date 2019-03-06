@@ -77,7 +77,7 @@ def index(request):
         context.push( {'student': student, 'getstatus' : True, } )
         return render( request, 'studenthome/index.html', context.flatten() )
 
-# view to find a student that is never called
+# view to find a student that was never called
 def never(request):
     student_list = StudentInfo.objects.order_by('rollno')
     if len(student_list) == 0:
@@ -200,25 +200,28 @@ def db_import(request):
         with open(csv_file) as f:
             reader = csv.reader(f)
             for row in reader:
-                _, created = StudentInfo.objects.get_or_create(
-                    rollno=row[1],
-                    name=row[2],
-                    imagePath=row[3],
-                    calls=None
+                student, created = StudentInfo.objects.get_or_create(
+                    rollno=row[1]
                 )
                 current_rolls.append( row[1] )
                 if created:
+                    student.name = row[2]
+                    student.imagePath = row[3]
+                    student.calls = None
+                    student.save()
                     shutil.copy('/tmp/'+row[3],'studenthome/images/'+row[3])
-                    imported=imported + row[1]+"," + row[2]+","+row[3]+"<br>"
+                    imported += row[1]+"," + row[2]+","+row[3]+"<br>"
     except IOError as e:
         return HttpResponse( "Failed to open file "+csv_file + ".<br> Look into README for importing students!")
-    deleted="To be deleted students:<br>"
-    deleted= deleted+"(to avoid accedental deletion, user needs to do it manually. goto <a href=\"admin/\">admin</a>)<br>"
+    deleted  = "The following students are not in rolls any more."
+    deleted += "to be deleted students:<br>"
+    deleted += "(To avoid accedental deletion, user needs to do it manually."
+    deleted += "goto to the student page)<br>"
     student_list = StudentInfo.objects.order_by('rollno')
     any_deleted = False
     for student in student_list:
         if student.rollno not in current_rolls:
-            deleted=deleted + student.rollno + "<br>"
+            deleted += "<a href=\"/" + student.rollno + "\">" + student.rollno + "</a><br>"
             any_deleted = True
     if not any_deleted:
         deleted = ''
