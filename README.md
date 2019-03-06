@@ -5,7 +5,7 @@ For taking random attendance in the class
   1. __copy this code to the following folder__
 
    ```
-   ~/py3/attendance
+   ~/py3/randomAttendance
    ```
 
   2. __Install dependencies: Django and the others__
@@ -22,6 +22,7 @@ For taking random attendance in the class
   3. __db needs to be initialized__
 
   ```
+  $cd ~/py3/randomAttendance
   $python3 manage.py migrate
   ```
   
@@ -33,6 +34,7 @@ For taking random attendance in the class
  * Start server of the application
 
    ```
+   $cd ~/py3/randomAttendance
    $python3 manage.py runserver
    ```
     
@@ -45,6 +47,7 @@ For taking random attendance in the class
   - Start server of the application
 
    ```
+   $cd ~/py3/randomAttendance
    $python3 manage.py runserver
    ```
 
