@@ -2,26 +2,32 @@
 For taking random attendance in the class
 
 # setting up
-  1. __Install dependencies: Django and the others__
+  1. __copy this code to the following folder__
+
+   ```
+   ~/py3/attendance
+   ```
+
+  2. __Install dependencies: Django and the others__
   
    ```
    $sudo apt update
-   $apt-get install python3 python3-pip
+   $sudo apt-get install python3 python3-pip
    $pip3 install Django
    $pip3 install django-mathfilters
    ```
 
   -- the above list may not be exaustive (let us know the missing dependencies)
 
-  2. __db needs to be initialized__
+  3. __db needs to be initialized__
 
   ```
   $python3 manage.py migrate
   ```
   
-  3. __import student data into the db__
+  4. __import student data into the db__
 
- * Goto ASC webpage with the list of students with pictures and without CPIs
+ * Goto IITB ASC webpage with the list of students with pictures and without CPIs
  * Save the page from the browser (tested only on Firefox) to ~/downloads folder
  * Run ./scripts/asc-import.csv which generates /tmp/output.csv and /tmp/<rollno>.jpeg files
  * Start server of the application
@@ -34,7 +40,7 @@ For taking random attendance in the class
 
     http://127.0.0.1:8000/import/
 
-  4. __Using attendance__
+  5. __Using attendance__
 
   - Start server of the application
 
