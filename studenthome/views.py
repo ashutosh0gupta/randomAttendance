@@ -196,6 +196,7 @@ def db_import(request):
     imported=''
     csv_file = os.path.expanduser('/tmp/output.csv')
     current_rolls = []
+    os.makedirs('studenthome/images/', exist_ok=True)
     try:
         with open(csv_file) as f:
             reader = csv.reader(f)

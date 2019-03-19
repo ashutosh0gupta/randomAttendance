@@ -8,21 +8,24 @@ For taking random attendance in the class
    ~/randomAttendance
    ```
 
+  (may be, code can run from anywhere! Needs testing.)
+
   2. __Install dependencies: Django and the others__
   
    ```
    $sudo apt update
-   $sudo apt-get install python3 python3-pip
+   $sudo apt-get install python3 python3-pip mysql-server
    $pip3 install Django
    $pip3 install django-mathfilters
    ```
 
-  -- the above list may not be exaustive (let us know the missing dependencies)
+  -- the above list may not be exhaustive (let us know the missing dependencies)
 
   3. __Initialize db__
 
   ```
   $cd ~/randomAttendance
+  $python3 manage.py makemigrations studenthome
   $python3 manage.py migrate
   ```
   
@@ -30,14 +33,15 @@ For taking random attendance in the class
 
  * Goto IITB ASC webpage with the list of students with pictures and without CPIs
  * Save the page from the browser (tested only on Firefox) to /tmp folder
- * Run ./scripts/asc-import.py which generates /tmp/output.csv in the following format
+    (Yes! literally save the page from the browser.)
+ * Run ~/randomAttendance/scripts/asc-import.py which generates /tmp/output.csv in the following format
 
  ```
  1,[rollno1],STUDENT NAME1,[rollno1].jpeg
  2,[rollno2],STUDENT NAME2,[rollno2].jpeg
  ....
  ```
-  and for each student generates /tmp/[rollno*].jpeg.
+  and /tmp/[rollno*].jpeg for each student .
  
  * Start server of the application
 
@@ -79,10 +83,14 @@ For taking random attendance in the class
      To import students
      http://127.0.0.1:8000/import
 
+  - Policy of choosing a random student
 
-# Other notes for devlopment
+  The policy is implemented by function in pick_a_student file ~/randomAttendance/studenthome/views.py
 
-(should not be relavant to a user)
+
+# Other notes for development
+
+(should not be relevant to a user)
 
 - Django help
 
@@ -93,5 +101,6 @@ For taking random attendance in the class
 - to create a app inside a new project
 
    $python manage.py startapp
+
 
 
