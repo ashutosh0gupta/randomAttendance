@@ -85,7 +85,7 @@ For taking random attendance in the class
 
   - Policy of choosing a random student
 
-  The policy is implemented by function in pick_a_student file ~/randomAttendance/studenthome/views.py
+  The policy is implemented by function pick_a_student in file ~/randomAttendance/studenthome/views.py
 
 
 # Other notes for development
