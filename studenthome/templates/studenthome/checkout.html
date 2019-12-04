@@ -1,0 +1,20 @@
+<!-- test code for a payment system -->
+
+<form action="/paid/" method="POST">
+  {% csrf_token %}
+<script
+    src="https://checkout.razorpay.com/v1/checkout.js"
+    data-key="{{ rpay_id }}"
+    data-amount="{{ amt }}" 
+    data-currency="{{ curr }}"
+    data-order_id="{{ oid }}"
+    data-buttontext="Pay with Razorpay"
+    data-name="This is test"
+    data-description="{{ reason }}"
+    data-image="{{ logo }}"
+    data-prefill.name="{{ c_name }}"
+    data-prefill.email="{{ c_email }}"
+    data-theme.color="#F37254"
+></script>
+<input type="hidden" custom="Hidden Element" name="hidden">
+</form>
