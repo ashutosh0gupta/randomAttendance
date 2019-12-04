@@ -6,8 +6,17 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('login/', views.login, name='login'),
+    path('logout/', views.logout, name='logout'),
+    path('call/', views.call, name='call'),
     path('never/', views.never, name='never'),
     path('all/', views.all_status, name='all'),
     path('import/', views.db_import, name='import'),
     re_path(r'^(?P<rollno>\d\d[0-9D]\d+)/$', views.status, name='status'),
+    path('startq/', views.startq, name='startq'),
+    path('stopq/', views.stopq, name='stopq'),
+    path('createq/', views.CreateQuestion.as_view(), name='createq'),
+    re_path(r'^editq/(?P<qid>\d+)/', views.EditQuestion.as_view(), name='editq'),    
+    re_path(r'^deleteq/(?P<qid>\d+)/$', views.deleteq, name='deleteq'),
+    re_path(r'^activateq/(?P<qid>\d+)/$', views.activateq, name='activateq'),    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

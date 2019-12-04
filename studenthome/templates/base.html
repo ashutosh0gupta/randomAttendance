@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>FSTTCS Registration System</title>
+
+  {%block pagestyle%}
+  {% endblock %}
+  <link rel="stylesheet" type="text/css" href="{% static 'semantic.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'components/calendar.min.css' %}">
+  <style>
+    .main {
+      margin: 2em;
+      margin-top:12rem;
+
+      margin-bottom: 5em;
+    }
+
+    .ui.secondary.menu .active.item {
+      background: rgba(0, 0, 255, .15);
+      color: rgba(0, 0, 0, .95);
+      border-radius: .28571429rem;
+
+
+    }
+
+    #top-bar {
+      background-color: #222;
+      padding-left: 2em;
+      padding-right: 2em;
+      /* height:30px; */
+    }
+
+    #department-bar {
+      background-color: whitesmoke;
+      background-color: #E9E6DF;
+      height: auto;
+
+    }
+
+    #auxiliary-menu {
+      margin-top: 15rem;
+
+    }
+
+    .noshadow {
+      box-shadow: 0 0 0 0 !important;
+      -webkit-box-shadow: 0 0 0 0 !important;
+    }
+
+    .remove-margin {
+      margin: 0 0 0 0 !important;
+      /* padding: 0 0 0 0 !important; */
+    }
+
+    .remove-bottom {
+      padding-bottom: 0 !important;
+    }
+
+
+    .remove-top {
+      padding-top: 0.5em !important;
+    }
+
+    .single {
+      color: darkorange;
+      font-size: 40px;
+      /* font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; */
+      font-family: 'Source Sans Pro', sans-serif;
+    }
+
+    .full-width {
+      width: 100%;
+    }
+
+    .top-divider-margin{
+      margin: 1rem 0 0 0 !important;
+      -webkit-margin: 1rem 0 0 0 !important;
+    }
+
+    .fieldWrapper{
+    }
+
+    <!-- label{ -->
+    <!--   color: #B4886B; -->
+    <!--   display: block; -->
+    <!--   width: 200px; -->
+    <!--   float: left; -->
+    <!-- } -->
+    <!-- label.required { -->
+    <!--   color: #c00; -->
+    <!--   font-weight: bold; -->
+    <!-- } -->
+    <!-- input:required { -->
+    <!--   border:2px solid tomato; -->
+    <!-- } -->
+    <!-- select:required { -->
+    <!--   border:2px solid tomato; -->
+    <!-- } -->
+
+    table, th, td {
+     border: 1px solid black;
+     height: 50px;
+    }
+
+    button[type=submit] {
+      color:white;
+      font-size:30px;
+      background-color:green;
+      width:150px;
+      height:50px;
+    }
+
+    .errorlist {
+      color:red;
+    }
+
+    /* //medium+ screen sizes */
+    @media (min-width:992px) {
+      .desktop-only {
+        display: block !important;
+      }
+
+      .mobile-only {
+        display: none !important;
+      }
+    }
+
+    /* //small screen sizes */
+    @media (max-width: 991px) {
+      .mobile-only {
+        display: block !important;
+      }
+
+      .desktop-only {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body {% block body_attr %}{% endblock %}>
+
+  {% block secondarymenu %}
+
+  {% comment "this is customized in every applications"%}
+  
+  {% endcomment %}
+
+  {% endblock %}
+  
+
+
+  {% block content %}
+  {% endblock %}
+
+</body>

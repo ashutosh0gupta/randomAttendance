@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block body_attr %}
+{% endblock %}
+
+{% block pagestyle %}
+{% endblock %}
+
+{% block content %}
+
+{% if is_auth %}
+<div class="ui container">
+  <h1>Create questions</h1>
+
+  <div class="ui container">
+    {% if messages %}
+     {% for message in messages %}
+       <p class=" ui {{ message.tags }} tiny message">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+<form class="ui form attached fluid segment" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="ui button blue" type="submit">Create</button>  
+</form>
+</div>
+
+<div class="ui container">
+<h1>Questions</h1>
+
+<table style="border: 1px solid black">
+<tr>
+    <th>No.</th>
+    <th>Question</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+  {% for q in qs %}
+  <tr>
+    <td>{{ q.id }}</td>
+    <td>{{ q.q }}</td>
+    <td>
+      <a href="{%url 'editq' q.id %}" onclick="return confirm('Are you sure that you want to edit question {{p.id}}?');">Edit</a>
+    </td>
+    <td>
+      <a href="{%url 'deleteq' q.id %}" onclick="return confirm('Are you sure that you want to delete question {{p.id}}?');">Delete</a>
+    </td>
+    <td>
+      {% if q.id != sys.activeq %}
+      <a href="{%url 'activateq' q.id %}">Activate</a>
+      {% else %}
+      Active
+      {% endif %}
+    </td>
+
+  </tr>
+  {% endfor %}
+  <tr>
+  </tr>
+</table>
+</div>
+
+
+{% else %}
+Please <a href="{% url 'admin:index' %}">login</a>!
+
+
+{% endif %}
+
+{% endblock %}
