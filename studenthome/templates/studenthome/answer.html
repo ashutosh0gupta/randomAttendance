@@ -4,31 +4,62 @@
 {% endblock %}
 
 {% block pagestyle %}
-<meta http-equiv="refresh" content="3">
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 80%;
+    border: 1px solid #dddddd
+  }
+
+  td,
+  th {
+    text-align: left;
+    padding: 8px;
+  }
+
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
+  tr:nth-child(odd) {
+    background-color: #eeeeee;
+  }
+</style>
+
 {% endblock %}
 
 {% block content %}
 
-<div class="ui container">
+{% if is_auth %}
 
-<h1 style=font-size:50px>Q : {{q}}</h1>
+{% if yet_to_answer %}
 
-{% for s in students %}
-{% if s.curr_status == 'ABSENT' %}
-<font color="lightgray">{{s.rollno}}</font>
-{% elif s.curr_status == 'CORRECT' %}
-<font color="green">{{s.rollno}}</font>
+<h1 style=font-size:50px>Options</h1>
+<form class="ui form attached fluid segment" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+ <table>
+  <tr><td><label class="ui container">{{ form.ans1 }} {{ op1 }}</label></td></tr>
+  <tr><td><label class="ui container">{{ form.ans2 }} {{ op2 }}</label></td></tr>
+  <tr><td><label class="ui container">{{ form.ans3 }} {{ op3 }}</label></td></tr>
+  <tr><td><label class="ui container">{{ form.ans4 }} {{ op4 }}</label></td></tr>
+ </table>
+ <button type="submit">Answer</button>
+</form>
+
 {% else %}
-<font color="red">{{s.rollno}}</font>
+You have already answered:
+ <table>
+  <tr><td><label class="ui container">{{ sa.ans1 }} {{ op1 }}</label></td></tr>
+  <tr><td><label class="ui container">{{ sa.ans2 }} {{ op2 }}</label></td></tr>
+  <tr><td><label class="ui container">{{ sa.ans3 }} {{ op3 }}</label></td></tr>
+  <tr><td><label class="ui container">{{ sa.ans4 }} {{ op4 }}</label></td></tr>
+ </table>
 {% endif %}
-{% endfor %}
 
-
-<p><a href="{% url 'stopq' %}" class="ui label blue" >Stop quiz</a></p>
-
-<!-- <a href="{% url 'logout' %}" class="ui label blue" >Logout</a> -->
-
-</div>
+{% else %}
+    Please <a href="{% url 'login' %}">login</a>!
+{% endif %}
 
 
 {% endblock %}

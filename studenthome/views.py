@@ -49,39 +49,68 @@ def is_called_today( student ):
     if last_call.date() == datetime.date.today():
         return True
 
-def pick_a_student(student_list):
-    # do not accept a student that is alreay called today
-    already_called_today = True
-    today_retry = 0 
-    while already_called_today and today_retry < 5:
-        # choose a random student
-        student = random.choice( student_list )
-        if student.presentCount + student.absentCount > 1:
-            # retry one time if the student has at least two calls
-            r_count = 0
-            while random.random() > 0.3 and r_count < 1:
-                # retry with 0.7 probability
-                studentp = random.choice( student_list )
-                if studentp.presentCount + studentp.absentCount < 2:
-                    # retry student has less than two calls,switch student
-                    student = studentp
-                    break
-                r_count += 1
-        already_called_today = is_called_today( student )
-        today_retry  += 1
-    return student
+# def pick_a_student(student_list):
+#     # do not accept a student that is alreay called today
+#     already_called_today = True
+#     today_retry = 0 
+#     while already_called_today and today_retry < 5:
+#         # choose a random student
+#         student = random.choice( student_list )
+#         if student.presentCount + student.absentCount > 1:
+#             # retry one time if the student has at least two calls
+#             r_count = 0
+#             while random.random() > 0.3 and r_count < 1:
+#                 # retry with 0.7 probability
+#                 studentp = random.choice( student_list )
+#                 if studentp.presentCount + studentp.absentCount < 2:
+#                     # retry student has less than two calls,switch student
+#                     student = studentp
+#                     break
+#                 r_count += 1
+#         already_called_today = is_called_today( student )
+#         today_retry  += 1
+#     return student
 
+def pick_a_student(student_list):
+    return random.choice( student_list )
+    
 #----------------------------------------------------------------------------
 # VIEWS
 
-def login(request):
-    return HttpResponse("Not implemented yet!!")
+# def login(request):
+#     return HttpResponse("Not implemented yet!!")
 
-def logout(request):
-    return redirect( reverse("login") )
-    
+# def logout(request):
+#     return redirect( reverse("login") )
+
+def get_user_rollno( u ):
+    print(u)
+    if u.is_anonymous:
+        return "150020094"
+    if( u.ladp_user ):
+        rollno = u.ldap_user.attrs['employeeNumber']
+        return rollno
+    else:
+        # test situation where we do not care of ldap authenticaiton
+        u.username
+    # return "150020094"
+
 def who_auth(request):
-    return "prof"
+    u = request.user
+    if u.username == "akg":
+        return "prof"
+    s = get_or_none( StudentInfo, username = u.username )
+    if s == None:
+        rollno = get_user_rollno( u )
+        s = get_or_none( StudentInfo, pk = rollno )
+        if s == None:
+            return None
+        else:
+            s.username = u.username
+            s.save()
+            return s.rollno
+    else:
+        return s.rollno
 
 def get_q_op( q, idx ):
     op = q._meta.get_field("op"+str(idx))
@@ -92,11 +121,40 @@ def get_q_op( q, idx ):
         # must never happen
         assert( False )
         return None
+
+def get_q_ans( q, idx ):
+    op = q._meta.get_field("ans"+str(idx))
+    return op.value_from_object( q )
+
     
+def get_active_options( q ):
+    active_idxes = []
+    for i in range(1,6):
+        op = q._meta.get_field("op"+str(i))
+        op_str = op.value_from_object( q )
+        if op_str :
+            active_idxes.append( i )
+    return active_idxes
+
+def is_answer_correct( sa ):
+    q = get_or_none( Question, pk=sa.q )
+    s = get_or_none( StudentInfo, pk=sa.rollno )
+    result = True
+    for idx in range(1,5):
+        op = sa._meta.get_field("op"+str(idx))
+        op_num = op.value_from_object( sa )
+        correct_ans = get_q_ans(q,op_num)
+        ans = sa._meta.get_field("ans"+str(idx))
+        student_ans = ans.value_from_object( sa )
+        if correct_ans != student_ans :
+            result = False
+            break
+    return result
+
 def index(request):
     p = who_auth(request)
     if p == None:
-        return HttpResponse("Noone has logged in goto login page!!")
+        return redirect( reverse("logout") )
     context = RequestContext(request)
     s = get_sys_state()
     context["sys"] = s
@@ -110,15 +168,11 @@ def index(request):
             return render( request, 'studenthome/dashboard.html', context.flatten() )
     # student is logged in
     if s.mode == "QUIZ":
-        q = get_or_none( Question, pk=s.activeq )
-        sa = get_or_none( StudentAnswers, rollno=rn, q=q.pk )
+        # q = get_or_none( Question, pk=s.activeq )
+        sa = get_or_none( StudentAnswers, rollno=p, q=s.activeq )
         if sa == None:
-            return HttpResponse( "Something is wrong!!" )            
-        context["op1"] = get_q_op( q, sa.op1 )
-        context["op2"] = get_q_op( q, sa.op2 )
-        context["op3"] = get_q_op( q, sa.op3 )
-        context["op4"] = get_q_op( q, sa.op4 )
-        return render( request, 'studenthome/answer.html', context )
+            return HttpResponse( "Something is wrong!!" )
+        return redirect( reverse('answer', kwargs={'ansid':sa.pk}) )
     else:
         return HttpResponse( "Quiz is not running!!" )
     
@@ -128,7 +182,7 @@ def call(request):
     if len(student_list) == 0:
         return HttpResponse("No students in the class!!")
     else:
-        student = pick_a_student( student_list )
+        student = pick_a_student( student_list ).filter( curr_status != 'ABSENT' )
         context = RequestContext(request)
         context.push( {'student': student, 'getstatus' : True, } )
         return render( request, 'studenthome/index.html', context.flatten() )
@@ -322,7 +376,7 @@ class CreateQuestion(SuccessMessageMixin,CreateView):
             d = None
             u = who_auth(self.request)
             if u == None:
-                raise Exception( "Not logged in!" )
+                return redirect( reverse("logout") )
             if u != 'prof':
                 raise Exception( "Wrong kind of login!" )
             # if not self.request.user.is_authenticated:
@@ -383,17 +437,26 @@ def activateq(request, qid):
     s.save()
     return redirect( reverse( 'createq' ) )
 
+
+
 def startq(request):
+    if sys.mode == 'QUIZ':
+        return redirect( reverse( 'index' ) )
     u = who_auth(request)
     if u != 'prof':
         return HttpResponse( 'Incorrect login!' )
-    sys = get_sys_state()    
-    for s in StudentInfo.objects.all():
-        q = get_or_none( Question, pk=sys.activeq )        
+    sys = get_sys_state()
+    q = get_or_none( Question, pk=sys.activeq )
+    ops = get_active_options( q )
+    ss = StudentInfo.objects.all()
+    # s_abs = QuerySet()
+    # s_corr = []
+    # s_wrong = []
+    for s in ss:
+        # print(s.rollno)
         sa = get_or_none( StudentAnswers, rollno=s.rollno, q=sys.activeq )
         if sa == None:
-            ops = get_active_options( q )
-            op = random.choice( ops,k=4 )
+            op = random.sample( ops, 4 )
             sa = StudentAnswers.objects.create(rollno=s.rollno, q=q.pk)
             sa.op1 = op[0]
             sa.op2 = op[1]
@@ -401,24 +464,46 @@ def startq(request):
             sa.op4 = op[3]
             sa.save()
         if sa.answer_time == None:
+            # s_abs.append( s )
             s.curr_status = 'ABSENT'
         elif is_answer_correct( sa ):
+            # s_corr.append( s )
             s.curr_status = 'CORRECT'
         else:
+            # s_wrong.append( s )
             s.curr_status = 'WRONG'
+        print( "start "+ str( datetime.datetime.now() ) )
         s.save()
+        print( "end "+ str( datetime.datetime.now() ) )
+    # ss.save()
+    # s_abs.update(curr_status = 'ABSENT')
     sys.mode = 'QUIZ'
     sys.save()
     return redirect( reverse( 'index' ) )
 
 def stopq(request):
+    if sys.mode == 'INACTIVE':
+        return redirect( reverse( 'index' ) )
     u = who_auth(request)
     if u != 'prof':
         return HttpResponse( 'Incorrect login!' )
     sys = get_sys_state()
     sys.mode = 'INACTIVE'
     sys.save()
-    return redirect( reverse( 'index' ) )
+    # choose three random students that have answered
+    student_list = Entry.objects.filter( curr_status != 'ABSENT' )
+    if len(student_list) > 3:
+        student1,student2,student3 = pick_a_student( student_list, )
+    else:
+        if len(student_list) > 2:
+            student3 = student_list[2]
+        if len(student_list) > 1:
+            student2 = student_list[1]            
+        if len(student_list) > 0:
+            student1 = student_list[0]
+    context = RequestContext(request)
+    context.push( {'s1': s1, 's2': s2, 's2': s2 } )
+    return render( request, 'studenthome/results.html', context.flatten() )
 
 class StudentResponse(UpdateView):
     model = StudentAnswers
@@ -428,9 +513,15 @@ class StudentResponse(UpdateView):
     
     def get_context_data( self, **kwargs ):
         context = super(StudentResponse,self).get_context_data(**kwargs)
-        context[ "is_auth" ] = (who_auth( self.request ) == "prof")
         sa = self.object
-        q = get_or_none( Question, pk=s.activeq )
+        sys = get_sys_state()
+        if sa.answer_time :
+            context[ "yet_to_answer" ] = False
+        else:
+            context[ "yet_to_answer" ] = (sys.mode == 'QUIZ')
+        context[ "is_auth" ] = ( who_auth( self.request ) == sa.rollno )
+        context[ "sys" ] = sys
+        q = get_or_none( Question, pk=sys.activeq )
         # sa = get_or_none( StudentAnswers, ansid )
         # if sa == None:
         #     return HttpResponse( "Something is wrong!!" )            
@@ -438,7 +529,29 @@ class StudentResponse(UpdateView):
         context["op2"] = get_q_op( q, sa.op2 )
         context["op3"] = get_q_op( q, sa.op3 )
         context["op4"] = get_q_op( q, sa.op4 )
+        context["sa"] = sa
         return context
 
+    def form_valid(self,form):
+        try:
+            sa = None
+            response = super().form_valid(form)
+            sa = self.object
+            sa.answer_time = datetime.datetime.now()
+            sa.user_agent = self.request.headers['User-Agent']
+            sa.save()
+            s = get_or_none(StudentInfo, pk=rollno)
+            if is_answer_correct( sa ):
+                s.curr_status = 'CORRECT'
+            else:
+                s.curr_status = 'WRONG'            
+            s.save()
+            return resonse
+        except Exception as e:
+            # Form has failed fill gain
+            form.add_error( None, '{}!'.format(e) )
+            # messages.error(self.request,'{}!'.format(e))
+            return super().form_invalid(form)
+
     def get_success_url(self):
-        return reverse( "createq" )
+        return reverse( "index" )

@@ -1,20 +1,51 @@
-<!-- test code for a payment system -->
 
-<form action="/paid/" method="POST">
-  {% csrf_token %}
-<script
-    src="https://checkout.razorpay.com/v1/checkout.js"
-    data-key="{{ rpay_id }}"
-    data-amount="{{ amt }}" 
-    data-currency="{{ curr }}"
-    data-order_id="{{ oid }}"
-    data-buttontext="Pay with Razorpay"
-    data-name="This is test"
-    data-description="{{ reason }}"
-    data-image="{{ logo }}"
-    data-prefill.name="{{ c_name }}"
-    data-prefill.email="{{ c_email }}"
-    data-theme.color="#F37254"
-></script>
-<input type="hidden" custom="Hidden Element" name="hidden">
-</form>
+{% extends 'base.html' %}
+
+{% block body_attr %}
+{% endblock %}
+
+{% block pagestyle %}
+{% endblock %}
+
+{% block content %}
+
+<div>
+<table>  
+  <tr>
+    {% if s1 %}
+    <td><img border="0"  src="/images/{{s1.imagePath}}" WIDTH=300></td>
+    {% endif %}
+    {% if s2 %}
+    <td><img border="0"  src="/images/{{s2.imagePath}}" WIDTH=300></td>
+    {% endif %}
+    {% if s3 %}
+    <td><img border="0"  src="/images/{{s3.imagePath}}" WIDTH=300></td>
+    {% endif %}
+  </tr>
+  <tr>
+    {% if s1 %}
+    <td>{{ s1.name }}</td>
+    {% endif %}
+    {% if s2 %}
+    <td>{{ s2.name }}</td>
+    {% endif %}
+    {% if s3 %}
+    <td>{{ s3.name }}</td>
+    {% endif %}
+  </tr>
+  <tr>
+    {% if s1 %}
+    <td>{{ s1.rollno }}</td>
+    {% endif %}
+    {% if s2 %}
+    <td>{{ s2.rollno }}</td>
+    {% endif %}
+    {% if s3 %}
+    <td>{{ s3.rollno }}</td>
+    {% endif %}
+  </tr>
+</table>
+</div>
+<div><a href="/">Go to Dashboard</a></div>
+
+{% endblock %}

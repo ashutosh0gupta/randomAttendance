@@ -10,7 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
+
+
 import os
+from dotenv import load_dotenv
+load_dotenv()
+load_dotenv(verbose=True)
+
+from .ldap_settings import *
+from .email_settings import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,17 +28,18 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '5a0@^9y=*#&vxj$9(0x8v$q4jo-pxav4wx#o8d1##oncr-)55)'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'account',
     'studenthome.apps.StudenthomeConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -38,9 +47,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'import_export',
+    'post_office',
     'mathfilters',
 ]
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -108,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -121,8 +131,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-
-MEDIA_ROOT = 'studenthome/images'
-MEDIA_URL = '/images/'
-
 STATICFILES_DIRS = [(os.path.join(BASE_DIR, 'static')),]
+
+
+MEDIA_URL = '/images/'
+MEDIA_ROOT = 'studenthome/images'
+
+
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# SESSION_COOKIE_AGE = 10000
+
+# DEBUG=False
+
+# if(DEBUG==False):
+#     from .deploy_settings import *
+

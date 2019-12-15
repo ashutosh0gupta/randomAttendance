@@ -6,8 +6,8 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('login/', views.login, name='login'),
-    path('logout/', views.logout, name='logout'),
+    # path('login/', views.login, name='login'),
+    # path('logout/', views.logout, name='logout'),
     path('call/', views.call, name='call'),
     path('never/', views.never, name='never'),
     path('all/', views.all_status, name='all'),
@@ -18,5 +18,6 @@ urlpatterns = [
     path('createq/', views.CreateQuestion.as_view(), name='createq'),
     re_path(r'^editq/(?P<qid>\d+)/', views.EditQuestion.as_view(), name='editq'),    
     re_path(r'^deleteq/(?P<qid>\d+)/$', views.deleteq, name='deleteq'),
-    re_path(r'^activateq/(?P<qid>\d+)/$', views.activateq, name='activateq'),    
+    re_path(r'^activateq/(?P<qid>\d+)/$', views.activateq, name='activateq'),     re_path(r'^answer/(?P<ansid>\d+)/', views.StudentResponse.as_view(), name='answer'),    
+   
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
