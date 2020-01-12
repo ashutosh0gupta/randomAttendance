@@ -32,6 +32,7 @@ table {
 
 {% if is_auth %}
 
+<h1>RollNo. {{ sa.rollno }} </h1>
 {% if yet_to_answer %}
 
 <h1 style=font-size:50px>Options</h1>
@@ -46,20 +47,33 @@ table {
  </table>
  <button type="submit">Answer</button>
 </form>
+<p><span class="ui red label">Note: please be careful before submit.
+    You will not be able to change the answers.</span></p>
 
 {% else %}
-You have already answered:
+You have already answered the following:
  <table>
-  <tr><td><label class="ui container">{{ sa.ans1 }} {{ op1 }}</label></td></tr>
-  <tr><td><label class="ui container">{{ sa.ans2 }} {{ op2 }}</label></td></tr>
-  <tr><td><label class="ui container">{{ sa.ans3 }} {{ op3 }}</label></td></tr>
-  <tr><td><label class="ui container">{{ sa.ans4 }} {{ op4 }}</label></td></tr>
+   <tr><td><label class="ui container">
+         {% if sa.ans1 %} <font color="green">✔</font> {% else %} <font color="red">✘</font>  {% endif %}
+         {{ op1 }}</label></td></tr>
+   <tr><td><label class="ui container">
+         {% if sa.ans2 %} <font color="green">✔</font> {% else %} <font color="red">✘</font> {% endif %}
+         {{ op2 }}</label></td></tr>
+   <tr><td><label class="ui container">
+         {% if sa.ans3 %} <font color="green">✔</font> {% else %} <font color="red">✘</font> {% endif %}
+         {{ op3 }}</label></td></tr>
+   <tr><td><label class="ui container">
+         {% if sa.ans4 %} <font color="green">✔</font> {% else %} <font color="red">✘</font> {% endif %}
+         {{ op4 }}</label></td></tr>
  </table>
-{% endif %}
-
+ {% endif %}
 {% else %}
     Please <a href="{% url 'login' %}">login</a>!
 {% endif %}
 
+ To change student, please logout and login again.
+ <div>
+   <a href="{% url 'logout' %}" class="ui label red" >Logout</a>
+ </div>
 
 {% endblock %}

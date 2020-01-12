@@ -440,12 +440,12 @@ def activateq(request, qid):
 
 
 def startq(request):
+    sys = get_sys_state()
     if sys.mode == 'QUIZ':
         return redirect( reverse( 'index' ) )
     u = who_auth(request)
     if u != 'prof':
         return HttpResponse( 'Incorrect login!' )
-    sys = get_sys_state()
     q = get_or_none( Question, pk=sys.activeq )
     ops = get_active_options( q )
     ss = StudentInfo.objects.all()
@@ -482,25 +482,28 @@ def startq(request):
     return redirect( reverse( 'index' ) )
 
 def stopq(request):
-    if sys.mode == 'INACTIVE':
-        return redirect( reverse( 'index' ) )
     u = who_auth(request)
     if u != 'prof':
         return HttpResponse( 'Incorrect login!' )
     sys = get_sys_state()
+    if sys.mode == 'INACTIVE':
+        return redirect( reverse( 'index' ) )
     sys.mode = 'INACTIVE'
     sys.save()
     # choose three random students that have answered
-    student_list = Entry.objects.filter( curr_status != 'ABSENT' )
+    student_list = StudentInfo.objects.exclude( curr_status = 'ABSENT' ).all()
+    s1 = None
+    s2 = None
+    s3 = None
     if len(student_list) > 3:
-        student1,student2,student3 = pick_a_student( student_list, )
+        s1,s2,s3 = pick_a_student( student_list )
     else:
         if len(student_list) > 2:
-            student3 = student_list[2]
+            s3 = student_list[2]
         if len(student_list) > 1:
-            student2 = student_list[1]            
+            s2 = student_list[1]            
         if len(student_list) > 0:
-            student1 = student_list[0]
+            s1 = student_list[0]
     context = RequestContext(request)
     context.push( {'s1': s1, 's2': s2, 's2': s2 } )
     return render( request, 'studenthome/results.html', context.flatten() )

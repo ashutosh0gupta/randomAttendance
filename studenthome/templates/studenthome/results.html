@@ -10,16 +10,17 @@
 {% block content %}
 
 <div>
+  <h3>The following students please raise hands.</h3>
 <table>  
   <tr>
     {% if s1 %}
-    <td><img border="0"  src="/images/{{s1.imagePath}}" WIDTH=300></td>
+    <td><img border="0"  src="/images/{{s1.imagePath}}" WIDTH=200></td>
     {% endif %}
     {% if s2 %}
-    <td><img border="0"  src="/images/{{s2.imagePath}}" WIDTH=300></td>
+    <td><img border="0"  src="/images/{{s2.imagePath}}" WIDTH=200></td>
     {% endif %}
     {% if s3 %}
-    <td><img border="0"  src="/images/{{s3.imagePath}}" WIDTH=300></td>
+    <td><img border="0"  src="/images/{{s3.imagePath}}" WIDTH=200></td>
     {% endif %}
   </tr>
   <tr>
@@ -46,6 +47,6 @@
   </tr>
 </table>
 </div>
-<div><a href="/">Go to Dashboard</a></div>
+<div><a href="{% url 'index'%}">Go to Dashboard</a></div>
 
 {% endblock %}

@@ -58,7 +58,7 @@
     {% for rollno, cs in print_calls.items %}
     <tr>
       <td>
-        <a href="/{{ rollno }}">{{ rollno }}</a>
+        <a href="{% url 'status' rollno %}">{{ rollno }}</a>
       </td>
       <td>
         {% for c in cs %}
@@ -86,7 +86,7 @@
     {% for student in student_list %}
     <tr>
       {% if show_photo %}
-      <td><a href="/{{ student.rollno }}">{{ student.name }}</a></td>
+      <td><a href="{% url 'status' rollno %}">{{ student.name }}</a></td>
       {% endif %}
       <td>{{ student.rollno }}</td>
       {% if show_photo %}
