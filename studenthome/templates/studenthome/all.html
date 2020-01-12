@@ -1,3 +1,4 @@
+{% load static %}
 {% load mathfilters %}
 {% if student_list %}
 <h2>Status of all students</h2>
@@ -86,11 +87,11 @@
     {% for student in student_list %}
     <tr>
       {% if show_photo %}
-      <td><a href="{% url 'status' rollno %}">{{ student.name }}</a></td>
+      <td><a href="{% url 'status' student.rollno %}">{{ student.name }}</a></td>
       {% endif %}
       <td>{{ student.rollno }}</td>
       {% if show_photo %}
-      <td><img border="0"  src="/images/{{student.imagePath}}" WIDTH=100></td>
+      <td><img border="0"  src="{% get_media_prefix %}{{student.imagePath}}" WIDTH=100></td>
       {% endif %}      
       <td>{{ student.absentCount }}</td>
       <td>{{ student.presentCount }}</td>

@@ -12,7 +12,7 @@ urlpatterns = [
     path('never/', views.never, name='never'),
     path('all/', views.all_status, name='all'),
     path('import/', views.db_import, name='import'),
-    re_path(r'^(?P<rollno>\d\d[0-9D]\d+)/$', views.status, name='status'),
+    re_path(r'^(?P<rollno>[0-9D]+)/$', views.status, name='status'),
     path('startq/', views.startq, name='startq'),
     path('stopq/', views.stopq, name='stopq'),
     path('createq/', views.CreateQuestion.as_view(), name='createq'),
@@ -21,3 +21,6 @@ urlpatterns = [
     re_path(r'^activateq/(?P<qid>\d+)/$', views.activateq, name='activateq'),     re_path(r'^answer/(?P<ansid>\d+)/', views.StudentResponse.as_view(), name='answer'),    
    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+    # re_path(r'^(?P<rollno>\d\d[0-9D]+\d+)/$', views.status, name='status'),

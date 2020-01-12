@@ -297,7 +297,7 @@ def all_status(request):
         else:
             called_counts.append( 0 )
     context = RequestContext(request)
-    context.push( {'student_list': student_list, 'called_idxs': called_idxs, 'called_counts': called_counts, 'absent_count': absent_count, 'present_count': present_count, 'print_calls' : print_calls, 'show_photo' : False, } )
+    context.push( {'student_list': student_list, 'called_idxs': called_idxs, 'called_counts': called_counts, 'absent_count': absent_count, 'present_count': present_count, 'print_calls' : print_calls, 'show_photo' : True, } )
     return render( request, 'studenthome/all.html', context.flatten() )
 
 

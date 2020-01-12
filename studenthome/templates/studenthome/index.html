@@ -2,9 +2,9 @@
 <h2>{{ student.name }} ({{ student.rollno }})</h2>
 <div >
   <table>  
-  <tr> <td><img border="0"  src="/images/{{student.imagePath}}" WIDTH=300></td> <td>
+  <tr> <td><img border="0"  src="{% get_media_prefix %}{{student.imagePath}}" WIDTH=300></td> <td>
   {% if getstatus %}
-  <form action="{% url 'status' rollno %}" method="post" style="display: inline;vertical-align:top">
+  <form action="{% url 'status' student.rollno %}" method="post" style="display: inline;vertical-align:top">
     {% csrf_token %}
     <input type="submit" name="status" value="Absent" style="color:white;font-size:30px;background-color:red;width:150px;height:150px;"/><br>
     <input type="submit" name="status" value="Present" style="color:white;font-size:30px;background-color:green;width:150px;height:150px;" />
@@ -27,14 +27,14 @@
           {% endif %}
         </td>
         <td>
-          <form action="{% url 'status' rollno %}" method="post" style="display: inline;">
+          <form action="{% url 'status' student.rollno %}" method="post" style="display: inline;">
             {% csrf_token %}
             <input type="hidden" name="event" value={{c.created_on|date:"c"}}>
             <input type="submit" name="status" value="Delete" />
           </form>
         </td>
         <td>
-          <form action="{% url 'status' rollno %}" method="post" style="display: inline;">
+          <form action="{% url 'status' student.rollno %}" method="post" style="display: inline;">
             {% csrf_token %}
             <input type="hidden" name="event" value={{c.created_on|date:"c"}}>
             <input type="submit" name="status" value="Flip Attendance" />
@@ -44,13 +44,13 @@
       {% endfor %} 
     </table>
     Add an attendance
-    <form action="{% url 'status' rollno %}" method="post">
+    <form action="{% url 'status' student.rollno %}" method="post">
       {% csrf_token %}
       <input type="submit" name="status" value="Absent" style="color:white;font-size:30px;background-color:red;width:150px;height:50px;"/>
       <input type="submit" name="status" value="Present" style="color:white;font-size:30px;background-color:green;width:150px;height:50px;" />
     </form>
     Warning: clinking at the following button will permanently delete the student from DB.
-    <form action="{% url 'status' rollno %}" method="post">
+    <form action="{% url 'status' student.rollno %}" method="post">
       {% csrf_token %}
       <input type="submit" name="status" value="Remove student" style="color:white;font-size:30px;background-color:red;width:300px;height:50px;" onclick="return confirm('Are you sure?');"/>
     </form>

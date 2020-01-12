@@ -14,13 +14,13 @@
 <table>  
   <tr>
     {% if s1 %}
-    <td><img border="0"  src="/images/{{s1.imagePath}}" WIDTH=200></td>
+    <td><img border="0"  src="{% get_media_prefix %}{{s1.imagePath}}" WIDTH=200></td>
     {% endif %}
     {% if s2 %}
-    <td><img border="0"  src="/images/{{s2.imagePath}}" WIDTH=200></td>
+    <td><img border="0"  src="{% get_media_prefix %}{{s2.imagePath}}" WIDTH=200></td>
     {% endif %}
     {% if s3 %}
-    <td><img border="0"  src="/images/{{s3.imagePath}}" WIDTH=200></td>
+    <td><img border="0"  src="{% get_media_prefix %}{{s3.imagePath}}" WIDTH=200></td>
     {% endif %}
   </tr>
   <tr>
