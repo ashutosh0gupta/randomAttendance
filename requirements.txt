@@ -77,7 +77,7 @@ python-dotenv==0.10.2
 python-ldap==3.2.0
 python-magic==0.4.16
 pytz==2019.2
-pyxdg==0.25
+pyxdg==0.26
 PyYAML==5.1
 razorpay==1.2.0
 reportlab==3.4.0
