@@ -23,8 +23,12 @@
       </td>
     </tr>
   </table> 
+
   Call counts:
-  <table style="border: 1px solid black">
+
+
+{% comment %}
+ <table style="border: 1px solid black">
     <tr>
       <td></td>
       {% for count in called_counts %}
@@ -49,9 +53,12 @@
       <td>{{ idx }}</td>
       {% endfor %}
     </tr>
-  </table> 
+ </table>
+{% endcomment %}
+ 
 </div>
-  <table style="border: 1px solid black">
+
+<table style="border: 1px solid black">
     <tr>
       <th>Roll No</th>
       <th>Events</th>
@@ -63,17 +70,14 @@
       </td>
       <td>
         {% for c in cs %}
-          {% if c.status == 'Absent' %}
-            <font color="red">{{ c.created_on|date:"Y-m-d" }}</font> 
-          {% else %}
-            <font color="green">{{ c.created_on|date:"Y-m-d" }}</font> 
-          {% endif %}
+            <font color="green">{{ c.answer_time|date:"Y-m-d" }}</font> 
         {% endfor %}
       </td>
     </tr>
     {% endfor %}
-  </table> 
-  <table style="border: 1px solid black">
+</table> 
+
+<table style="border: 1px solid black">
     <tr>
       {% if show_photo %}
       <th>Name</th>
@@ -82,7 +86,7 @@
       {% if show_photo %}
       <th>Photo</th>
       {% endif %}
-      <th>Absent</th> <th>Present</th>
+      <th>Present</th>
     </tr>
     {% for student in student_list %}
     <tr>
@@ -93,7 +97,6 @@
       {% if show_photo %}
       <td><img border="0"  src="{% get_media_prefix %}{{student.imagePath}}" WIDTH=100></td>
       {% endif %}      
-      <td>{{ student.absentCount }}</td>
       <td>{{ student.presentCount }}</td>
     </tr>
     {% endfor %}
