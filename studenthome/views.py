@@ -447,7 +447,7 @@ class StudentResponse(UpdateView):
             sa.answer_time = datetime.datetime.now()
             sa.user_agent = self.request.headers['User-Agent']
             sa.save()
-            s = get_or_none(StudentInfo, pk=rollno)
+            s = get_or_none(StudentInfo, pk=sa.rollno)
             if is_answer_correct( sa ):
                 s.curr_status = 'CORRECT'
             else:
