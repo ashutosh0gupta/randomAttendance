@@ -92,7 +92,7 @@ def get_user_rollno( u ):
     print(u)
     # if u.is_anonymous:
     #     return "150020094"
-    if( u.ladp_user ):
+    if( u.ldap_user ):
         rollno = u.ldap_user.attrs['employeeNumber']
         return rollno
     else:
@@ -107,7 +107,8 @@ def who_auth(request):
     s = get_or_none( StudentInfo, username = u.username )
     if s == None:
         rollno = get_user_rollno( u )
-        s = get_or_none( StudentInfo, pk = rollno )
+        assert( len(rollno) > 0 )
+        s = get_or_none( StudentInfo, pk = rollno[0] )
         if s == None:
             return None
         else:
