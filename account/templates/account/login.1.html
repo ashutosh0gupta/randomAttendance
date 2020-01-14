@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{%block pagestyle%}
+
+<style type="text/css">
+  body {
+    background-color: #DADADA;
+  }
+
+  body>.grid {
+    height: 100%;
+  }
+
+  .image {
+    margin-top: -100px;
+  }
+
+  #centerbox {
+    max-width: 35rem;
+    margin-top: 15rem;
+  }
+</style>
+
+
+{% endblock %}
+
+
+
+{% block content %}
+{% comment %} <div class="ui main text"> {% endcomment %}
+
+  <div class="ui main text center aligned grid">
+    <div id="centerbox" class="column">
+      <h2 class="ui orange image header">
+        <!-- <img src="assets/images/logo.png" class="image"> -->
+        <i class="home icon"></i>
+        <div class="content">
+          Log-in using cse ldap account
+        </div>
+      </h2>
+      <form class="ui large form" method="post">
+        {% csrf_token %}
+        <input type="hidden" name='next' value="{{ request.GET.next }}" />
+        <div style="background:#E9E6DF;color: rgba(0,0,0,.87);" class="ui stacked segment">
+          <div class="field">
+            <div class="ui left icon input">
+              <i class="user icon"></i>
+              <!-- <input type="text" name="email" placeholder="cse ldap"> -->
+              {{ form.username }}
+            </div>
+          </div>
+          <div class="field">
+            <div class="ui left icon input">
+              <i class="lock icon"></i>
+              <!-- <input type="password" name="password" placeholder="Password"> -->
+              {{ form.password }}
+            </div>
+          </div>
+          <button type="submit" class="ui fluid large black submit button">
+
+            {% if request.user.is_authenticated %}
+            Hello {{request.user.username}}
+
+            {% else %}
+
+            Login
+            <!-- {{request.GET.next}} -->
+
+            {% endif %}
+          </button>
+        </div>
+
+
+
+
+      </form>
+
+      <div class="ui hidden divider"></div>
+              {% if messages %}
+        <div class="ui container">
+          <div class="ui tiny message">
+            <ul class="list">
+              {% for message in messages %}
+              <li {% if message.tags %} class="ui {{ message.tags }} text" {% endif %}>{{ message }}</li>
+              {% endfor %}
+
+            </ul>
+          </div>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+  </div>
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,292 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Internal@CSE</title>
+
+  {% block pagestyle %}
+  {% endblock %}
+  <link rel="stylesheet" type="text/css" href="{% static 'coursehome/semantic.min.css' %}">
+  <style>
+    .main {
+      margin: 25em;
+      /* margin-top:12rem; */
+
+      margin-bottom: 5em;
+    }
+
+    .ui.secondary.menu .active.item {
+      background: rgba(0, 0, 255, .15);
+      color: rgba(0, 0, 0, .95);
+      border-radius: .28571429rem;
+
+
+    }
+
+    #top-bar {
+      background-color: #222;
+      padding-left: 2em;
+      padding-right: 2em;
+      /* height:30px; */
+    }
+
+    #department-bar {
+      background-color: whitesmoke;
+      background-color: #E9E6DF;
+      height: auto;
+
+    }
+
+    #auxiliary-menu {
+      margin-top: 15em;
+
+    }
+
+    .noshadow {
+      box-shadow: 0 0 0 0 !important;
+      -webkit-box-shadow: 0 0 0 0 !important;
+    }
+
+    .remove-margin {
+      margin: 0 0 0 0 !important;
+      /* padding: 0 0 0 0 !important; */
+    }
+
+    .remove-bottom {
+      padding-bottom: 0 !important;
+    }
+
+
+    .remove-top {
+      padding-top: 0.5em !important;
+    }
+
+    .single {
+      color: darkorange;
+      font-size: 40px;
+      /* font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; */
+      font-family: 'Source Sans Pro', sans-serif;
+    }
+
+    .full-width {
+      width: 100%;
+    }
+
+    .top-divider-margin{
+      margin: 1rem 0 0 0 !important;
+      -webkit-margin: 1rem 0 0 0 !important;
+    }
+
+
+    /* //medium+ screen sizes */
+    @media (min-width:992px) {
+      .desktop-only {
+        display: block !important;
+      }
+
+      .mobile-only {
+        display: none !important;
+      }
+    }
+
+    /* //small screen sizes */
+    @media (max-width: 991px) {
+      .mobile-only {
+        display: block !important;
+      }
+
+      .desktop-only {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  {% block navbar %}
+  <div id="top-bar" class="ui fixed inverted menu" style="z-index:9999;">
+
+    <div class="header item">
+      <img src="{% static 'images/iitb-dj.png' %}"></img>
+    </div>
+    <div class="right menu">
+      <p class="header item" style="color:darkorange;">
+        Indian Institute of Tenchnology, Bombay
+      </p>
+      <a href="http://www.cse.iitb.ac.in" class="item">
+        <img src="{% static 'images/logo.png' %}"></img>
+      </a>
+
+    </div>
+  </div>
+
+  <div id="department-bar" class="ui fixed menu" style="z-index:999; margin-top: 2.85714286em">
+
+    <div class="ui celled grid noshadow remove-margin">
+      <div class="row noshadow">
+        <div class="right aligned three wide column noshadow remove-margin remove-bottom">
+        </div>
+        <div class="ten wide column noshadow remove-margin remove-bottom">
+          <h3>Department of</h3>
+        </div>
+        <div class="three wide column noshadow remove-margin remove-bottom">
+          <img>
+        </div>
+      </div>
+      <div class="row noshadow">
+        <div class="three wide column noshadow remove-margin remove-top remove-bottom">
+        </div>
+        <div class="ten wide column desktop-only noshadow remove-margin remove-top remove-bottom">
+
+          <h1><span class="single">C</span>OMPUTER <span class="single">S</span>CIENCE and <span class="single">E</span>NGINEERING</h1>
+
+
+        </div>
+        <div class="ten wide column mobile-only noshadow remove-margin remove-top remove-bottom">
+
+          <h2><span class="single">C</span>omputer <span class="single">S</span>cience and <span class="single">E</span>ngineering</h2>
+
+        </div>
+        <div class="three wide column noshadow remove-margin remove-top remove-bottom">
+          <img>
+        </div>
+      </div>
+
+      <div class="ui divider full-width top-divider-margin"></div>
+
+        <div class="ui secondary menu full-width">
+          <div>
+            <a class="item" href="https://www.cse.iitb.ac.in">
+              <i class="home icon"></i>Main Home
+            </a>
+          </div>
+          <div >
+            <a class="item" href="https://systems.cse.iitb.ac.in/systems/">
+              <i class="cog icon"></i>Sysads
+            </a>
+          </div>
+          <div >
+            <a class="item" href="https://systems.cse.iitb.ac.in/systems/">
+              <i class="bug icon"></i>File a Bug!
+            </a>
+          </div>
+          <!-- <div class="ui dropdown item">
+            Calender
+
+            <div class="menu">
+              <a class="item" href="/calendar/talk">Submit Talk</a>
+              <a class="item" hred="/calendar/event">Submit Event</a>
+            </div>
+          </div> -->
+          
+          <div class="right menu">
+          {% comment %}
+            <div class="item">
+                <div class="ui icon input">
+                  <input type="text" placeholder="Search...">
+                  <i class="search link icon"></i>
+                </div>
+              </div>
+            <div class="ui dropdown item">
+              <i class="user link icon"></i>
+              Login
+
+              <div class="menu">
+                <div class="item">Change Profile</div>
+                <div class="item">Logout</div>
+              </div>
+            </div>
+            {% endcomment %}
+          </div>
+        </div>
+
+    </div>
+
+
+
+
+  </div>
+
+
+  {% endblock %}
+
+
+{% comment "Seconday menu not required presently" %}
+  {% block secondarymenu %}
+  <div id="auxiliary-menu" class="ui secondary menu">
+    <div class="ui container stackable seven column grid">
+      <a  {% if mode == "image" %} class=" active item" {% else %} class="item" {% endif %} href="/submit/add/image">
+        <i class="image icon"></i>Add Image
+      </a>
+      <a  {% if mode == "news" %} class=" active item" {% else %} class="item" {% endif %} href="/submit/add/news">
+        <i class="newspaper icon"></i>Add News
+      </a>
+      <a {% if mode == "homeimage" %} class=" active item" {% else %} class="item" {% endif %} href="/submit/add/homeimage">
+        <i class="home icon"></i>Add Home Images
+      </a>
+      <a {% if mode == "event" %} class=" active item" {% else %} class="item" {% endif %} href="/submit/add/event">
+        <i class="calendar alternate icon"></i>Add Events
+      </a>
+      <!-- <a  class="item" href="/submit/technicalreportlist">
+        <i class="calendar alternate icon"></i>List technical reports
+      </a> -->
+      <div class="ui dropdown item">
+        <i class="plus icon"></i>Add
+
+        <div class="menu">
+          <a class="item" href="/submit/list/image">Talk</a>
+          <div class="item" href="/submit/list/event">Event</div>
+          <div class="item" href="/submit/list/news">News</div>
+          <div class="item" href="/submit/list/image">Image</div>
+          <div class="item" href="/submit/list/homeimage">Home Image</div>
+
+
+
+        </div>
+      </div>
+
+
+    </div>
+
+  </div>
+  <div class="ui clearing divider"></div>
+
+  
+  {%endblock%}
+
+  {% endcomment %}
+
+  {% if messages %}
+  <div class="ui container">
+    <div class="ui message">
+      <ul class="list">
+        {% for message in messages %}
+        <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+        {% endfor %}
+
+      </ul>
+    </div>
+  </div>
+
+  {% endif %}
+
+
+
+  {% block content %}
+  {% endblock %}
+
+</body>
+
+<script src="{% static 'coursehome/jquery-3.1.1.min.js' %}"></script>
+<script src="{% static 'coursehome/semantic.min.js' %}"></script>
+<script>
+  $('.ui.dropdown')
+    .dropdown();
+</script>
+
+</html>
