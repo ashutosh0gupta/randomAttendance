@@ -112,6 +112,54 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# log setting
+
+# Logging setting
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': './debug.log',
+            'formatter': 'verbose'
+        },
+        'errorfile': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': './debug.error.log',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file','errorfile'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        "post_office": {
+            "handlers": ['file','errorfile'],
+            "level": "INFO"
+        },
+        'quiz': {
+            'handlers': ['file','errorfile'],
+            'level': 'INFO',
+        },
+    },
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
@@ -125,6 +173,7 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
 
 
 # Static files (CSS, JavaScript, Images)
