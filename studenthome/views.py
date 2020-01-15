@@ -11,6 +11,8 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView,FormVie
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 
+import logging
+
 import csv
 import os
 import shutil
@@ -18,6 +20,8 @@ import datetime
 import random
 import pylatexenc
 from pylatexenc.latex2text import LatexNodes2Text
+
+logq = logging.getLogger('quiz')
 
 #----------------------------------------------------------------------------
 # utils
@@ -222,6 +226,7 @@ def db_import(request):
             any_deleted = True
     if not any_deleted:
         deleted = ''
+    logq.info( 'Import ran!' )
     return HttpResponse(imported+deleted)
 
 # view for loading student list from ASC website
@@ -287,6 +292,8 @@ class CreateQuestion(SuccessMessageMixin,CreateView):
                                            op3 = op[2],op4 = op[3] ) )
             StudentAnswers.objects.bulk_create( sas )
 
+            logq.info( 'Question ' + str(d.pk) + ' created.' )
+
             return response
         except Exception as e:
             # Form has failed fill gain
@@ -308,6 +315,7 @@ class EditQuestion(UpdateView):
         return context
 
     def get_success_url(self):
+        logq.info( 'Question ' + str(pk_url_kwarg) + ' edited.' )
         return reverse( "createq" )
 
 def deleteq(request, qid):
@@ -318,6 +326,8 @@ def deleteq(request, qid):
     if q:
         messages.success(request,'Question '+str(q.id)+' deleted!')
         q.delete()
+
+    logq.info( 'Question ' + str(qid) + ' deleted.' )
     # return HttpResponse( 'Done!' )
     return redirect( reverse( 'createq' ) )
 
@@ -345,9 +355,11 @@ def activateq(request, qid):
         return HttpResponse( 'Incorrect login!' )
 
     #update system state
-    s = get_sys_state()
-    s.activeq = qid
-    s.save()
+    sys = get_sys_state()
+    sys.activeq = qid
+    sys.save()
+    
+    logq.info( 'Question ' + str(sys.activeq) + ' activated.' )
 
     return redirect( reverse( 'createq' ) )
 
@@ -398,6 +410,8 @@ def startq(request):
         sys.num_attendance = sys.num_attendance + 1
     sys.mode = 'QUIZ'
     sys.save()
+    
+    logq.info( 'Quiz of question ' + str(sys.activeq) + ' started.' )
     return redirect( reverse( 'index' ) )
 
 def stopq(request):
@@ -425,6 +439,8 @@ def stopq(request):
             s1 = student_list[0]
     context = RequestContext(request)
     context.push( {'s1': s1, 's2': s2, 's3': s3 } )
+    logq.info( 'Quiz for Question ' + str(sys.activeq) + ' is stopped.' )
+
     return render( request, 'studenthome/results.html', context.flatten() )
 
 class StudentResponse(UpdateView):
@@ -469,6 +485,7 @@ class StudentResponse(UpdateView):
                 s.curr_status = 'WRONG'
             s.presentCount = s.presentCount + 1
             s.save()
+            logq.info( str(sa.rollno) + ' answered ' + str(sa.q) )
             return response
         except Exception as e:
             # Form has failed fill gain
@@ -523,8 +540,7 @@ def all_status(request):
 
 # view to see a random student
 def call(request):
-    students = StudentInfo.objects.filter( curr_status = 'WRONG' ) | StudentInfo.objects.filter( curr_status = 'CORRECT' )
-    student_list = students.all()
+    student_list = StudentInfo.objects.exclude( curr_status = 'ABSENT' ).all()
     
     if len(student_list) == 0:
         return HttpResponse("No students in the class!!")
@@ -547,7 +563,7 @@ def call(request):
 
 # view to look or modify student data
 def status(request, rollno):
-    return HttpResponse("Status is disabled for now!" + time)
+    return HttpResponse("Status is disabled for now!")
     # student = get_object_or_404(StudentInfo, pk=rollno)
     student = get_or_none(StudentInfo, pk=rollno)
     if student == None:
