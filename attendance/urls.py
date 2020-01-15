@@ -15,9 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from . import settings
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('account.urls')),
     path('',include('studenthome.urls')),
 ]
+
+if settings.DEPLOY:
+    urlpatterns = [path('~internal/cs228/',include(urlpatterns))]

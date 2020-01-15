@@ -130,19 +130,20 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [(os.path.join(BASE_DIR, 'static')),]
-
-
-MEDIA_URL = '/images/'
-MEDIA_ROOT = 'studenthome/images'
-
 
 # SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # SESSION_COOKIE_AGE = 10000
 
-# DEBUG=False
+DEBUG=False
+DEPLOY = True
+if(DEPLOY == True):
+     from .deploy_settings import *
+     
+else:
+     STATIC_URL = '/static/'
+     #STATIC_ROOT = os.path.join(BASE_DIR,'static')
+     STATICFILES_DIRS = [(os.path.join(BASE_DIR, 'static')),]
 
-# if(DEBUG==False):
-#     from .deploy_settings import *
+     MEDIA_URL = '/images/'
+     MEDIA_ROOT = 'studenthome/images'
 
