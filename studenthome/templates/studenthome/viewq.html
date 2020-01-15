@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block body_attr %}
+{% endblock %}
+
+{% block pagestyle %}
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 80%;
+    border: 1px solid #dddddd
+  }
+
+  td,
+  th {
+    text-align: left;
+    padding: 8px;
+  }
+
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
+  tr:nth-child(odd) {
+    background-color: #eeeeee;
+  }
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<h1>{{ q.q }} </h1>
+
+<div>
+  <table>
+    {% if op1 %} <tr><td>{{ op1 }}</td></tr> {% endif %}
+    {% if op2 %} <tr><td>{{ op2 }}</td></tr> {% endif %}
+    {% if op3 %} <tr><td>{{ op3 }}</td></tr> {% endif %}
+    {% if op4 %} <tr><td>{{ op4 }}</td></tr> {% endif %}
+    {% if op5 %} <tr><td>{{ op5 }}</td></tr> {% endif %}
+    {% if op6 %} <tr><td>{{ op6 }}</td></tr> {% endif %}
+    {% if op7 %} <tr><td>{{ op7 }}</td></tr> {% endif %}
+    {% if op8 %} <tr><td>{{ op8 }}</td></tr> {% endif %}
+    {% if op9 %} <tr><td>{{ op9 }}</td></tr> {% endif %}
+    {% if op10 %} <tr><td>{{ op10 }}</td></tr> {% endif %}
+    {% if op11 %} <tr><td>{{ op11 }}</td></tr> {% endif %}
+    {% if op12 %} <tr><td>{{ op12 }}</td></tr> {% endif %}
+    {% if op13 %} <tr><td>{{ op13 }}</td></tr> {% endif %}
+    {% if op14 %} <tr><td>{{ op14 }}</td></tr> {% endif %}
+    {% if op15 %} <tr><td>{{ op15 }}</td></tr> {% endif %}
+    {% if op16 %} <tr><td>{{ op16 }}</td></tr> {% endif %}
+    {% if op17 %} <tr><td>{{ op17 }}</td></tr> {% endif %}
+    {% if op18 %} <tr><td>{{ op18 }}</td></tr> {% endif %}
+    {% if op19 %} <tr><td>{{ op19 }}</td></tr> {% endif %}
+    {% if op10 %} <tr><td>{{ op20 }}</td></tr> {% endif %}
+  </table> 
+</div>
+
+{% endblock %}

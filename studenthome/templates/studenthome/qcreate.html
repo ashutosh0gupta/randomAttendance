@@ -39,6 +39,7 @@
     <th></th>
     <th></th>
     <th></th>
+    <th></th>
   </tr>
   {% for q in qs %}
   <tr>
@@ -49,6 +50,9 @@
     </td>
     <td>
       <a href="{%url 'deleteq' q.id %}" onclick="return confirm('Are you sure that you want to delete question {{p.id}}?');">Delete</a>
+    </td>
+    <td>
+      <a href="{%url 'viewq' q.id %}">View Options</a>
     </td>
     <td>
       {% if q.id != sys.activeq %}

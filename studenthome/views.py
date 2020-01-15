@@ -89,9 +89,6 @@ def pick_a_student(student_list):
 #     return redirect( reverse("login") )
 
 def get_user_rollno( u ):
-    print(u)
-    # if u.is_anonymous:
-    #     return "150020094"
     if( u.ldap_user ):
         rollno = u.ldap_user.attrs['employeeNumber']
         return rollno
@@ -102,6 +99,8 @@ def get_user_rollno( u ):
 
 def who_auth(request):
     u = request.user
+    if u.is_anonymous:
+        return None
     if u.username == "akg":
         return "prof"
     s = get_or_none( StudentInfo, username = u.username )
@@ -124,8 +123,7 @@ def get_q_op( q, idx ):
     if op_str :
         return LatexNodes2Text().latex_to_text( op_str )
     else:
-        # must never happen
-        assert( False )
+        # assert( False )
         return None
 
 def get_q_ans( q, idx ):
@@ -323,6 +321,20 @@ def deleteq(request, qid):
     # return HttpResponse( 'Done!' )
     return redirect( reverse( 'createq' ) )
 
+def viewq(request, qid):
+    u = who_auth(request)
+    if u != 'prof':
+        return HttpResponse( 'Incorrect login!' )
+    q = get_or_none( Question, pk = int(qid) )
+    ops = dict()
+    for i in range(1,21):
+        ops['op'+str(i)] = get_q_op( q, i )
+    context = RequestContext(request)
+    context.push( {'q': q } )
+    context.push( ops )
+    return render( request, 'studenthome/viewq.html', context.flatten() )
+
+    
 def get_sys_state():
     s, created = SystemState.objects.get_or_create(pk = 1)
     return s
@@ -400,7 +412,7 @@ def stopq(request):
     s2 = None
     s3 = None
     if len(student_list) > 3:
-        s1,s2,s3 = pick_a_student( student_list )
+        s1,s2,s3 = random.sample( student_list, 3 )
     else:
         if len(student_list) > 2:
             s3 = student_list[2]
@@ -508,11 +520,13 @@ def all_status(request):
 
 # view to see a random student
 def call(request):
-    student_list = StudentInfo.objects.order_by('rollno')
+    students = StudentInfo.objects.filter( curr_status = 'WRONG' ) | StudentInfo.objects.filter( curr_status = 'CORRECT' )
+    student_list = students.all()
+    
     if len(student_list) == 0:
         return HttpResponse("No students in the class!!")
     else:
-        student = pick_a_student( student_list ).filter( curr_status != 'ABSENT' )
+        student = pick_a_student( student_list )
         context = RequestContext(request)
         context.push( {'student': student, 'getstatus' : True, } )
         return render( request, 'studenthome/index.html', context.flatten() )
