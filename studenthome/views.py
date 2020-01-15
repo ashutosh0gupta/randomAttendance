@@ -362,7 +362,10 @@ def startq(request):
         return HttpResponse( 'Incorrect login!' )
     q = get_or_none( Question, pk=sys.activeq )
     ops = get_active_options( q )
-            
+
+    if q.first_activation_time == None:
+        StudentInfo.objects.update( curr_status = 'ABSENT')
+        
     ss = StudentInfo.objects.all()   
     for s in ss:
         sa = get_or_none( StudentAnswers, rollno=s.rollno, q=sys.activeq )
