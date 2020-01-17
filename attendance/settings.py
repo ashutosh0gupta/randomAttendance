@@ -183,16 +183,18 @@ USE_TZ = True
 # SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # SESSION_COOKIE_AGE = 10000
 
-DEBUG=False
-DEPLOY = True
-if(DEPLOY == True):
-     from .deploy_settings import *
-     
-else:
-     STATIC_URL = '/static/'
-     #STATIC_ROOT = os.path.join(BASE_DIR,'static')
-     STATICFILES_DIRS = [(os.path.join(BASE_DIR, 'static')),]
+DEPLOY = False
 
-     MEDIA_URL = '/images/'
-     MEDIA_ROOT = 'studenthome/images'
+DEBUG= not DEPLOY
+
+if(DEPLOY == True):
+    from .deploy_settings import *     
+else:
+    print('I am here')
+    STATIC_URL = '/static/'
+    # STATIC_ROOT = os.path.join(BASE_DIR,'static')
+    # STATICFILES_DIRS = ['']
+    STATICFILES_DIRS = [(os.path.join(BASE_DIR, 'static'))]
+    MEDIA_URL = '/images/'
+    MEDIA_ROOT = 'studenthome/images'
 

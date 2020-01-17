@@ -10,6 +10,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin, AccessMixin,User
 from django.views.generic.edit import CreateView, DeleteView, UpdateView,FormView
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
+from django.conf import settings
 
 import logging
 
@@ -103,9 +104,10 @@ def get_user_rollno( u ):
 def who_auth(request):
     u = request.user
     if u.is_anonymous:
-        return '170050074'
-        # return '170050053'
-        # return None
+        if settings.DEBUG:
+            return '170050074'
+            # return '170050053'
+        return None
     if u.username == "akg":
         return "prof"
     s = get_or_none( StudentInfo, username = u.username )
@@ -430,11 +432,16 @@ def stopq(request):
     sys.save()
     # choose three random students that have answered
     student_list = StudentInfo.objects.exclude( curr_status = 'ABSENT' ).all()
+
     s1 = None
     s2 = None
     s3 = None
     if len(student_list) > 3:
-        s1,s2,s3 = random.sample( student_list, 3 )
+        #todo: remove this loop
+        s_list = []
+        for s in student_list:
+            s_list.push_back(s)
+        s1,s2,s3 = random.sample( s_list, 3 )
     else:
         if len(student_list) > 2:
             s3 = student_list[2]
