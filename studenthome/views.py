@@ -318,7 +318,8 @@ class EditQuestion(UpdateView):
         return context
 
     def get_success_url(self):
-        logq.info( 'Question ' + str(pk_url_kwarg) + ' edited.' )
+        q = self.object
+        logq.info( 'Question ' + str(q.id) + ' edited.' )
         return reverse( "createq" )
 
 def deleteq(request, qid):
@@ -465,13 +466,17 @@ class StudentResponse(UpdateView):
         context = super(StudentResponse,self).get_context_data(**kwargs)
         sa = self.object
         sys = get_sys_state()
+        q = get_or_none( Question, pk=sys.activeq )
         if sa.answer_time :
             context[ "yet_to_answer" ] = False
+            context[ "q_ans1" ] = get_q_ans( q, sa.op1 )
+            context[ "q_ans2" ] = get_q_ans( q, sa.op2 )
+            context[ "q_ans3" ] = get_q_ans( q, sa.op3 )
+            context[ "q_ans4" ] = get_q_ans( q, sa.op4 )
         else:
             context[ "yet_to_answer" ] = (sys.mode == 'QUIZ')
         context[ "is_auth" ] = ( who_auth( self.request ) == sa.rollno )
         context[ "sys" ] = sys
-        q = get_or_none( Question, pk=sys.activeq )
         # sa = get_or_none( StudentAnswers, ansid )
         # if sa == None:
         #     return HttpResponse( "Something is wrong!!" )            
@@ -480,6 +485,7 @@ class StudentResponse(UpdateView):
         context["op3"] = get_q_op( q, sa.op3 )
         context["op4"] = get_q_op( q, sa.op4 )
         context["sa"] = sa
+
         return context
 
     def form_valid(self,form):

@@ -55,16 +55,24 @@ You have already answered the following:
  <table>
    <tr><td><label class="ui container">
          {% if sa.ans1 %} <font color="green">✔</font> {% else %} <font color="red">✘</font>  {% endif %}
-         {{ op1 }}</label></td></tr>
+         {{ op1 }}
+         {% if sa.ans1 == q_ans1 %} (correct ) {% else %} (incorrect ) {% endif %}
+   </label></td></tr>
    <tr><td><label class="ui container">
          {% if sa.ans2 %} <font color="green">✔</font> {% else %} <font color="red">✘</font> {% endif %}
-         {{ op2 }}</label></td></tr>
+         {{ op2 }}
+         {% if sa.ans2 == q_ans2 %} (correct ) {% else %} (incorrect ) {% endif %}
+   </label></td></tr>
    <tr><td><label class="ui container">
          {% if sa.ans3 %} <font color="green">✔</font> {% else %} <font color="red">✘</font> {% endif %}
-         {{ op3 }}</label></td></tr>
+         {{ op3 }}
+         {% if sa.ans3 == q_ans3 %} (correct ) {% else %} (incorrect ) {% endif %}
+   </label></td></tr>
    <tr><td><label class="ui container">
          {% if sa.ans4 %} <font color="green">✔</font> {% else %} <font color="red">✘</font> {% endif %}
-         {{ op4 }}</label></td></tr>
+         {{ op4 }}
+         {% if sa.ans3 == q_ans4 %} (correct ) {% else %} (incorrect ) {% endif %}
+   </label></td></tr>
  </table>
  {% endif %}
 {% else %}
