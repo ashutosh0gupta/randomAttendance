@@ -34,11 +34,15 @@ class UserLoginView(FormView):
 
         if next_ == '':
             next_ = self.success_url
+        #todo : workout what is_valid does
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-        user = authenticate(username=username, password=password)
-        print(user)
+            user = authenticate(username=username, password=password)
+            print(user)
+        else:
+            user = None
+
         if user is not None:
             # print(hasattr(user, 'ldap_user'))
             login(request,user)

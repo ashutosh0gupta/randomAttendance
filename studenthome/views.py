@@ -30,12 +30,12 @@ logq = logging.getLogger('quiz')
 # def hash(h, key):
 #     return h[key]
 
-def find_never_called(student_list):
-    for student in student_list:
-        called_count = student.absentCount+student.presentCount
-        if called_count == 0:
-            return student
-    return None
+# def find_never_called(student_list):
+#     for student in student_list:
+#         called_count = student.absentCount+student.presentCount
+#         if called_count == 0:
+#             return student
+#     return None
 
 def get_or_none(model, *args, **kwargs):
     try:
@@ -99,12 +99,13 @@ def get_user_rollno( u ):
     else:
         # test situation where we do not care of ldap authenticaiton
         u.username
-    # return "150020094"
 
 def who_auth(request):
     u = request.user
     if u.is_anonymous:
-        return None
+        return '170050074'
+        # return '170050053'
+        # return None
     if u.username == "akg":
         return "prof"
     s = get_or_none( StudentInfo, username = u.username )
@@ -323,11 +324,18 @@ def deleteq(request, qid):
     if u != 'prof':
         return HttpResponse( 'Incorrect login!' )
     q = get_or_none( Question, pk = int(qid) )
+    StudentAnswers.objects.filter(q=qid).delete()
+    
     if q:
+        if q.first_activation_time != None:
+            # if quiz has been attempted
+            sys = get_sys_state()
+            sys.num_attendance = sys.num_attendance - 1
+            sys.save()
         messages.success(request,'Question '+str(q.id)+' deleted!')
         q.delete()
-
-    logq.info( 'Question ' + str(qid) + ' deleted.' )
+        logq.info( 'Question ' + str(qid) + ' deleted.' )
+ 
     # return HttpResponse( 'Done!' )
     return redirect( reverse( 'createq' ) )
 
@@ -401,9 +409,6 @@ def startq(request):
             if s.curr_status != 'WRONG':
                 s.curr_status = 'WRONG'
                 s.save()
-        # print( "start "+ str( datetime.datetime.now() ) )
-        # s.save()
-        # print( "end "+ str( datetime.datetime.now() ) )
     if q.first_activation_time == None:
         q.first_activation_time = datetime.datetime.now()
         q.save()
@@ -475,20 +480,29 @@ class StudentResponse(UpdateView):
             sa = None
             response = super().form_valid(form)
             sa = self.object
+            if who_auth( self.request ) != sa.rollno:
+                logq.error('[Attack] wrong student is trying to submit' )
+                raise Exception( 'Delayed submission, the quiz is closed!' )
+            sys = get_sys_state()
+            if sys.mode != 'QUIZ' and sys.activeq != sa.q:
+                logq.error('Delayed submission of answers.' )
+                raise Exception( 'Delayed submission, the quiz is closed!' )
             sa.answer_time = datetime.datetime.now()
             sa.user_agent = self.request.headers['User-Agent']
             sa.save()
             s = get_or_none(StudentInfo, pk=sa.rollno)
             if is_answer_correct( sa ):
+                sa.is_correct = True
                 s.curr_status = 'CORRECT'
             else:
+                sa.is_correct = False
                 s.curr_status = 'WRONG'
-            s.presentCount = s.presentCount + 1
+            sa.save()
             s.save()
             logq.info( str(sa.rollno) + ' answered ' + str(sa.q) )
             return response
         except Exception as e:
-            # Form has failed fill gain
+            # No timing is saved 
             form.add_error( None, '{}!'.format(e) )
             # messages.error(self.request,'{}!'.format(e))
             return super().form_invalid(form)
@@ -503,23 +517,35 @@ def all_status(request):
     student_list = StudentInfo.objects.order_by('rollno')
     sys = get_sys_state()
     num_attendance = sys.num_attendance
-    # count_list = dict()
     absent_count = 0
     present_count = 0    
-    # max_called_count = 0
     print_calls = dict()
     for student in student_list:
+        attendances = StudentAnswers.objects.filter( rollno = student.rollno ).exclude(answer_time = None ).all()
+        # code for backward compatibility
+        for sa in attendances:
+            b = is_answer_correct( sa )
+            if b != sa.is_correct:
+                sa.is_correct = b
+                sa.save()
+        present_count = present_count +  len(attendances)
+        print_calls[student.rollno] = attendances
+    presence_rate = (100*present_count)/(num_attendance*len(student_list))
+    context = RequestContext(request)
+    context.push( {'student_list': student_list,
+                   'presence_rate': presence_rate, 
+                   'num_attendance': num_attendance,
+                   'print_calls' : print_calls, 'show_photo' : False, } )
+    return render( request, 'studenthome/all.html', context.flatten() )
+
+
         # called_count = student.absentCount+student.presentCount
-        absent_count = absent_count + num_attendance - student.presentCount
-        present_count = present_count +  student.presentCount        
         # if called_count in count_list:
         #     count_list[called_count] = count_list[called_count] + 1
         # else:
         #     count_list[called_count] = 1
         # if called_count > max_called_count:
         #     max_called_count = called_count
-        attendances = StudentAnswers.objects.filter( rollno = student.rollno ).exclude(answer_time = None ).all()
-        print_calls[student.rollno] = attendances
     # called_idxs = []
     # called_counts = []    
     # for called_count in range(max_called_count+1):
@@ -528,12 +554,6 @@ def all_status(request):
     #         called_counts.append( count_list[called_count] )
     #     else:
     #         called_counts.append( 0 )
-    context = RequestContext(request)
-    context.push( {'student_list': student_list,
-                   # 'called_idxs': called_idxs, 'called_counts': called_counts,
-                   'absent_count': absent_count, 'present_count': present_count,
-                   'print_calls' : print_calls, 'show_photo' : False, } )
-    return render( request, 'studenthome/all.html', context.flatten() )
 
 #======================================================
 # Old random views

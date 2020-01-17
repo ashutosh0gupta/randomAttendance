@@ -49,7 +49,7 @@
       <a href="{%url 'editq' q.id %}" onclick="return confirm('Are you sure that you want to edit question {{p.id}}?');">Edit</a>
     </td>
     <td>
-      <a href="{%url 'deleteq' q.id %}" onclick="return confirm('Are you sure that you want to delete question {{p.id}}?');">Delete</a>
+      <a href="{%url 'deleteq' q.id %}" onclick="return confirm('Are you sure that you want to delete question {{p.id}}? Please note that the student responses will also be deleted');">Delete</a>
     </td>
     <td>
       <a href="{%url 'viewq' q.id %}">View Options</a>

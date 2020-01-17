@@ -146,7 +146,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['file','errorfile'],
-            'level': 'INFO',
+            'level': 'ERROR',
             'propagate': True,
         },
         "post_office": {
