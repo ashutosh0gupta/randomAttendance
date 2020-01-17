@@ -8,19 +8,22 @@
 {% endblock %}
 
 {% block content %}
+<div class="ui container">
+
+<h1 style=font-size:50px>Q : {{q}}</h1>
 
 <div>
-  <h3>The following students please raise hands.</h3>
+  <h2>The following students please raise hands.</h2>
 <table>  
   <tr>
     {% if s1 %}
-    <td><img border="0"  src="{% get_media_prefix %}{{s1.imagePath}}" WIDTH=200></td>
+    <td><img border="0"  src="{% get_media_prefix %}{{s1.imagePath}}" WIDTH=300></td>
     {% endif %}
     {% if s2 %}
-    <td><img border="0"  src="{% get_media_prefix %}{{s2.imagePath}}" WIDTH=200></td>
+    <td><img border="0"  src="{% get_media_prefix %}{{s2.imagePath}}" WIDTH=300></td>
     {% endif %}
     {% if s3 %}
-    <td><img border="0"  src="{% get_media_prefix %}{{s3.imagePath}}" WIDTH=200></td>
+    <td><img border="0"  src="{% get_media_prefix %}{{s3.imagePath}}" WIDTH=300></td>
     {% endif %}
   </tr>
   <tr>
@@ -48,5 +51,7 @@
 </table>
 </div>
 <div><a href="{% url 'index'%}">Go to Dashboard</a></div>
+
+</div>
 
 {% endblock %}
