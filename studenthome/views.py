@@ -440,7 +440,7 @@ def stopq(request):
         #todo: remove this loop
         s_list = []
         for s in student_list:
-            s_list.push_back(s)
+            s_list.append(s)
         s1,s2,s3 = random.sample( s_list, 3 )
     else:
         if len(student_list) > 2:
