@@ -95,8 +95,9 @@ def pick_a_student(student_list):
 
 def get_user_rollno( u ):
     if( u.ldap_user ):
-        rollno = u.ldap_user.attrs['employeeNumber']        
-        return rollno.upper()
+        rollno = u.ldap_user.attrs['employeeNumber']
+        assert( len(rollno) > 0 )
+        return rollno[0].upper()
     else:
         # test situation where we do not care of ldap authenticaiton
         u.username
@@ -113,8 +114,7 @@ def who_auth(request):
     s = get_or_none( StudentInfo, username = u.username )
     if s == None:
         rollno = get_user_rollno( u )
-        assert( len(rollno) > 0 )
-        s = get_or_none( StudentInfo, pk = rollno[0] )
+        s = get_or_none( StudentInfo, pk = rollno )
         if s == None:
             return None
         else:
