@@ -95,8 +95,8 @@ def pick_a_student(student_list):
 
 def get_user_rollno( u ):
     if( u.ldap_user ):
-        rollno = u.ldap_user.attrs['employeeNumber']
-        return rollno
+        rollno = u.ldap_user.attrs['employeeNumber']        
+        return rollno.upper()
     else:
         # test situation where we do not care of ldap authenticaiton
         u.username
