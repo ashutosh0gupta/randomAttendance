@@ -12,7 +12,7 @@ urlpatterns = [
     # path('never/', views.never, name='never'),
     path('all/', views.all_status, name='all'),
     path('import/', views.db_import, name='import'),
-    re_path(r'^(?P<rollno>[0-9D]+)/$', views.status, name='status'),
+    re_path(r'^(?P<rollno>\d\d[0-9DV]+\d+)/$', views.status, name='status'),
     path('startq/', views.startq, name='startq'),
     path('stopq/', views.stopq, name='stopq'),
     path('createq/', views.CreateQuestion.as_view(), name='createq'),
@@ -24,4 +24,4 @@ urlpatterns = [
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
-    # re_path(r'^(?P<rollno>\d\d[0-9D]+\d+)/$', views.status, name='status'),
+    # re_path(r'^(?P<rollno>[0-9DV]+)/$', views.status, name='status'),
