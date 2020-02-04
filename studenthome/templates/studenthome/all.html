@@ -15,13 +15,16 @@
       </td>
     </tr>
     <tr>
-      <td>Presence rate</td>
+      <td>Overall Presence rate</td>
       <td>
         <svg width="200" height="25">
           <rect width="{{ presence_rate }}" height="20" style="fill:rgb(0,0,255)" />
         </svg>{{ presence_rate }}%
       </td>
     </tr>
+    {% for dat,num in attend_count_map.items %}    
+    <tr> <td>{{ dat }} :</td> <td> {{ num }}</td> </tr>
+    {% endfor %}
   </table> 
 
   Call counts:

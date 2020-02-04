@@ -533,11 +533,17 @@ def all_status(request):
     absent_count = 0
     present_count = 0    
     print_calls = dict()
+    attend_count_map = dict()
     for student in student_list:
         attendances = StudentAnswers.objects.filter( rollno = student.rollno ).exclude(answer_time = None ).all()
         # code for backward compatibility
         for sa in attendances:
             b = is_answer_correct( sa )
+            dt = sa.answer_time.strftime("%m-%d")
+            if dt in attend_count_map:
+                attend_count_map[dt] = attend_count_map[dt] + 1                
+            else:
+                attend_count_map[dt] = 1
             if b != sa.is_correct:
                 sa.is_correct = b
                 sa.save()
@@ -546,7 +552,8 @@ def all_status(request):
     presence_rate = (100*present_count)/(num_attendance*len(student_list))
     context = RequestContext(request)
     context.push( {'student_list': student_list,
-                   'presence_rate': presence_rate, 
+                   'presence_rate': presence_rate,
+                   'attend_count_map': attend_count_map,
                    'num_attendance': num_attendance,
                    'print_calls' : print_calls, 'show_photo' : False, } )
     return render( request, 'studenthome/all.html', context.flatten() )
