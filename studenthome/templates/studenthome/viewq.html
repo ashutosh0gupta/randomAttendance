@@ -34,26 +34,26 @@ table {
 
 <div>
   <table>
-    {% if op1 %} <tr><td><font color= {% if q.ans1 %}"green">✔{% else %}"red">✘{% endif %} </font> {{ op1 }}</td></tr> {% endif %}
-    {% if op2 %} <tr><td><font color= {% if q.ans2 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op2 }}</td></tr> {% endif %}
-    {% if op3 %} <tr><td><font color= {% if q.ans3 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op3 }}</td></tr> {% endif %}
-    {% if op4 %} <tr><td><font color= {% if q.ans4 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op4 }}</td></tr> {% endif %}
-    {% if op5 %} <tr><td><font color= {% if q.ans5 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op5 }}</td></tr> {% endif %}
-    {% if op6 %} <tr><td><font color= {% if q.ans6 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op6 }}</td></tr> {% endif %}
-    {% if op7 %} <tr><td><font color= {% if q.ans7 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op7 }}</td></tr> {% endif %}
-    {% if op8 %} <tr><td><font color= {% if q.ans8 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op8 }}</td></tr> {% endif %}
-    {% if op9 %} <tr><td><font color= {% if q.ans9 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op9 }}</td></tr> {% endif %}
-    {% if op10 %} <tr><td><font color= {% if q.ans10 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op10 }}</td></tr> {% endif %}
-    {% if op11 %} <tr><td><font color= {% if q.ans11 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op11 }}</td></tr> {% endif %}
-    {% if op12 %} <tr><td><font color= {% if q.ans12 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op12 }}</td></tr> {% endif %}
-    {% if op13 %} <tr><td><font color= {% if q.ans13 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op13 }}</td></tr> {% endif %}
-    {% if op14 %} <tr><td><font color= {% if q.ans14 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op14 }}</td></tr> {% endif %}
-    {% if op15 %} <tr><td><font color= {% if q.ans15 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op15 }}</td></tr> {% endif %}
-    {% if op16 %} <tr><td><font color= {% if q.ans16 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op16 }}</td></tr> {% endif %}
-    {% if op17 %} <tr><td><font color= {% if q.ans17 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op17 }}</td></tr> {% endif %}
-    {% if op18 %} <tr><td><font color= {% if q.ans18 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op18 }}</td></tr> {% endif %}
-    {% if op19 %} <tr><td><font color= {% if q.ans19 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op19 }}</td></tr> {% endif %}
-    {% if op20 %} <tr><td><font color= {% if q.ans20 %}"green">✔{% else %}"red">✘{% endif %} </font>{{ op20 }}</td></tr> {% endif %}
+    {% include 'studenthome/qoption.html' with op=op1 ans=q.ans1 %}
+    {% include 'studenthome/qoption.html' with op=op2 ans=q.ans2 %}
+    {% include 'studenthome/qoption.html' with op=op3 ans=q.ans3 %}
+    {% include 'studenthome/qoption.html' with op=op4 ans=q.ans4 %}
+    {% include 'studenthome/qoption.html' with op=op5 ans=q.ans5 %}
+    {% include 'studenthome/qoption.html' with op=op6 ans=q.ans6 %}
+    {% include 'studenthome/qoption.html' with op=op7 ans=q.ans7 %}
+    {% include 'studenthome/qoption.html' with op=op8 ans=q.ans8 %}
+    {% include 'studenthome/qoption.html' with op=op9 ans=q.ans9 %}
+    {% include 'studenthome/qoption.html' with op=op10 ans=q.ans10 %}
+    {% include 'studenthome/qoption.html' with op=op11 ans=q.ans11 %}
+    {% include 'studenthome/qoption.html' with op=op12 ans=q.ans12 %}
+    {% include 'studenthome/qoption.html' with op=op13 ans=q.ans13 %}
+    {% include 'studenthome/qoption.html' with op=op14 ans=q.ans14 %}
+    {% include 'studenthome/qoption.html' with op=op15 ans=q.ans15 %}
+    {% include 'studenthome/qoption.html' with op=op16 ans=q.ans16 %}
+    {% include 'studenthome/qoption.html' with op=op17 ans=q.ans17 %}
+    {% include 'studenthome/qoption.html' with op=op18 ans=q.ans18 %}
+    {% include 'studenthome/qoption.html' with op=op19 ans=q.ans19 %}
+    {% include 'studenthome/qoption.html' with op=op20 ans=q.ans20 %}
   </table> 
 </div>
 
