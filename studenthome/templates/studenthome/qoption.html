@@ -1,1 +1,11 @@
-{% if op %} <tr><td><font color= {% if ans %}"green">✔{% else %}"red">✘{% endif %} </font> {{ op }}</td></tr> {% endif %}
+{% if op %}
+<tr>
+  <td>
+    <font color= {% if ans %}"green">✔{% else %}"red">✘{% endif %} </font>
+    {{ op }}
+    {% if q_ans != None %}
+     {% if ans == q_ans %} (correct ) {% else %} (incorrect ) {% endif %}
+    {% endif %}
+  </td>
+</tr>
+{% endif %}

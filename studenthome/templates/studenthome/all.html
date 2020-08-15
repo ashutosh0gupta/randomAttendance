@@ -92,6 +92,7 @@
 <table style="border: 1px solid black">
     <tr>
       <th>Roll No</th>
+      <th>Number</th>
       <th>Events</th>
     </tr>
     {% for rollno, cs in print_calls.items %}
@@ -101,11 +102,14 @@
         <!-- <a href="{% url 'status' rollno %}">{{ rollno }}</a> -->
       </td>
       <td>
+        {{ cs| length }}
+      </td>
+      <td>
         {% for c in cs %}
            {% if c.is_correct %} 
-              <font color="green">{{ c.answer_time|date:"Y-m-d" }}</font>
+              <font color="green">{{ c.answer_time|date:"m-d" }}</font>
            {% else %}
-              <font color="red">{{ c.answer_time|date:"Y-m-d" }}</font>
+              <font color="red">{{ c.answer_time|date:"m-d" }}</font>
            {% endif %}
         {% endfor %}
       </td>
