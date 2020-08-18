@@ -28,10 +28,22 @@ For taking random attendance in the class
   $python3 manage.py makemigrations studenthome
   $python3 manage.py migrate
   ```
-  
-  4. __Import student data into the db__
+  Write the following content in randomAttendance/attendance/.env
+  ```
+  SECRET_KEY="<django-secret-key>"
+  AUTH_LDAP_SERVER_URI="<your-ldap-server>"
+  EMAIL_HOST="smtp.<your-smtp-server>"
+  EMAIL_HOST_USER="<user-on-smtp-server>"
+  EMAIL_HOST_PASSWORD="<password-of-the-user>"
+  ```
 
- * Goto IITB ASC webpage with the list of students with pictures and without CPIs
+* Use the following shell command to generate a random django-secret-key key
+
+   $tr -dc 'a-z0-9!@#$%^&*(-_=+)' < /dev/urandom | head -c50
+
+4. __Import student data into the db__
+
+ * Goto IITB ASC webpage with the list of students with default options
  * Save the page from the browser (tested only on Firefox) to /tmp folder
     (Yes! literally save the page from the browser.)
  * Run ~/randomAttendance/scripts/asc-import.py which generates /tmp/output.csv in the following format

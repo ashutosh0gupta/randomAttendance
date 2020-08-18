@@ -25,4 +25,4 @@ urlpatterns = [
 ]
 
 if settings.DEPLOY:
-    urlpatterns = [path('~internal/cs228/',include(urlpatterns))]
+    urlpatterns = [path(settings.MOUNT_SUB_URL,include(urlpatterns))]

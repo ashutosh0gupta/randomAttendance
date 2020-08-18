@@ -106,7 +106,8 @@ def who_auth(request):
     u = request.user
     if u.is_anonymous:
         if settings.DEBUG:
-            return '170050074'
+            return '170050014'
+            # return '170050004'
             # return '170050053'
         return None
     if u.username == "akg":
@@ -171,7 +172,7 @@ def index(request):
     context["sys"] = s
     if p == "prof":
         if s.mode == "QUIZ":
-            q = get_or_none( Question, pk=s.activeq )
+            q = get_or_none( Question, pk=s.activeq1 )
             context["q"] = LatexNodes2Text().latex_to_text( q.q )
             context[ "students" ] = StudentInfo.objects.all()
             return render( request, 'studenthome/quiz.html', context.flatten() )
@@ -180,7 +181,14 @@ def index(request):
     # student is logged in
     if s.mode == "QUIZ":
         # q = get_or_none( Question, pk=s.activeq )
-        sa = get_or_none( StudentAnswers, rollno=p, q=s.activeq )
+        sa = None
+        for i in range(1,5):
+            qid = get_active_q(i)
+            local_sa = get_or_none( StudentAnswers, rollno=p, q=qid )
+            if local_sa != None:
+                sa = local_sa
+                if sa.answer_time == None:
+                    break
         if sa == None:
             return HttpResponse( "Something is wrong!!" )
         return redirect( reverse('answer', kwargs={'ansid':sa.pk}) )
@@ -360,21 +368,57 @@ def get_sys_state():
     s, created = SystemState.objects.get_or_create(pk = 1)
     return s
 
-def activateq(request, qid):
+def get_active_q( i ):
+    sys = get_sys_state()
+    op = sys._meta.get_field("activeq"+str(i))
+    return op.value_from_object( sys )
+
+def put_active_q( i, qid ):
+    sys = get_sys_state()
+    if i == 1:
+        sys.activeq1 = qid
+    elif i == 2:
+        sys.activeq2 = qid
+    elif i == 3:
+        sys.activeq3 = qid
+    elif i == 4:
+        sys.activeq4 = qid        
+    sys.save()
+        
+def activateq(request, iid, qid):
     u = who_auth(request)
     if u != 'prof':
         return HttpResponse( 'Incorrect login!' )
 
+    iid=int(iid)
+    qid = int(qid)
+    for i in range(1,5):
+        print(iid)
+        print(i)
+        if iid == i:
+            # update qid
+            put_active_q( iid, qid )
+        else:
+            # qid is not repeated
+            if get_active_q(i) == qid:
+                put_active_q(i,0)
+
     #update system state
-    sys = get_sys_state()
-    sys.activeq = qid
-    sys.save()
+    # sys = get_sys_state()
+    # sys.activeq = qid
+    # sys.save()
     
-    logq.info( 'Question ' + str(sys.activeq) + ' activated.' )
+    logq.info( 'Question ' + str(qid) + ' at ' + str(iid) +' activated.' )
 
     return redirect( reverse( 'createq' ) )
 
+def deactivateq(request, iid):
+    if who_auth(request) != 'prof':
+        return HttpResponse( 'Incorrect login!' )
 
+    put_active_q( int(iid), 0 )
+    logq.info( 'Idx ' + iid +' deactivated.' )
+    return redirect( reverse( 'createq' ) )
 
 def startq(request):
     sys = get_sys_state()
@@ -383,43 +427,52 @@ def startq(request):
     u = who_auth(request)
     if u != 'prof':
         return HttpResponse( 'Incorrect login!' )
-    q = get_or_none( Question, pk=sys.activeq )
-    ops = get_active_options( q )
+    q1 = get_or_none( Question, pk=sys.activeq1 )
+    q2 = get_or_none( Question, pk=sys.activeq2 )
+    q3 = get_or_none( Question, pk=sys.activeq3 )
+    q4 = get_or_none( Question, pk=sys.activeq4 )
+    
+    for q in [q1,q2,q3,q4]:
+        if q == None:
+            continue
+        ops = get_active_options( q )
 
-    if q.first_activation_time == None:
-        StudentInfo.objects.update( curr_status = 'ABSENT')
+        if q.first_activation_time == None:
+            StudentInfo.objects.update( curr_status = 'ABSENT')
         
-    ss = StudentInfo.objects.all()   
-    for s in ss:
-        sa = get_or_none( StudentAnswers, rollno=s.rollno, q=sys.activeq )
-        if sa == None:
-            op = random.sample( ops, 4 )
-            sa = StudentAnswers.objects.create(rollno=s.rollno, q=q.pk)
-            sa.op1 = op[0]
-            sa.op2 = op[1]
-            sa.op3 = op[2]
-            sa.op4 = op[3]
-            sa.save()
-        if sa.answer_time == None:
-            if s.curr_status != 'ABSENT':
-                s.curr_status = 'ABSENT'
-                s.save()
-        elif is_answer_correct( sa ):
-            if s.curr_status != 'CORRECT':
-                s.curr_status = 'CORRECT'
-                s.save()
-        else:
-            if s.curr_status != 'WRONG':
-                s.curr_status = 'WRONG'
-                s.save()
-    if q.first_activation_time == None:
-        q.first_activation_time = datetime.datetime.now()
-        q.save()
-        sys.num_attendance = sys.num_attendance + 1
+        ss = StudentInfo.objects.all()   
+        for s in ss:
+            sa = get_or_none( StudentAnswers, rollno=s.rollno, q=q.pk )
+            if sa == None:
+                op = random.sample( ops, 4 )
+                sa = StudentAnswers.objects.create(rollno=s.rollno, q=q.pk)
+                sa.op1 = op[0]
+                sa.op2 = op[1]
+                sa.op3 = op[2]
+                sa.op4 = op[3]
+                sa.save()
+            if sa.answer_time == None:
+                if s.curr_status != 'ABSENT':
+                    s.curr_status = 'ABSENT'
+                    s.save()
+            elif is_answer_correct( sa ):
+                if s.curr_status != 'CORRECT':
+                    s.curr_status = 'CORRECT'
+                    s.save()
+            else:
+                if s.curr_status != 'WRONG':
+                    s.curr_status = 'WRONG'
+                    s.save()
+        if q.first_activation_time == None:
+            q.first_activation_time = datetime.datetime.now()
+            q.save()
+            sys.num_attendance = sys.num_attendance + 1
+        
     sys.mode = 'QUIZ'
     sys.save()
-    
-    logq.info( 'Quiz of question ' + str(sys.activeq) + ' started.' )
+
+    logq.info( 'Quiz for Question ' + str(sys.activeq1) + str(sys.activeq2) + str(sys.activeq3) +str(sys.activeq4) + ' is ended.' )
+
     return redirect( reverse( 'index' ) )
 
 def stopq(request):
@@ -452,7 +505,7 @@ def stopq(request):
             s1 = student_list[0]
     context = RequestContext(request)
     context.push( {'s1': s1, 's2': s2, 's3': s3 } )
-    logq.info( 'Quiz for Question ' + str(sys.activeq) + ' is stopped.' )
+    logq.info( 'Quiz for Question ' + str(sys.activeq1) + str(sys.activeq2) + str(sys.activeq3) +str(sys.activeq4) + ' is stopped.' )
 
     return render( request, 'studenthome/results.html', context.flatten() )
 
@@ -465,8 +518,25 @@ class StudentResponse(UpdateView):
     def get_context_data( self, **kwargs ):
         context = super(StudentResponse,self).get_context_data(**kwargs)
         sa = self.object
+        
+        # identifiy the next quiz id 
+        idx = 0
+        nxt = None
+        prv = None
+        for i in range(1,5):
+            qid = get_active_q( i )
+            if idx > 0 and qid > 0:
+                nxt = get_or_none(StudentAnswers,rollno=sa.rollno, q=qid)
+                continue
+            if idx == 0 and qid > 0 and qid != sa.q:
+                prv = get_or_none(StudentAnswers,rollno=sa.rollno, q=qid)
+            if qid == sa.q:
+                idx = i
+        
+        get_sys_state()
+        # populate context
+        q = get_or_none( Question, pk=sa.q )
         sys = get_sys_state()
-        q = get_or_none( Question, pk=sys.activeq )
         if sa.answer_time :
             context[ "yet_to_answer" ] = False
             context[ "q_ans1" ] = get_q_ans( q, sa.op1 )
@@ -475,16 +545,20 @@ class StudentResponse(UpdateView):
             context[ "q_ans4" ] = get_q_ans( q, sa.op4 )
         else:
             context[ "yet_to_answer" ] = (sys.mode == 'QUIZ')
+
         context[ "is_auth" ] = ( who_auth( self.request ) == sa.rollno )
         context[ "sys" ] = sys
         # sa = get_or_none( StudentAnswers, ansid )
         # if sa == None:
-        #     return HttpResponse( "Something is wrong!!" )            
+        #     return HttpResponse( "Something is wrong!!" )
+        context["q_name"] = LatexNodes2Text().latex_to_text( q.q )
         context["op1"] = get_q_op( q, sa.op1 )
         context["op2"] = get_q_op( q, sa.op2 )
         context["op3"] = get_q_op( q, sa.op3 )
         context["op4"] = get_q_op( q, sa.op4 )
         context["sa"] = sa
+        context["prev"] = prv # link to the previous question
+        context["next"] = nxt # link to the next question
 
         return context
 
@@ -521,7 +595,8 @@ class StudentResponse(UpdateView):
             return super().form_invalid(form)
 
     def get_success_url(self):
-        return reverse( "index" )
+        return reverse('answer', kwargs={'ansid':self.object.id})
+        # return reverse( "index" )
 
 
 

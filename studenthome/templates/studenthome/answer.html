@@ -32,10 +32,16 @@ table {
 
 {% if is_auth %}
 
-<h1>RollNo. {{ sa.rollno }} </h1>
+<h1>RollNo. {{ sa.rollno }} <a href="{% url 'logout' %}" class="ui label red" >Logout</a></h1>
+
+{% if in_class %}
+<h1 style=font-size:50px>Options</h1>
+{% else %}
+<h1 style=font-size:50px>Q : {{q_name}}</h1>
+{% endif %}
+
 {% if yet_to_answer %}
 
-<h1 style=font-size:50px>Options</h1>
 <form class="ui form attached fluid segment" method="post" enctype="multipart/form-data">
   {% csrf_token %}
   {{ form.non_field_errors }}
@@ -51,21 +57,26 @@ table {
     You will not be able to change the answers.</span></p>
 
 {% else %}
-You have already answered the following:
+You have answered the following:
 <table>
   {% include 'studenthome/qoption.html' with op=op1 ans=sa.ans1 q_ans=q_ans1 %}
   {% include 'studenthome/qoption.html' with op=op2 ans=sa.ans2 q_ans=q_ans2 %}
   {% include 'studenthome/qoption.html' with op=op3 ans=sa.ans3 q_ans=q_ans3 %}
   {% include 'studenthome/qoption.html' with op=op4 ans=sa.ans4 q_ans=q_ans4 %}
- </table>
- {% endif %}
+</table>
+    {% if prev %}
+       <a href="{%url 'answer' prev.id %}" class="ui label blue">Previous question</a>
+    {% endif %}
+    {% if next %}
+       <a href="{%url 'answer' next.id %}" class="ui label blue">Next question</a>
+    {% endif %}
+{% endif %}
 {% else %}
     Please <a href="{% url 'login' %}">login</a>!
 {% endif %}
 
- To change student, please logout and login again.
- <div>
-   <a href="{% url 'logout' %}" class="ui label red" >Logout</a>
- </div>
+ <!-- To change student, please logout and login again. -->
+ <!-- <div> -->
+ <!-- </div> -->
 
 {% endblock %}

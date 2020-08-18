@@ -39,7 +39,26 @@
     <th></th>
     <th></th>
     <th></th>
-    <th></th>
+    <th>
+      {% if sys.activeq1 > 0 %}
+         <a href="{%url 'deactivateq' 1 %}">Deactivate 1</a>
+      {% endif %}
+    </th>
+    <th>
+      {% if sys.activeq2 > 0 %}
+      <a href="{%url 'deactivateq' 2 %}">Deactivate 2</a>
+      {% endif %}
+    </th>
+    <th>
+      {% if sys.activeq3 > 0 %}
+      <a href="{%url 'deactivateq' 3 %}">Deactivate 3</a>
+      {% endif %}
+    </th>
+    <th>
+      {% if sys.activeq4 > 0 %}
+      <a href="{%url 'deactivateq' 4 %}">Deactivate 4</a>
+      {% endif %}
+    </th>
   </tr>
   {% for q in qs %}
   <tr>
@@ -55,13 +74,33 @@
       <a href="{%url 'viewq' q.id %}">View Options</a>
     </td>
     <td>
-      {% if q.id != sys.activeq %}
-      <a href="{%url 'activateq' q.id %}">Activate</a>
+      {% if q.id != sys.activeq1 %}
+      <a href="{%url 'activateq' 1 q.id %}">Activate</a>
       {% else %}
-      Active
+      Active as Q1
       {% endif %}
     </td>
-
+    <td>
+      {% if q.id != sys.activeq2 %}
+      <a href="{%url 'activateq' 2 q.id %}">Activate</a>
+      {% else %}
+      Active as Q2
+      {% endif %}
+    </td>
+    <td>
+      {% if q.id != sys.activeq3 %}
+      <a href="{%url 'activateq' 3 q.id %}">Activate</a>
+      {% else %}
+      Active as Q3
+      {% endif %}
+    </td>
+    <td>
+      {% if q.id != sys.activeq4 %}
+      <a href="{%url 'activateq' 4 q.id %}">Activate</a>
+      {% else %}
+      Active as Q4
+      {% endif %}
+    </td>
   </tr>
   {% endfor %}
   <tr>

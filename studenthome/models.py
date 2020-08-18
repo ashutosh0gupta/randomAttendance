@@ -83,7 +83,10 @@ class StudentAnswers(models.Model):
 
 class SystemState(models.Model):
     SYS_MODE = ( ( 'QUIZ', 'Quiz is running'), ('INACTIVE','Inactive') )
-    activeq = models.IntegerField(verbose_name="Question number", default=0    )
+    activeq1 = models.IntegerField(verbose_name="Quiz Question 1", default=0    )
+    activeq2 = models.IntegerField(verbose_name="Quiz Question 2", default=0    )
+    activeq3 = models.IntegerField(verbose_name="Quiz Question 3", default=0    )
+    activeq4 = models.IntegerField(verbose_name="Quiz Question 4", default=0    )
     num_answered = models.IntegerField(verbose_name="Number of students answered", default=0)
     num_attendance = models.IntegerField(verbose_name="Number of attendance", default=0)
     mode = models.CharField(verbose_name='Mode', choices=SYS_MODE, default='INACTIVE', max_length=20 )
