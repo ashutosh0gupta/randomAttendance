@@ -100,9 +100,9 @@ For taking random attendance in the class
   The policy is implemented by function pick_a_student in file ~/randomAttendance/studenthome/views.py
 
 
-# Setting up nginix gunicorn
+# Setting up nginx and gunicorn
 
- - nginix config file located at /etc/ngnix/sites-enabled/
+ - nginx config file located at /etc/nginx/sites-enabled/
 
 ```
 server{
@@ -164,10 +164,10 @@ ExecStart=<ABSOLUTE PATH TO APP>/Env/randomAttendance/bin/gunicorn --access-logf
 WantedBy=multi-user.target
 ```
 
-# Instruction for updating djano project on server
+# Instruction for updating django project on server
 
 ```
-$ cd randomattendance/
+$ cd randomAttendance/
 $ source source ../Env/randomAttendance/bin/activate
 
 $ git pull
