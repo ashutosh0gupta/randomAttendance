@@ -166,7 +166,7 @@ WantedBy=multi-user.target
 
 # Instruction for updating djano project on server
 
-'''
+```
 $ cd randomattendance/
 $ source source ../Env/randomAttendance/bin/activate
 
@@ -183,13 +183,14 @@ $ sudo nginx -t && sudo systemctl restart nginx
 > (checks nginx config file and restarts the nginx server)
 
 $ deactivate
-'''
+```
 
 One command to restart and nginx together.[Risky may cause error]
 
-'''
+```
 $ sudo systemctl daemon-reload && sudo systemctl restart gunicorn && sudo systemctl restart nginx
-'''
+```
+
 
 # Other notes for development
 
