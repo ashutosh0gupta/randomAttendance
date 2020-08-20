@@ -163,6 +163,24 @@ def is_answer_correct( sa ):
             break
     return result
 
+def get_answer_status( sa ):
+    if sa.answer_time == None:
+        return 'ABSENT'
+    elif sa.is_correct:
+        return 'CORRECT'
+    else:
+        return 'WRONG'
+    
+def find_first_active_question():
+    for i in range(1,5):
+        qid = get_active_q(i)
+        if qid > 0:
+            return qid
+    return 0
+
+#-------------------------------------------------------
+# MAIN ENTRY POINT
+
 def index(request):
     p = who_auth(request)
     if p == None:
@@ -172,8 +190,12 @@ def index(request):
     context["sys"] = s
     if p == "prof":
         if s.mode == "QUIZ":
-            q = get_or_none( Question, pk=s.activeq1 )
-            context["q"] = LatexNodes2Text().latex_to_text( q.q )
+            q = get_or_none( Question, pk=find_first_active_question() )
+            # question on the screen
+            if( q != None ):
+                context["q"] = LatexNodes2Text().latex_to_text( q.q )
+            else:
+                context["q"] = ""
             context[ "students" ] = StudentInfo.objects.all()
             return render( request, 'studenthome/quiz.html', context.flatten() )
         else:
@@ -196,8 +218,9 @@ def index(request):
         return HttpResponse( "Quiz is not running!! Refresh to check if it is running now!" )
     
 
-
+#---------------------------------------------------------
 # view for loading student list from ASC website
+
 def db_import(request):
     u = who_auth(request)
     if u != 'prof':
@@ -240,14 +263,16 @@ def db_import(request):
     logq.info( 'Import ran!' )
     return HttpResponse(imported+deleted)
 
-# view for loading student list from ASC website
     
-def question(request):
-    if is_student(request):
-        return student_attempt(attempt)
-    if is_prof(request):
-        return show_question(attempt)
-    return HttpResponse( 'No login or unregistered user!' )        
+# def question(request):
+#     if is_student(request):
+#         return student_attempt(attempt)
+#     if is_prof(request):
+#         return show_question(attempt)
+#     return HttpResponse( 'No login or unregistered user!' )        
+
+#--------------------------------------------------------------------
+# question creation and management
 
 q_fields = ['q']
 op_fields = []
@@ -420,30 +445,71 @@ def deactivateq(request, iid):
     logq.info( 'Idx ' + iid +' deactivated.' )
     return redirect( reverse( 'createq' ) )
 
+
+#-----------------------------------------------------------------------------
+# Running quiz
+
+def quiz_status( q_statuses ):
+    any_wrong = 'WRONG' in q_statuses
+    any_correct = 'CORRECT' in q_statuses
+    if 'ABSENT' in q_statuses:
+        if any_wrong  or any_correct:
+            return 'PART_FINISHED'
+        else:
+            return 'ABSENT'
+    else:
+        if any_wrong:
+            if any_correct:
+                return 'PART_CORRECT'
+            else:
+                return 'WRONG'
+        else:
+            return 'CORRECT'
+        
+
 def startq(request):
-    sys = get_sys_state()
-    if sys.mode == 'QUIZ':
-        return redirect( reverse( 'index' ) )
+    # check authentication
     u = who_auth(request)
     if u != 'prof':
         return HttpResponse( 'Incorrect login!' )
+
+    sys = get_sys_state()
+
+    # check mode
+    if sys.mode == 'QUIZ':
+        return redirect( reverse( 'index' ) )
+
+
+    # collect active active questions
     q1 = get_or_none( Question, pk=sys.activeq1 )
     q2 = get_or_none( Question, pk=sys.activeq2 )
     q3 = get_or_none( Question, pk=sys.activeq3 )
-    q4 = get_or_none( Question, pk=sys.activeq4 )
-    
+    q4 = get_or_none( Question, pk=sys.activeq4 )    
+    qs = []
+    reset_student_status = False
     for q in [q1,q2,q3,q4]:
         if q == None:
             continue
-        ops = get_active_options( q )
-
+        qs.append(q)
         if q.first_activation_time == None:
-            StudentInfo.objects.update( curr_status = 'ABSENT')
+            q.first_activation_time = datetime.datetime.now()
+            q.save()
+            sys.num_attendance = sys.num_attendance + 1
+            reset_student_status = False
+    qs.reverse()           
+    # reset students
+    if reset_student_status:
+        StudentInfo.objects.update( curr_status = 'ABSENT')
         
-        ss = StudentInfo.objects.all()   
-        for s in ss:
+    
+    ss = StudentInfo.objects.all()   
+    for s in ss:
+        statuses = []
+        for q in qs:
             sa = get_or_none( StudentAnswers, rollno=s.rollno, q=q.pk )
             if sa == None:
+                # expected to occur rarely. Only if a student is added later
+                ops = get_active_options( q )                
                 op = random.sample( ops, 4 )
                 sa = StudentAnswers.objects.create(rollno=s.rollno, q=q.pk)
                 sa.op1 = op[0]
@@ -451,27 +517,34 @@ def startq(request):
                 sa.op3 = op[2]
                 sa.op4 = op[3]
                 sa.save()
-            if sa.answer_time == None:
-                if s.curr_status != 'ABSENT':
-                    s.curr_status = 'ABSENT'
-                    s.save()
-            elif is_answer_correct( sa ):
-                if s.curr_status != 'CORRECT':
-                    s.curr_status = 'CORRECT'
-                    s.save()
-            else:
-                if s.curr_status != 'WRONG':
-                    s.curr_status = 'WRONG'
-                    s.save()
-        if q.first_activation_time == None:
-            q.first_activation_time = datetime.datetime.now()
-            q.save()
-            sys.num_attendance = sys.num_attendance + 1
+            statuses.append( get_answer_status( sa ) )
+        # only needs db change if multiple quizzes were executed
+        status = quiz_status( statuses )
+        if status != s.curr_status:
+            s.curr_status = status
+            s.save()
+            
+            # if sa.answer_time == None:
+            #     if s.curr_status != 'ABSENT':
+            #         s.curr_status = 'ABSENT'
+            #         s.save()
+            # elif is_answer_correct( sa ):
+            #     if s.curr_status != 'CORRECT':
+            #         s.curr_status = 'CORRECT'
+            #         s.save()
+            # else:
+            #     if s.curr_status != 'WRONG':
+            #         s.curr_status = 'WRONG'
+            #         s.save()
+        # if q.first_activation_time == None:
+        #     q.first_activation_time = datetime.datetime.now()
+        #     q.save()
+        #     sys.num_attendance = sys.num_attendance + 1
         
     sys.mode = 'QUIZ'
     sys.save()
 
-    logq.info( 'Quiz for Question ' + str(sys.activeq1) + str(sys.activeq2) + str(sys.activeq3) +str(sys.activeq4) + ' is ended.' )
+    logq.info( 'Quiz for Question ' + str(sys.activeq1) + str(sys.activeq2) + str(sys.activeq3) +str(sys.activeq4) + ' is started.' )
 
     return redirect( reverse( 'index' ) )
 
@@ -509,6 +582,18 @@ def stopq(request):
 
     return render( request, 'studenthome/results.html', context.flatten() )
 
+#------------------------------------------------------------------------------
+# Student answering quiz
+
+def calculate_student_status(s):
+    statuses = []
+    for i in range(1,5):
+        qid = get_active_q( i )
+        if qid > 0:
+            sa = get_or_none(StudentAnswers,rollno=s.rollno, q=qid)
+            statuses.append( get_answer_status( sa ) )
+    return quiz_status( statuses )
+            
 class StudentResponse(UpdateView):
     model = StudentAnswers
     fields = ['ans1','ans2','ans3','ans4']
@@ -519,17 +604,19 @@ class StudentResponse(UpdateView):
         context = super(StudentResponse,self).get_context_data(**kwargs)
         sa = self.object
         
-        # identifiy the next quiz id 
+        # identifiy the next and previous quiz id 
         idx = 0
         nxt = None
         prv = None
+        q_num = 1
         for i in range(1,5):
             qid = get_active_q( i )
             if idx > 0 and qid > 0:
                 nxt = get_or_none(StudentAnswers,rollno=sa.rollno, q=qid)
-                continue
+                break
             if idx == 0 and qid > 0 and qid != sa.q:
                 prv = get_or_none(StudentAnswers,rollno=sa.rollno, q=qid)
+                q_num = q_num + 1
             if qid == sa.q:
                 idx = i
         
@@ -557,6 +644,7 @@ class StudentResponse(UpdateView):
         context["op3"] = get_q_op( q, sa.op3 )
         context["op4"] = get_q_op( q, sa.op4 )
         context["sa"] = sa
+        context["q_num"] = q_num
         context["prev"] = prv # link to the previous question
         context["next"] = nxt # link to the next question
 
@@ -574,18 +662,18 @@ class StudentResponse(UpdateView):
             if sys.mode != 'QUIZ' and sys.activeq != sa.q:
                 logq.error('Delayed submission of answers.' )
                 raise Exception( 'Delayed submission, the quiz is closed!' )
+
+            # record student response details
             sa.answer_time = datetime.datetime.now()
             sa.user_agent = self.request.headers['User-Agent']
+            sa.is_correct = is_answer_correct( sa )
             sa.save()
+
+            # update student
             s = get_or_none(StudentInfo, pk=sa.rollno)
-            if is_answer_correct( sa ):
-                sa.is_correct = True
-                s.curr_status = 'CORRECT'
-            else:
-                sa.is_correct = False
-                s.curr_status = 'WRONG'
-            sa.save()
+            s.curr_status = calculate_student_status(s)
             s.save()
+            
             logq.info( str(sa.rollno) + ' answered ' + str(sa.q) )
             return response
         except Exception as e:
@@ -599,22 +687,26 @@ class StudentResponse(UpdateView):
         # return reverse( "index" )
 
 
-
+#-------------------------------------------------------
 # view for status for all the students
+
 def all_status(request):
     student_list = StudentInfo.objects.order_by('rollno')
     sys = get_sys_state()
     num_attendance = sys.num_attendance
     absent_count = 0
-    present_count = 0    
+    present_count = 0
+    device_map = dict()
     print_calls = dict()
     attend_count_map = dict()
     for student in student_list:
         attendances = StudentAnswers.objects.filter( rollno = student.rollno ).exclude(answer_time = None ).all()
         # code for backward compatibility
+        devs = set()
         for sa in attendances:
             b = is_answer_correct( sa )
             dt = sa.answer_time.strftime("%m-%d")
+            devs.add( sa.user_agent )
             if dt in attend_count_map:
                 attend_count_map[dt] = attend_count_map[dt] + 1                
             else:
@@ -624,12 +716,25 @@ def all_status(request):
                 sa.save()
         present_count = present_count +  len(attendances)
         print_calls[student.rollno] = attendances
-    presence_rate = (100*present_count)/(num_attendance*len(student_list))
+        device_map[student.rollno] = devs
+    reverse_dev_map = dict()
+    for rollno,devs in device_map.items():
+        for dev in devs:
+            if dev in reverse_dev_map:
+                reverse_dev_map[dev].add(rollno)
+            else:
+                reverse_dev_map[dev] = { rollno }                
+                
+    presence_rate = 0
+    total_calls = num_attendance*len(student_list)
+    if total_calls > 0:
+        presence_rate = (100*present_count)/total_calls
     context = RequestContext(request)
     context.push( {'student_list': student_list,
                    'presence_rate': presence_rate,
                    'attend_count_map': attend_count_map,
                    'num_attendance': num_attendance,
+                   'device_map'  : reverse_dev_map,
                    'print_calls' : print_calls, 'show_photo' : False, } )
     return render( request, 'studenthome/all.html', context.flatten() )
 

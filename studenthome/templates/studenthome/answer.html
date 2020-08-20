@@ -37,7 +37,7 @@ table {
 {% if in_class %}
 <h1 style=font-size:50px>Options</h1>
 {% else %}
-<h1 style=font-size:50px>Q : {{q_name}}</h1>
+<h1 style=font-size:50px>Q {{q_num}}: {{q_name}}</h1>
 {% endif %}
 
 {% if yet_to_answer %}
@@ -65,10 +65,14 @@ You have answered the following:
   {% include 'studenthome/qoption.html' with op=op4 ans=sa.ans4 q_ans=q_ans4 %}
 </table>
     {% if prev %}
-       <a href="{%url 'answer' prev.id %}" class="ui label blue">Previous question</a>
+    <a href="{%url 'answer' prev.id %}" class="ui label blue">Previous question</a>
+    {% else %}
+    <span class="ui label gray">Previous question</span>
     {% endif %}
     {% if next %}
-       <a href="{%url 'answer' next.id %}" class="ui label blue">Next question</a>
+    <a href="{%url 'answer' next.id %}" class="ui label blue">Next question</a>
+    {% else %}
+    <span class="ui label gray">Next question</span>
     {% endif %}
 {% endif %}
 {% else %}

@@ -107,15 +107,39 @@
       <td>
         {% for c in cs %}
            {% if c.is_correct %} 
-              <font color="green">{{ c.answer_time|date:"m-d" }}</font>
+              <font color="green">{{c.q}}:{{ c.answer_time|date:"m-d" }}</font>
            {% else %}
-              <font color="red">{{ c.answer_time|date:"m-d" }}</font>
+              <font color="red">{{c.q}}:{{ c.answer_time|date:"m-d" }}</font>
            {% endif %}
         {% endfor %}
       </td>
     </tr>
     {% endfor %}
 </table> 
+
+<table style="border: 1px solid black">
+    <tr>
+      <th>Device</th>
+      <th>Number</th>
+      <th>RollNo</th>
+    </tr>
+    {% for dev,rolls in device_map.items %}
+    <tr>
+      <td>
+        {{ dev }}
+      </td>
+      <td>
+        {{ rolls| length }}
+      </td>
+      <td>
+        {% for roll in rolls %}
+           {{ roll }},
+        {% endfor %}
+      </td>
+    </tr>
+    {% endfor %}
+</table> 
+
 
 {% else %}
     <p>No students are available.</p>

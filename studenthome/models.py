@@ -10,7 +10,9 @@ class Call(models.Model):
 # Create your models here
 class StudentInfo(models.Model):
     CURRENT = ( ('ABSENT', 'Not in class'),
+                ('PART_FINISHED', 'Part Finished'),
                 ('CORRECT', 'Correct'),
+                ('PART_CORRECT', 'Half Correct'),
                 ('WRONG', 'Wrong'))
     name=models.CharField(max_length=100)
     imagePath = models.CharField(max_length=200)
@@ -20,7 +22,6 @@ class StudentInfo(models.Model):
     absentCount = models.IntegerField(default=0)
     awakeCount=models.IntegerField(default=0)
     curr_status = models.CharField(verbose_name='Current status', choices=CURRENT, default='ABSENT', max_length=20 )
-    calls=models.ForeignKey(Call,null=True,on_delete=models.CASCADE)
 
 class Question(models.Model):
     q=models.CharField(verbose_name="Question", max_length=1000)

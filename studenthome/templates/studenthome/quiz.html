@@ -16,8 +16,12 @@
 {% for s in students %}
 {% if s.curr_status == 'ABSENT' %}
 <font color="lightgray">{{s.rollno}}</font>
+{% elif s.curr_status == 'PART_FINISHED' %}
+<font color="gray">{{s.rollno}}</font>
 {% elif s.curr_status == 'CORRECT' %}
 <font color="green">{{s.rollno}}</font>
+{% elif s.curr_status == 'PART_CORRECT' %}
+<font color="yellow">{{s.rollno}}</font>
 {% else %}
 <font color="red">{{s.rollno}}</font>
 {% endif %}
