@@ -25,6 +25,8 @@ class StudentInfo(models.Model):
 
 class Question(models.Model):
     q=models.CharField(verbose_name="Question", max_length=1000)
+    trues=models.TextField(verbose_name="True Options(new line separated)",max_length=3000,null=True)
+    falses=models.TextField(verbose_name="False Options (new line separated)",max_length=3000,null=True)
     op1 = models.CharField(verbose_name="Option 1",max_length=500,null=True,blank=True)
     ans1 = models.BooleanField(verbose_name="Option 1 value", default=False)
     op2 = models.CharField(verbose_name="Option 2",max_length=500,null=True,blank=True)

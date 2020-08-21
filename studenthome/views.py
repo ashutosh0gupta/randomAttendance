@@ -106,7 +106,8 @@ def who_auth(request):
     u = request.user
     if u.is_anonymous:
         if settings.DEBUG:
-            return '170050014'
+            # return '170050014'
+            return '174050004'
             # return '170050004'
             # return '170050053'
         return None
@@ -283,9 +284,14 @@ for i in range(1,21):
     op_fields.append('op'+str(i))
     ans_fields.append('ans'+str(i))
 
+def clean_ops( ss ):
+    ls = ss.split('\n')
+    ls = [ s.strip() for s in ls]
+    return list(filter( None, ls ))
+        
 class CreateQuestion(SuccessMessageMixin,CreateView):
     model = Question
-    fields= q_fields
+    fields= ['q','trues','falses'] #q_fields
     template_name = 'studenthome/qcreate.html'
 
     def get_context_data( self, **kwargs ):
@@ -306,10 +312,29 @@ class CreateQuestion(SuccessMessageMixin,CreateView):
                 return redirect( reverse("logout") )
             if u != 'prof':
                 raise Exception( "Wrong kind of login!" )
-            # if not self.request.user.is_authenticated:
-            #     raise Exception( "Not logged in!" )
+            
             response = super().form_valid(form)
             d = self.object
+
+            t_ops = clean_ops(d.trues)
+            f_ops = clean_ops(d.falses)
+            total_op_nums =len(t_ops)+len(f_ops)
+            if total_op_nums > 20 or total_op_nums < 4:
+                raise Exception( "Out of range number of options :" + str(total_op_nums) )
+
+            # save options on the object
+            idx = 1
+            for t_op in t_ops:
+                setattr(d, f'op{idx}', t_op)
+                setattr(d, f'ans{idx}', True)
+                idx = idx+1
+            for f_op in f_ops:
+                setattr(d, f'op{idx}', f_op)
+                setattr(d, f'ans{idx}', False)
+                idx = idx+1
+            d.save()
+
+            # view options on the command line
             for op_name in op_fields:
                 op = d._meta.get_field(op_name)
                 op_str = op.value_from_object(d)
@@ -665,7 +690,7 @@ class StudentResponse(UpdateView):
 
             # record student response details
             sa.answer_time = datetime.datetime.now()
-            sa.user_agent = self.request.headers['User-Agent']
+            sa.user_agent = self.request.headers['User-Agent'] #+'::'+self.request.headers['Origin']
             sa.is_correct = is_answer_correct( sa )
             sa.save()
 
