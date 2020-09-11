@@ -262,7 +262,8 @@ def clean_ops( ss ):
         
 class CreateQuestion(SuccessMessageMixin,CreateView):
     model = Question
-    fields= ['q','trues','falses','fillCode','checkCode'] #q_fields
+    fields= ['q','trues','falses'] #q_fields
+    # fields= ['q','trues','falses','fillCode','checkCode']
     template_name = 'studenthome/qcreate.html'
 
     def get_context_data( self, **kwargs ):
