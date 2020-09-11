@@ -31,13 +31,6 @@ logq = logging.getLogger('quiz')
 # def hash(h, key):
 #     return h[key]
 
-# def find_never_called(student_list):
-#     for student in student_list:
-#         called_count = student.absentCount+student.presentCount
-#         if called_count == 0:
-#             return student
-#     return None
-
 def get_or_none(model, *args, **kwargs):
     try:
         return model.objects.get(*args, **kwargs)
@@ -58,28 +51,6 @@ def is_called_today( student ):
     last_call = student.calls.created_on
     if last_call.date() == datetime.date.today():
         return True
-
-# def pick_a_student(student_list):
-#     # do not accept a student that is alreay called today
-#     already_called_today = True
-#     today_retry = 0 
-#     while already_called_today and today_retry < 5:
-#         # choose a random student
-#         student = random.choice( student_list )
-#         if student.presentCount + student.absentCount > 1:
-#             # retry one time if the student has at least two calls
-#             r_count = 0
-#             while random.random() > 0.3 and r_count < 1:
-#                 # retry with 0.7 probability
-#                 studentp = random.choice( student_list )
-#                 if studentp.presentCount + studentp.absentCount < 2:
-#                     # retry student has less than two calls,switch student
-#                     student = studentp
-#                     break
-#                 r_count += 1
-#         already_called_today = is_called_today( student )
-#         today_retry  += 1
-#     return student
 
 def pick_a_student(student_list):
     return random.choice( student_list )
@@ -291,7 +262,7 @@ def clean_ops( ss ):
         
 class CreateQuestion(SuccessMessageMixin,CreateView):
     model = Question
-    fields= ['q','trues','falses'] #q_fields
+    fields= ['q','trues','falses','fillCode','checkCode'] #q_fields
     template_name = 'studenthome/qcreate.html'
 
     def get_context_data( self, **kwargs ):
@@ -549,22 +520,6 @@ def startq(request):
             s.curr_status = status
             s.save()
             
-            # if sa.answer_time == None:
-            #     if s.curr_status != 'ABSENT':
-            #         s.curr_status = 'ABSENT'
-            #         s.save()
-            # elif is_answer_correct( sa ):
-            #     if s.curr_status != 'CORRECT':
-            #         s.curr_status = 'CORRECT'
-            #         s.save()
-            # else:
-            #     if s.curr_status != 'WRONG':
-            #         s.curr_status = 'WRONG'
-            #         s.save()
-        # if q.first_activation_time == None:
-        #     q.first_activation_time = datetime.datetime.now()
-        #     q.save()
-        #     sys.num_attendance = sys.num_attendance + 1
         
     sys.mode = 'QUIZ'
     sys.save()
@@ -764,21 +719,6 @@ def all_status(request):
     return render( request, 'studenthome/all.html', context.flatten() )
 
 
-        # called_count = student.absentCount+student.presentCount
-        # if called_count in count_list:
-        #     count_list[called_count] = count_list[called_count] + 1
-        # else:
-        #     count_list[called_count] = 1
-        # if called_count > max_called_count:
-        #     max_called_count = called_count
-    # called_idxs = []
-    # called_counts = []    
-    # for called_count in range(max_called_count+1):
-    #     called_idxs.append( called_count )
-    #     if called_count in count_list:
-    #         called_counts.append( count_list[called_count] )
-    #     else:
-    #         called_counts.append( 0 )
 
 #======================================================
 # Old random views
@@ -795,16 +735,6 @@ def call(request):
         context.push( {'student': student, 'getstatus' : True, } )
         return render( request, 'studenthome/index.html', context.flatten() )
 
-# # view to find a student that was never called
-# def never(request):
-#     student_list = StudentInfo.objects.order_by('rollno')
-#     if len(student_list) == 0:
-#         return HttpResponse("No students in the class!!")
-#     else:
-#         student = find_never_called( student_list )
-#         context = RequestContext(request)
-#         context.push( {'student': student, 'getstatus' : True, 'ata': True} )
-#         return render( request, 'studenthome/index.html', context.flatten() )
 
 # view to look or modify student data
 def status(request, rollno):

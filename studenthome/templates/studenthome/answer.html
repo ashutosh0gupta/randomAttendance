@@ -35,9 +35,9 @@ table {
 <h1>RollNo. {{ sa.rollno }} <a href="{% url 'logout' %}" class="ui label red" >Logout</a></h1>
 
 {% if in_class %}
-<h1 style=font-size:50px>Options</h1>
+<h1>Options</h1>
 {% else %}
-<h1 style=font-size:50px>Q {{q_num}}: {{q_name}}</h1>
+<h1>Q {{q_num}}: {{q_name}}</h1>
 {% endif %}
 
 {% if yet_to_answer %}
