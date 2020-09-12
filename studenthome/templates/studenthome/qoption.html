@@ -7,7 +7,9 @@
      {% if ans == q_ans %} (You are correct) {% else %} (You are incorrect) {% endif %}
     {% endif %}
     {% if corrects or wrongs %}
+    <font color= {% if corrects > wrongs %} "green" {% else %} "red" {% endif %}> 
       ( Correct answers: {{ corrects }}, Wrong answers: {{ wrongs }} )
+    </font>
     {% endif %}    
   </td>
 </tr>
