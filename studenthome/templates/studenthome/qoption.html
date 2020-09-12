@@ -4,8 +4,11 @@
     <font color= {% if ans %}"green">✔{% else %}"red">✘{% endif %} </font>
     {{ op }}
     {% if q_ans != None %}
-     {% if ans == q_ans %} (correct ) {% else %} (incorrect ) {% endif %}
+     {% if ans == q_ans %} (You are correct) {% else %} (You are incorrect) {% endif %}
     {% endif %}
+    {% if corrects or wrongs %}
+      ( Correct answers: {{ corrects }}, Wrong answers: {{ wrongs }} )
+    {% endif %}    
   </td>
 </tr>
 {% endif %}

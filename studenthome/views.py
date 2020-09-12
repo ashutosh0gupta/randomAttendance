@@ -120,6 +120,28 @@ def get_active_options( q ):
             active_idxes.append( i )
     return active_idxes
 
+def is_ith_option_correct( sa, idx, q):
+    op = sa._meta.get_field("op"+str(idx))
+    op_num = op.value_from_object( sa )
+    correct_ans = get_q_ans(q,op_num)
+    ans = sa._meta.get_field("ans"+str(idx))
+    student_ans = ans.value_from_object( sa )
+    if correct_ans == student_ans :
+        return (True,op_num)
+    else:
+        return (False,op_num)
+
+def is_answer_correct( sa ):
+    q = get_or_none( Question, pk=sa.q )
+    s = get_or_none( StudentInfo, pk=sa.rollno )
+    result = True
+    for idx in range(1,5):
+        is_correct, _ =  is_ith_option_correct( sa, idx, q)
+        if not is_correct:
+            result = False
+            break
+    return result
+
 def is_answer_correct( sa ):
     q = get_or_none( Question, pk=sa.q )
     s = get_or_none( StudentInfo, pk=sa.rollno )
@@ -378,11 +400,25 @@ def viewq(request, qid):
         return HttpResponse( 'Incorrect login!' )
     q = get_or_none( Question, pk = int(qid) )
     ops = dict()
+    corrects = dict()
+    wrongs = dict()
     for i in range(1,21):
         ops['op'+str(i)] = get_q_op( q, i )
+        corrects['c_num_'+str(i)] = 0
+        wrongs['w_num_'+str(i)] = 0        
+    sas = StudentAnswers.objects.filter( q = q.pk ).exclude(answer_time = None ).all()
+    for sa in sas:
+        for idx in range(1,5):
+            is_correct, op_num =  is_ith_option_correct( sa, idx, q)
+            if is_correct:
+                corrects['c_num_'+str(op_num)] += 1
+            else:
+                wrongs['w_num_'+str(op_num)] += 1                
     context = RequestContext(request)
     context.push( {'q': q } )
     context.push( ops )
+    context.push( corrects )
+    context.push( wrongs )
     return render( request, 'studenthome/viewq.html', context.flatten() )
 
     
