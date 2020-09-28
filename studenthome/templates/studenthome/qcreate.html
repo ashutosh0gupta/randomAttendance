@@ -36,9 +36,7 @@
 <tr>
     <th>No.</th>
     <th>Question</th>
-    <th></th>
-    <th></th>
-    <th></th>
+    <th>View</th>
     <th>
       {% if sys.activeq1 > 0 %}
          <a href="{%url 'deactivateq' 1 %}">Deactivate 1</a>
@@ -59,17 +57,13 @@
       <a href="{%url 'deactivateq' 4 %}">Deactivate 4</a>
       {% endif %}
     </th>
+    <th></th>
+    <th></th>
   </tr>
   {% for q in qs %}
   <tr>
     <td>{{ q.id }}</td>
     <td>{{ q.q }}</td>
-    <td>
-      <a href="{%url 'editq' q.id %}" onclick="return confirm('Are you sure that you want to edit question {{p.id}}?');">Edit</a>
-    </td>
-    <td>
-      <a href="{%url 'deleteq' q.id %}" onclick="return confirm('Are you sure that you want to delete question {{p.id}}? Please note that the student responses will also be deleted');">Delete</a>
-    </td>
     <td>
       <a href="{%url 'viewq' q.id %}">View Options</a>
     </td>
@@ -101,6 +95,12 @@
       Active as Q4
       {% endif %}
     </td>
+    <td>
+      <a href="{%url 'editq' q.id %}" onclick="return confirm('Are you sure that you want to edit question {{p.id}}?');">Edit</a>
+    </td>
+    <td>
+      <a href="{%url 'deleteq' q.id %}" onclick="return confirm('Are you sure that you want to delete question {{p.id}}? Please note that the student responses will also be deleted');">Delete</a>
+    </td>    
   </tr>
   {% endfor %}
   <tr>

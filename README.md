@@ -168,7 +168,7 @@ WantedBy=multi-user.target
 
 ```
 $ cd randomAttendance/
-$ source source ../Env/randomAttendance/bin/activate
+$ source ../Env/randomAttendance/bin/activate
 
 $ git pull
 > or any changes to project $ python manage.py createsuper

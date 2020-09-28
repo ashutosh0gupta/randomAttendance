@@ -54,7 +54,11 @@ def is_called_today( student ):
 
 def pick_a_student(student_list):
     return random.choice( student_list )
-    
+
+def clean_latex( s ):
+    return s
+    # return LatexNodes2Text().latex_to_text( s )
+
 #----------------------------------------------------------------------------
 # VIEWS
 
@@ -78,9 +82,10 @@ def who_auth(request):
     if u.is_anonymous:
         if settings.DEBUG:
             # return '170050014'
-            return '174050004'
+            # return '174050004'
             # return '170050004'
             # return '170050053'
+            return "prof"
         return None
     if u.username == "akg":
         return "prof"
@@ -101,7 +106,7 @@ def get_q_op( q, idx ):
     op = q._meta.get_field("op"+str(idx))
     op_str = op.value_from_object( q )
     if op_str :
-        return LatexNodes2Text().latex_to_text( op_str )
+        return clean_latex( op_str ) # LatexNodes2Text().latex_to_text( op_str )
     else:
         # assert( False )
         return None
@@ -131,17 +136,17 @@ def is_ith_option_correct( sa, idx, q):
     else:
         return (False,op_num)
 
-def is_answer_correct( sa ):
-    q = get_or_none( Question, pk=sa.q )
-    s = get_or_none( StudentInfo, pk=sa.rollno )
-    result = True
-    for idx in range(1,5):
-        is_correct, _ =  is_ith_option_correct( sa, idx, q)
-        if not is_correct:
-            result = False
-            break
-    return result
+# def is_answer_correct( sa ):
+#     q = get_or_none( Question, pk=sa.q )
+#     result = True
+#     for idx in range(1,5):
+#         is_correct, _ =  is_ith_option_correct( sa, idx, q)
+#         if not is_correct:
+#             result = False
+#             break
+#     return result
 
+# to be removed and replaced by the above function
 def is_answer_correct( sa ):
     q = get_or_none( Question, pk=sa.q )
     s = get_or_none( StudentInfo, pk=sa.rollno )
@@ -187,7 +192,7 @@ def index(request):
             q = get_or_none( Question, pk=find_first_active_question() )
             # question on the screen
             if( q != None ):
-                context["q"] = LatexNodes2Text().latex_to_text( q.q )
+                context["q"] = clean_latex( q.q) # LatexNodes2Text().latex_to_text( q.q )
             else:
                 context["q"] = ""
             context[ "students" ] = StudentInfo.objects.all()
@@ -333,7 +338,7 @@ class CreateQuestion(SuccessMessageMixin,CreateView):
                 op = d._meta.get_field(op_name)
                 op_str = op.value_from_object(d)
                 if op_str :
-                    uni_op = LatexNodes2Text().latex_to_text(op_str)
+                    uni_op = clean_latex( op_str ) #LatexNodes2Text().latex_to_text(op_str)
                     print(uni_op)
             messages.success(self.request,'Created question '+str(d.id)+'!')
 
@@ -655,7 +660,7 @@ class StudentResponse(UpdateView):
         # sa = get_or_none( StudentAnswers, ansid )
         # if sa == None:
         #     return HttpResponse( "Something is wrong!!" )
-        context["q_name"] = LatexNodes2Text().latex_to_text( q.q )
+        context["q_name"] = clean_latex( q.q ) # LatexNodes2Text().latex_to_text( q.q )
         context["op1"] = get_q_op( q, sa.op1 )
         context["op2"] = get_q_op( q, sa.op2 )
         context["op3"] = get_q_op( q, sa.op3 )
