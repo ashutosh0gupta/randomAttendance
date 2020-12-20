@@ -4,5 +4,6 @@ studenthome/migrations
 account/migrations
 attendance/__pycache__/
 studenthome/__pycache__/
+studenthome/templatetags/__pycache__/
 account/__pycache__/
 tmp/
