@@ -1,5 +1,7 @@
 {% load static %}
 {% load mathfilters %}
+{% load utils_filter %}
+
 {% if student_list %}
 <h2>Status of all students</h2>
 <div>
@@ -93,6 +95,8 @@
     <tr>
       <th>Roll No</th>
       <th>Number</th>
+      <th>Corrrect</th>
+      <th>Three corrects</th>
       <th>Events</th>
     </tr>
     {% for rollno, cs in print_calls.items %}
@@ -103,6 +107,12 @@
       </td>
       <td>
         {{ cs| length }}
+      </td>
+      <td>        
+        {{ corrects | hash:rollno }}
+      </td>
+      <td>        
+        {{ three_corrects | hash:rollno }}
       </td>
       <td>
         {% for c in cs %}

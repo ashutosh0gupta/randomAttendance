@@ -27,9 +27,8 @@ logq = logging.getLogger('quiz')
 #----------------------------------------------------------------------------
 # utils
 
-# @register.filter
-# def hash(h, key):
-#     return h[key]
+
+#----------------------------------------------------------------------------
 
 def get_or_none(model, *args, **kwargs):
     try:
@@ -151,16 +150,21 @@ def is_answer_correct( sa ):
     q = get_or_none( Question, pk=sa.q )
     s = get_or_none( StudentInfo, pk=sa.rollno )
     result = True
+    correct_count = 0
     for idx in range(1,5):
         op = sa._meta.get_field("op"+str(idx))
         op_num = op.value_from_object( sa )
         correct_ans = get_q_ans(q,op_num)
         ans = sa._meta.get_field("ans"+str(idx))
         student_ans = ans.value_from_object( sa )
-        if correct_ans != student_ans :
-            result = False
-            break
-    return result
+        if correct_ans == student_ans :
+            correct_count = correct_count + 1
+            # result = False
+            # break
+    if correct_count == 4:
+        return True,4
+    else:
+        return False,correct_count
 
 def get_answer_status( sa ):
     if sa.answer_time == None:
@@ -688,7 +692,7 @@ class StudentResponse(UpdateView):
             # record student response details
             sa.answer_time = datetime.datetime.now()
             sa.user_agent = self.request.headers['User-Agent'] #+'::'+self.request.headers['Origin']
-            sa.is_correct = is_answer_correct( sa )
+            sa.is_correct,_ = is_answer_correct( sa )
             sa.save()
 
             # update student
@@ -720,22 +724,34 @@ def all_status(request):
     present_count = 0
     device_map = dict()
     print_calls = dict()
+    corrects = dict()
+    three_corrects = dict()
+    wrongs = dict()    
     attend_count_map = dict()
     for student in student_list:
         attendances = StudentAnswers.objects.filter( rollno = student.rollno ).exclude(answer_time = None ).all()
         # code for backward compatibility
         devs = set()
+        corrects[student.rollno] = 0
+        three_corrects[student.rollno] = 0
+        wrongs[student.rollno] = 0
         for sa in attendances:
-            b = is_answer_correct( sa )
+            b,corr_count = is_answer_correct( sa )
             dt = sa.answer_time.strftime("%m-%d")
             devs.add( sa.user_agent )
             if dt in attend_count_map:
-                attend_count_map[dt] = attend_count_map[dt] + 1                
+                attend_count_map[dt] = attend_count_map[dt] + 1
             else:
                 attend_count_map[dt] = 1
             if b != sa.is_correct:
                 sa.is_correct = b
                 sa.save()
+            if b:
+                corrects[student.rollno] = corrects[student.rollno] + 1
+            elif corr_count == 3:
+                three_corrects[student.rollno] = three_corrects[student.rollno] + 1
+            else:
+                wrongs[student.rollno] = wrongs[student.rollno] + 1
         present_count = present_count +  len(attendances)
         print_calls[student.rollno] = attendances
         device_map[student.rollno] = devs
@@ -757,7 +773,11 @@ def all_status(request):
                    'attend_count_map': attend_count_map,
                    'num_attendance': num_attendance,
                    'device_map'  : reverse_dev_map,
-                   'print_calls' : print_calls, 'show_photo' : False, } )
+                   'print_calls' : print_calls,
+                   'corrects' : corrects,
+                   'wrongs' : wrongs,
+                   'three_corrects' : three_corrects,                   
+                    'show_photo' : False, } )
     return render( request, 'studenthome/all.html', context.flatten() )
 
 
