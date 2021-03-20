@@ -36,7 +36,7 @@ idna==2.8
 importlib-metadata==0.19
 itsdangerous==1.1.0
 jdcal==1.4.1
-Jinja2==2.10.1
+Jinja2==2.11.3
 jsonfield==2.0.2
 kazam==1.4.5
 keyring==10.6.0
