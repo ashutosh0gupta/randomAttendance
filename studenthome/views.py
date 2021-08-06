@@ -86,7 +86,7 @@ def who_auth(request):
             # return '170050053'
             return "prof"
         return None
-    if u.username == "akg":
+    if u.username == "akg" or u.username == "kkakadiya":
         return "prof"
     s = get_or_none( StudentInfo, username = u.username )
     if s == None:
