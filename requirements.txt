@@ -56,7 +56,7 @@ obd==0.7.1
 odfpy==1.4.0
 openpyxl==2.6.2
 pexpect==4.2.1
-Pillow==6.1.0
+Pillow==9.0.1
 Pint==0.7.2
 pipreqs==0.4.9
 pyasn1==0.4.5
