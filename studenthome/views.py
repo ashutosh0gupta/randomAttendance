@@ -800,7 +800,7 @@ def call(request):
 
 # view to look or modify student data
 def status(request, rollno):
-    return HttpResponse("Status is disabled for now!")
+    # return HttpResponse("Status is disabled for now!")
     # student = get_object_or_404(StudentInfo, pk=rollno)
     student = get_or_none(StudentInfo, pk=rollno)
     if student == None:

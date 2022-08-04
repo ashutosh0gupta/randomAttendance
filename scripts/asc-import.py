@@ -44,10 +44,16 @@ flat_tds = re.sub(r'b>[\s]*</a>[\s]*</td', r'b></a></td', flat_tds, flags=re.M)
 # p = re.compile(r'(\d?\d?\d)\.\*?</b></td><td align="center"><a href="[^<>"]*"><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td>[^><"]*</td>){5}<td align="center">[^><"]*</td><td>[^><"]*</td><td><img src="CourseList_data/([a-zA-Z0-9_]+.jpeg)')
 
 # 2022 ASC pattern: otimized pattern; hostel info added 
-p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){7}<td><img.*CourseList_data/([a-zA-Z0-9_]+.jpeg)')
+# p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){7}<td><img.*CourseList_data/([a-zA-Z0-9_]+.jpeg)')
 
-# out = p.findall(flat_tds)
+# 2022 ASC pattern: otimized pattern; hostel info added 
+p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){8}<td><img.*CourseList_data/([a-zA-Z0-9_]+.jpeg)')
+
 out = re.findall( p, flat_tds)
+
+# print(out)
+# exit()
+# print(len(out))
 # for o in out:
 #     print(o)
 #     exit()
