@@ -32,7 +32,6 @@
   Call counts:
 
 
-{% comment %}
  <table style="border: 1px solid black">
     <tr>
       <td></td>
@@ -80,14 +79,13 @@
       {% if show_photo %}
       <td><img border="0"  src="{% get_media_prefix %}{{student.imagePath}}" WIDTH=100></td>
       {% endif %}      
-      <td>{{ student.presentCount }}</td>
+      <!-- <td>{{ student.presentCount }}</td> -->
     </tr>
     {% endfor %}
     <tr>
     </tr>
   </table>
 
-{% endcomment %}
  
 </div>
 

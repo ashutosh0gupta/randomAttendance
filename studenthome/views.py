@@ -19,8 +19,8 @@ import os
 import shutil
 import datetime
 import random
-import pylatexenc
-from pylatexenc.latex2text import LatexNodes2Text
+# import pylatexenc
+# from pylatexenc.latex2text import LatexNodes2Text
 
 logq = logging.getLogger('quiz')
 
@@ -86,7 +86,7 @@ def who_auth(request):
             # return '170050053'
             return "prof"
         return None
-    if u.username == "akg" or u.username == "kkakadiya":
+    if u.username == "akg" or u.username == "omkarvtuppe":
         return "prof"
     s = get_or_none( StudentInfo, username = u.username )
     if s == None:
@@ -777,7 +777,7 @@ def all_status(request):
                    'corrects' : corrects,
                    'wrongs' : wrongs,
                    'three_corrects' : three_corrects,                   
-                    'show_photo' : False, } )
+                    'show_photo' : True, } )
     return render( request, 'studenthome/all.html', context.flatten() )
 
 

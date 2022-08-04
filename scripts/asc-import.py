@@ -31,6 +31,7 @@ flat_tds = re.sub(r'td>[\s]*<td', r'td><td', input, flags=re.M)
 flat_tds = re.sub(r'>[\s]*<a', r'><a', flat_tds, flags=re.M)
 flat_tds = re.sub(r'>[\s]*<b>', r'><b>', flat_tds, flags=re.M)
 flat_tds = re.sub(r'b>[\s]*</a>[\s]*</td', r'b></a></td', flat_tds, flags=re.M)
+
 # print(flat_tds)
 
 #2018 asc pattern
@@ -40,14 +41,19 @@ flat_tds = re.sub(r'b>[\s]*</a>[\s]*</td', r'b></a></td', flat_tds, flags=re.M)
 # p = re.compile(r'(\d?\d?\d)\.\*?</b></td><td align="center"><a href="[^<>"]*"><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td>[^><"]*</td>){4}<td align="center">[^><"]*</td><td>[^><"]*</td><td><img src="CourseList_data/([a-zA-Z0-9_]+.jpeg)')
 
 # 2021 ASC pattern
-p = re.compile(r'(\d?\d?\d)\.\*?</b></td><td align="center"><a href="[^<>"]*"><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td>[^><"]*</td>){5}<td align="center">[^><"]*</td><td>[^><"]*</td><td><img src="CourseList_data/([a-zA-Z0-9_]+.jpeg)')
+# p = re.compile(r'(\d?\d?\d)\.\*?</b></td><td align="center"><a href="[^<>"]*"><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td>[^><"]*</td>){5}<td align="center">[^><"]*</td><td>[^><"]*</td><td><img src="CourseList_data/([a-zA-Z0-9_]+.jpeg)')
 
+# 2022 ASC pattern: otimized pattern; hostel info added 
+p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){7}<td><img.*CourseList_data/([a-zA-Z0-9_]+.jpeg)')
 
-out = p.findall(flat_tds)
-os.chdir(jpeg_dir)
+# out = p.findall(flat_tds)
+out = re.findall( p, flat_tds)
 # for o in out:
-#     print(o[0])
+#     print(o)
+#     exit()
 
+
+os.chdir(jpeg_dir)
 for o in out:
     # print(o)
     index  = o[0]
