@@ -855,17 +855,17 @@ def status(request, rollno):
             else:
                 return HttpResponse("no call found for time " + time)
         if st == 'Remove student':
-            student_calls = get_call_list( student )
-            for c in reversed(student_calls):
-                c.delete()
-            student.calls = None
-            student.save()
+            # student_calls = get_call_list( student )
+            # for c in reversed(student_calls):
+            #     c.delete()
+            # student.calls = None
+            # student.save()
             student.delete()
             return HttpResponse( "Student for roll number " + str(rollno) + " has been removed." )
         return redirect( "/"+str(student.rollno)+"/" )
     else:
-        call_list = get_call_list( student )
+        # call_list = get_call_list( student )
         context = RequestContext(request)
-        context.push( {'student': student, 'getstatus' : False, 'call_list' : call_list } )
+        context.push( {'student': student, 'getstatus' : False } )
         return render( request, 'studenthome/index.html', context.flatten() )
 
