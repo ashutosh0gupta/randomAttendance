@@ -94,7 +94,7 @@ class UserLogoutView(View):
         return redirect('login')
 
     def __init__(self):
-        print('logout')
+        print('logout initiated:')
 
 
 @login_required(login_url=reverse_lazy('login'))

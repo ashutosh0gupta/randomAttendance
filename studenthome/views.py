@@ -75,9 +75,9 @@ def get_user_rollno( u ):
             return rollno[0].upper()
         else:
             # test situation where we do not care of ldap authenticaiton
-            u.username
+            return u.username
     except AttributeError:
-        u.username
+        return str(u.username)
 
 def who_auth(request):
     u = request.user
@@ -91,9 +91,11 @@ def who_auth(request):
         return None
     if u.username == "akg" or u.username == "omkarvtuppe":
         return "prof"
+    # if studentinfo is not found, the student is not registered in the course.
     s = get_or_none( StudentInfo, username = u.username )
     if s == None:
         rollno = get_user_rollno( u )
+        # print('I am here:' + rollno)
         s = get_or_none( StudentInfo, pk = rollno )
         if s == None:
             return None
