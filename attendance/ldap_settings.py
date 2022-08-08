@@ -35,7 +35,7 @@ AUTH_LDAP_CACHE_GROUPS = True
 
 AUTH_LDAP_USER_FLAGS_BY_GROUP = {
     "is_staff" : "cn=webteam,ou=Groups,dc=cse,dc=iitb,dc=ac,dc=in",
-    "is_superuser" : "cn=Faculty,ou=People,dc=cse,dc=iitb,dc=ac,dc=in"
+    "is_superuser" : "cn=webteam,ou=Groups,dc=cse,dc=iitb,dc=ac,dc=in"
 }
 
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
