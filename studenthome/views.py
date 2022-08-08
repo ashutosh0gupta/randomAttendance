@@ -68,12 +68,15 @@ def clean_latex( s ):
 #     return redirect( reverse("login") )
 
 def get_user_rollno( u ):
-    if( u.ldap_user ):
-        rollno = u.ldap_user.attrs['employeeNumber']
-        assert( len(rollno) > 0 )
-        return rollno[0].upper()
-    else:
-        # test situation where we do not care of ldap authenticaiton
+    try:
+        if( u.ldap_user ):
+            rollno = u.ldap_user.attrs['employeeNumber']
+            assert( len(rollno) > 0 )
+            return rollno[0].upper()
+        else:
+            # test situation where we do not care of ldap authenticaiton
+            u.username
+    except AttributeError:
         u.username
 
 def who_auth(request):
