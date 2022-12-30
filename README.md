@@ -44,7 +44,7 @@ For taking random attendance in the class
 4. __Import student data into the db__
 
  * Goto IITB ASC webpage with the list of students with default options
- * Save the page from the browser (tested only on Firefox) to /tmp folder
+ * Save the page from the browser (tested only on chrome) to /tmp folder
     (Yes! literally save the page from the browser.)
  * Run ~/randomAttendance/scripts/asc-import.py which generates /tmp/output.csv in the following format
 

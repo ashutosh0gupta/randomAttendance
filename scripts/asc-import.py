@@ -15,8 +15,11 @@ dump_path='/tmp/'
 path_dir = os.path.expanduser( path_to_saved_asc_page )
 dump_dir = os.path.expanduser( dump_path )
     
-jpeg_dir= path_dir + '/Welcome to ASC !_files/CourseList_data'
-in_file = path_dir + '/Welcome to ASC !_files/CourseList.html'
+jpeg_dir= path_dir + '/Welcome to ASC !_files/'
+in_file = path_dir + '/Welcome to ASC !_files/Login.html'
+# jpeg_dir= path_dir + '/Welcome to ASC !_files/CourseList_data'
+# in_file = path_dir + '/Welcome to ASC !_files/CourseList.html'
+
 out_file = os.path.expanduser(dump_dir+'output.csv')
 output = open(out_file,'w+')
 
@@ -47,7 +50,12 @@ flat_tds = re.sub(r'b>[\s]*</a>[\s]*</td', r'b></a></td', flat_tds, flags=re.M)
 # p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){7}<td><img.*CourseList_data/([a-zA-Z0-9_]+.jpeg)')
 
 # 2022 ASC pattern: otimized pattern; hostel info added 
-p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){8}<td><img.*CourseList_data/([a-zA-Z0-9_]+.jpeg)')
+# p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){8}<td><img.*CourseList_data/([a-zA-Z0-9_]+.jpeg)')
+
+# 2023 ASC pattern: downloaded via chrome 
+p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){8}<td><img.*src="([^>]*)">')
+
+
 
 out = re.findall( p, flat_tds)
 
