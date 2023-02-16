@@ -563,7 +563,7 @@ def startq(request):
                 sa.op2 = op[1]
                 sa.op3 = op[2]
                 sa.op4 = op[3]
-                sa.save()
+                sa.save() # todo: save in one shot (ineffcient now!)
             statuses.append( get_answer_status( sa ) )
         # only needs db change if multiple quizzes were executed
         status = quiz_status( statuses )
@@ -686,9 +686,11 @@ class StudentResponse(UpdateView):
             sa = None
             response = super().form_valid(form)
             sa = self.object
+            logq.info( str(sa.rollno) + ' submitting.' )
             if who_auth( self.request ) != sa.rollno:
-                logq.error('[Attack] wrong student is trying to submit' )
-                raise Exception( 'Delayed submission, the quiz is closed!' )
+                user_id = who_auth( self.request )
+                logq.error('[Attack] wrong student is trying to submit '+ str(user_id) + '!=' + str(sa.rollno) )
+                raise Exception( 'Authentication mismatch!' )
             sys = get_sys_state()
             if sys.mode != 'QUIZ' and sys.activeq != sa.q:
                 logq.error('Delayed submission of answers.' )
@@ -699,6 +701,7 @@ class StudentResponse(UpdateView):
             sa.user_agent = self.request.headers['User-Agent'] #+'::'+self.request.headers['Origin']
             sa.is_correct,_ = is_answer_correct( sa )
             sa.save()
+            logq.info( str(sa.rollno) + ' answer checked.' )
 
             # update student
             s = get_or_none(StudentInfo, pk=sa.rollno)
@@ -805,7 +808,7 @@ def call(request):
 
 # view to look or modify student data
 def status(request, rollno):
-    # return HttpResponse("Status is disabled for now!")
+    return HttpResponse("Status is disabled for now!")
     # student = get_object_or_404(StudentInfo, pk=rollno)
     student = get_or_none(StudentInfo, pk=rollno)
     if student == None:
