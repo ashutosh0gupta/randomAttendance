@@ -83,11 +83,11 @@ def who_auth(request):
     u = request.user
     if u.is_anonymous:
         if settings.DEBUG:
-            # return '170050014'
+            return '190050057'
             # return '174050004'
             # return '170050004'
             # return '170050053'
-            return "prof"
+            # return "prof"
         return None
     if u.username == "akg" or u.username == "omkarvtuppe" or u.username == "ivarnam":
         return "prof"
@@ -725,6 +725,9 @@ class StudentResponse(UpdateView):
 # view for status for all the students
 
 def all_status(request):
+    u = who_auth(request)
+    if u != 'prof':
+        return HttpResponse( 'Incorrect login!' )
     student_list = StudentInfo.objects.order_by('rollno')
     sys = get_sys_state()
     num_attendance = sys.num_attendance
