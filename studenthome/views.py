@@ -687,37 +687,44 @@ class StudentResponse(UpdateView):
     def form_valid(self,form):
         try:
             sa = None
-            response = super().form_valid(form)
             sa = self.object
             logq.info( str(sa.rollno) + ' submitting.' )
             if who_auth( self.request ) != sa.rollno:
                 user_id = who_auth( self.request )
-                logq.error('[Attack] wrong student is trying to submit '+ str(user_id) + '!=' + str(sa.rollno) )
-                raise Exception( 'Authentication mismatch!' )
+                raise Exception( '[Attack] wrong student is trying to submit '+ str(user_id) + '!=' + str(sa.rollno) )
             sys = get_sys_state()
-            if sys.mode != 'QUIZ' and sys.activeq != sa.q:
-                logq.error('Delayed submission of answers.' )
-                raise Exception( 'Delayed submission, the quiz is closed!' )
+            if sys.mode != 'QUIZ': 
+                raise Exception( str(sa.rollno) + ' submitting, while quiz is closed.' )
+            if sys.activeq1 != sa.q and sys.activeq2 != sa.q and sys.activeq3 != sa.q and sys.activeq4 != sa.q:
+                raise Exception( str(sa.rollno) + ' wrong question being answered.' )
+            if sa.answer_time :
+                raise Exception( str(sa.rollno) + ' answer is already submitted!' )
 
+            # saving the options
+            response = super().form_valid(form)
+
+            sa = self.object
             # record student response details
             sa.answer_time = datetime.datetime.now()
             sa.user_agent = self.request.headers['User-Agent'] #+'::'+self.request.headers['Origin']
-            sa.is_correct,_ = is_answer_correct( sa )
+            sa.is_correct,c_count = is_answer_correct( sa )
             sa.save()
-            logq.info( str(sa.rollno) + ' answer checked.' )
+            logq.info( str(sa.rollno) + ' answer-saved-'+str(c_count)+'.' )
 
             # update student
             s = get_or_none(StudentInfo, pk=sa.rollno)
             s.curr_status = calculate_student_status(s)
             s.save()
             
-            logq.info( str(sa.rollno) + ' answered ' + str(sa.q) )
+            logq.info( str(sa.rollno) + ' answered-' + str(sa.q) )
             return response
         except Exception as e:
-            # No timing is saved 
+            # No timing is saved
+            logq.error( '{}!'.format(e) )
             form.add_error( None, '{}!'.format(e) )
             # messages.error(self.request,'{}!'.format(e))
-            return super().form_invalid(form)
+            return redirect( reverse( 'index' ) )
+            # return super().form_invalid(form)
 
     def get_success_url(self):
         return reverse('answer', kwargs={'ansid':self.object.id})

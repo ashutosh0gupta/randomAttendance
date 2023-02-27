@@ -1,7 +1,11 @@
  {% if op %}
 <tr>
   <td>
+    {% if ans != None %}
     <font color= {% if ans %}"green">✔{% else %}"red">✘{% endif %} </font>
+    {% else %}
+    (No answer submitted)
+    {% endif %}
     {{ op }}
     {% if q_ans != None %}
      {% if ans == q_ans %} (You are correct) {% else %} (You are incorrect) {% endif %}
