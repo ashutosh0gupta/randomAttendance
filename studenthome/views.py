@@ -198,6 +198,7 @@ def index(request):
     context["sys"] = s
     if p == "prof":
         if s.mode == "QUIZ":
+            logq.info( 'prof Quiz status request' )
             q = get_or_none( Question, pk=find_first_active_question() )
             # question on the screen
             if( q != None ):
@@ -205,7 +206,9 @@ def index(request):
             else:
                 context["q"] = ""
             context[ "students" ] = StudentInfo.objects.all()
-            return render( request, 'studenthome/quiz.html', context.flatten() )
+            response = render( request, 'studenthome/quiz.html', context.flatten() )
+            logq.info( 'prof Quiz status rendered' )
+            return response # render( request, 'studenthome/quiz.html', context.flatten() )
         else:
             return render( request, 'studenthome/dashboard.html', context.flatten() )
     # student is logged in
