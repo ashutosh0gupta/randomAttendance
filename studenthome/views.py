@@ -11,6 +11,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView,FormVie
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.conf import settings
+from django.utils import timezone
 
 import logging
 
@@ -545,7 +546,7 @@ def startq(request):
             continue
         qs.append(q)
         if q.first_activation_time == None:
-            q.first_activation_time = datetime.datetime.now()
+            q.first_activation_time = timezone.now() #datetime.datetime.now()
             q.save()
             sys.num_attendance = sys.num_attendance + 1
             reset_student_status = False
