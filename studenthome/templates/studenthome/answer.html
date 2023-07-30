@@ -32,7 +32,10 @@ table {
 
 {% if is_auth %}
 
-<h1>RollNo. {{ sa.rollno }} <a href="{% url 'logout' %}" class="ui label red" >Logout</a></h1>
+<h1>RollNo. {{ sa.rollno }}
+  <a href="{% url 'index' %}" class="ui label blue" >Home</a>
+  <a href="{% url 'logout' %}" class="ui label red" >Logout</a>
+</h1>
 
 {% if in_class %}
 <h1>Options</h1>
@@ -74,7 +77,10 @@ You have answered the following:
     {% else %}
     <span class="ui label gray">Next question</span>
     {% endif %}
-{% endif %}
+    {% endif %}
+    <div>
+      Please click on home if your are viewing old quiz!
+    </div>
 {% else %}
     Please <a href="{% url 'login' %}">login</a>!
 {% endif %}

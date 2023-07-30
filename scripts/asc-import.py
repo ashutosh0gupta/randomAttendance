@@ -52,8 +52,11 @@ flat_tds = re.sub(r'b>[\s]*</a>[\s]*</td', r'b></a></td', flat_tds, flags=re.M)
 # 2022 ASC pattern: otimized pattern; hostel info added 
 # p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){8}<td><img.*CourseList_data/([a-zA-Z0-9_]+.jpeg)')
 
-# 2023 ASC pattern: downloaded via chrome 
-p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){8}<td><img.*src="([^>]*)">')
+# 2023 ASC pattern: downloaded via chrome
+# p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){8}<td><img.*src="([^>]*)">')
+
+# 2023 August ASC pattern: downloaded via chrome
+p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){9}<td><img.*src="([^>]*)">')
 
 
 
@@ -64,7 +67,7 @@ out = re.findall( p, flat_tds)
 # print(len(out))
 # for o in out:
 #     print(o)
-#     exit()
+# exit()
 
 
 os.chdir(jpeg_dir)

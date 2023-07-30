@@ -78,6 +78,7 @@ class StudentAnswers(models.Model):
     q = models.IntegerField(verbose_name="Question number",    default=0    )
     answer_time = models.DateTimeField(null=True)
     is_correct = models.BooleanField(verbose_name="Answer status", default=False)
+    correct_count = models.IntegerField(verbose_name="Number of currect answers", default=0)
     user_agent = models.CharField(verbose_name='Device Used',  max_length=100,null=True )
     op1 = models.IntegerField(verbose_name="Option number 1",    default=0    )
     op2 = models.IntegerField(verbose_name="Option number 2",    default=0    )

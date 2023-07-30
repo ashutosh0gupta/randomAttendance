@@ -115,9 +115,9 @@
       <td>
         {% for c in cs %}
            {% if c.is_correct %} 
-              <font color="green">{{c.q}}:{{ c.answer_time|date:"m-d" }}</font>
+              <font color="green">{{c.q}}:{{c.correct_count}}:{{ c.answer_time|date:"m-d" }}</font>
            {% else %}
-              <font color="red">{{c.q}}:{{ c.answer_time|date:"m-d" }}</font>
+              <font color="red">{{c.q}}:{{c.correct_count}}:{{ c.answer_time|date:"m-d" }}</font>
            {% endif %}
         {% endfor %}
       </td>

@@ -11,6 +11,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView,FormVie
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.conf import settings
+from django.utils import timezone
 
 import logging
 
@@ -176,6 +177,8 @@ def get_answer_status( sa ):
         return 'ABSENT'
     elif sa.is_correct:
         return 'CORRECT'
+    elif sa.correct_count == 3:
+        return 'PART_CORRECT'
     else:
         return 'WRONG'
     
@@ -308,7 +311,7 @@ class CreateQuestion(SuccessMessageMixin,CreateView):
     def get_context_data( self, **kwargs ):
         context = super(CreateQuestion,self).get_context_data(**kwargs)
         context[ "is_auth" ] = (who_auth( self.request ) == "prof")
-        context[ "qs" ] = Question.objects.all()
+        context[ "qs" ] = Question.objects.all().order_by("-id")
         context[ "sys" ] = get_sys_state()
         return context
     
@@ -500,7 +503,8 @@ def deactivateq(request, iid):
 # Running quiz
 
 def quiz_status( q_statuses ):
-    any_wrong = 'WRONG' in q_statuses
+    any_part    = 'PART_CORRECT' in q_statuses
+    any_wrong   = 'WRONG' in q_statuses
     any_correct = 'CORRECT' in q_statuses
     if 'ABSENT' in q_statuses:
         if any_wrong  or any_correct:
@@ -508,8 +512,8 @@ def quiz_status( q_statuses ):
         else:
             return 'ABSENT'
     else:
-        if any_wrong:
-            if any_correct:
+        if any_wrong or any_part:
+            if any_correct or any_part:
                 return 'PART_CORRECT'
             else:
                 return 'WRONG'
@@ -542,7 +546,7 @@ def startq(request):
             continue
         qs.append(q)
         if q.first_activation_time == None:
-            q.first_activation_time = datetime.datetime.now()
+            q.first_activation_time = timezone.now() #datetime.datetime.now()
             q.save()
             sys.num_attendance = sys.num_attendance + 1
             reset_student_status = False
@@ -705,9 +709,10 @@ class StudentResponse(UpdateView):
 
             sa = self.object
             # record student response details
-            sa.answer_time = datetime.datetime.now()
+            sa.answer_time = timezone.now() #datetime.datetime.now()
             sa.user_agent = self.request.headers['User-Agent'] #+'::'+self.request.headers['Origin']
             sa.is_correct,c_count = is_answer_correct( sa )
+            sa.correct_count = c_count
             sa.save()
             logq.info( str(sa.rollno) + ' answer-saved-'+str(c_count)+'.' )
 
@@ -764,8 +769,9 @@ def all_status(request):
                 attend_count_map[dt] = attend_count_map[dt] + 1
             else:
                 attend_count_map[dt] = 1
-            if b != sa.is_correct:
+            if b != sa.is_correct or corr_count != sa.correct_count:
                 sa.is_correct = b
+                sa.correct_count = corr_count
                 sa.save()
             if b:
                 corrects[student.rollno] = corrects[student.rollno] + 1
