@@ -25,4 +25,6 @@ urlpatterns = [
 ]
 
 if settings.DEPLOY:
-    urlpatterns = [path(settings.MOUNT_SUB_URL,include(urlpatterns))]
+    #urlpatterns = [path(settings.MOUNT_SUB_URL,include(urlpatterns))]
+    urlpatterns = [path('course_vm/cs433/',include(urlpatterns))]
+
