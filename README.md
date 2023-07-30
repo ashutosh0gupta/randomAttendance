@@ -208,3 +208,5 @@ $ sudo systemctl daemon-reload && sudo systemctl restart gunicorn && sudo system
 
 
 
+- Look for "course_vm/cs433/"
+  this path has infected deployment settings
