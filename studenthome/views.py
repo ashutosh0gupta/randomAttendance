@@ -709,7 +709,7 @@ class StudentResponse(UpdateView):
 
             sa = self.object
             # record student response details
-            sa.answer_time = datetime.datetime.now()
+            sa.answer_time = timezone.now() #datetime.datetime.now()
             sa.user_agent = self.request.headers['User-Agent'] #+'::'+self.request.headers['Origin']
             sa.is_correct,c_count = is_answer_correct( sa )
             sa.correct_count = c_count
