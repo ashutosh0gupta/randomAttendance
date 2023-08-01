@@ -12,6 +12,9 @@ from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.conf import settings
 from django.utils import timezone
+from django.contrib.auth.models import User
+from django.utils.crypto import get_random_string
+from django.contrib.auth.hashers import make_password
 
 import logging
 
@@ -75,7 +78,8 @@ def get_user_rollno( u ):
             assert( len(rollno) > 0 )
             return rollno[0].upper()
         else:
-            # test situation where we do not care of ldap authenticaiton
+            # test situation or local user 
+            # where we do not care of ldap authenticaiton
             return u.username
     except AttributeError:
         return str(u.username)
@@ -277,6 +281,32 @@ def db_import(request):
     logq.info( 'Import ran!' )
     return HttpResponse(imported+deleted)
 
+def create_local_users(request):
+    u = who_auth(request)
+    if u != 'prof':
+        return HttpResponse( 'Incorrect login!' )
+
+    sas = []
+    m = {}
+    created = ''
+    for s in StudentInfo.objects.all():
+        u = get_or_none( User, username=s.rollno )
+        if u == None: 
+            passwd = get_random_string(8)
+            sas.append( User(
+                username=s.rollno,
+                email=s.rollno+'@iitb.ac.in',
+                password=make_password(passwd),
+                is_active=True,
+            ) )
+            # sas.append( User( username=s.rollno,  password= passwd) )
+            print( s.rollno + "," + passwd )
+            created += s.rollno + "," + passwd+"<br>"
+    User.objects.bulk_create( sas )
+    if created == '':
+        created = 'No users were created! All already exist!'
+    created += 'Save this passwords, you will not be able to see them again!'
+    return HttpResponse(created)
     
 # def question(request):
 #     if is_student(request):

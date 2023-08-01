@@ -23,11 +23,6 @@ For taking random attendance in the class
 
   3. __Initialize db__
 
-  ```
-  $cd ~/randomAttendance
-  $python3 manage.py makemigrations studenthome
-  $python3 manage.py migrate
-  ```
   Write the following content in randomAttendance/attendance/.env
   ```
   SECRET_KEY="<django-secret-key>"
@@ -35,6 +30,12 @@ For taking random attendance in the class
   EMAIL_HOST="smtp.<your-smtp-server>"
   EMAIL_HOST_USER="<user-on-smtp-server>"
   EMAIL_HOST_PASSWORD="<password-of-the-user>"
+  ```
+
+  ```
+  $cd ~/randomAttendance
+  $python3 manage.py makemigrations studenthome
+  $python3 manage.py migrate
   ```
 
 * Use the following shell command to generate a random django-secret-key key
@@ -164,6 +165,13 @@ ExecStart=<ABSOLUTE PATH TO APP>/Env/randomAttendance/bin/gunicorn --access-logf
 WantedBy=multi-user.target
 ```
 
+# Instruction for cloning django project on the server
+
+$ cd ~/
+$ git clone https://github.com/ashutosh0gupta/randomAttendance.git
+
+# Instruction for creating envoirnment
+
 # Instruction for updating django project on server
 
 ```
@@ -176,7 +184,8 @@ $ git pull
 $ sudo systemctl daemon-reload && sudo systemctl restart gunicorn
 >(reloads project and restart gcunicorn service;repeat this after any change)
 
-$ sudo systemctl status gunicorn
+$ sudo systemctl status gunicorn [for me]
+$ sudo systemctl status krishna  [for krishna]
 > (check if there is any error or not, should say guicorn service is active)
 
 $ sudo nginx -t && sudo systemctl restart nginx

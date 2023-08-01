@@ -12,6 +12,7 @@ urlpatterns = [
     # path('never/', views.never, name='never'),
     path('all/', views.all_status, name='all'),
     path('import/', views.db_import, name='import'),
+    path('createlocal/', views.create_local_users, name='createlocal'),
     re_path(r'^(?P<rollno>\d\d[0-9BDVM]+\d+)/$', views.status, name='status'),
     path('startq/', views.startq, name='startq'),
     path('stopq/', views.stopq, name='stopq'),
