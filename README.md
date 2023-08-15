@@ -181,7 +181,8 @@ $ source ../Env/randomAttendance/bin/activate
 $ git pull
 > or any changes to project $ python manage.py createsuper
 
-$ sudo systemctl daemon-reload && sudo systemctl restart gunicorn
+$ sudo systemctl daemon-reload && sudo systemctl restart gunicorn [for me]
+$ sudo systemctl daemon-reload && sudo systemctl restart krishna [for krishna]
 >(reloads project and restart gcunicorn service;repeat this after any change)
 
 $ sudo systemctl status gunicorn [for me]

@@ -8,6 +8,7 @@ import re
 import os
 import shutil
 import sys
+import codecs
 
 path_to_saved_asc_page = '/tmp/'
 dump_path='/tmp/'
@@ -24,7 +25,7 @@ out_file = os.path.expanduser(dump_dir+'output.csv')
 output = open(out_file,'w+')
 
 try:
-    with open(in_file) as in_f:
+    with open(in_file, encoding='ISO-8859-1') as in_f:
         input = in_f.read()
 except IOError as e:
     print( "failed to open" + in_file + "\nHave you downloaded ASC webpage at " + path_to_saved_asc_page + "?" )

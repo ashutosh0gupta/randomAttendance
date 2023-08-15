@@ -15,6 +15,8 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 from django.contrib.auth.hashers import make_password
+from django.db import transaction
+
 
 import logging
 
@@ -61,6 +63,8 @@ def pick_a_student(student_list):
 def clean_latex( s ):
     return s
     # return LatexNodes2Text().latex_to_text( s )
+
+
 
 #----------------------------------------------------------------------------
 # VIEWS
@@ -306,6 +310,7 @@ def create_local_users(request):
     if created == '':
         created = 'No users were created! All already exist!'
     created += 'Save this passwords, you will not be able to see them again!'
+    logq.info( 'create local user ran!' )
     return HttpResponse(created)
     
 # def question(request):
@@ -550,6 +555,19 @@ def quiz_status( q_statuses ):
         else:
             return 'CORRECT'
         
+@transaction.atomic
+def bulk_update_student_status(qs):
+    to_be_saved = []
+    for s in StudentInfo.objects.all():
+        statuses = []
+        for q in qs:
+            sa = get_or_none( StudentAnswers, rollno=s.rollno, q=q.pk )
+            statuses.append( get_answer_status( sa ) )
+        # only needs db change if multiple quizzes were executed
+        status = quiz_status( statuses )
+        if status != s.curr_status:
+            s.curr_status = status
+            s.save()
 
 def startq(request):
     # check authentication
@@ -602,30 +620,20 @@ def startq(request):
                                            op1 = op[0], op2 = op[1],
                                            op3 = op[2],op4 = op[3] ) )
     StudentAnswers.objects.bulk_create( sas )
+
+    bulk_update_student_status(qs)
     
-    for s in ss:
-        statuses = []
-        for q in qs:
-            sa = get_or_none( StudentAnswers, rollno=s.rollno, q=q.pk )
-            # if sa == None:
-            #     #
-            #     # expected to occur rarely. Only if a student is added later
-            #     #
-            #     ops = get_active_options( q )                
-            #     op = random.sample( ops, 4 )
-            #     sa = StudentAnswers.objects.create(rollno=s.rollno, q=q.pk)
-            #     sa.op1 = op[0]
-            #     sa.op2 = op[1]
-            #     sa.op3 = op[2]
-            #     sa.op4 = op[3]
-            #     sa.save() # todo: save in one shot (ineffcient now!)
-            statuses.append( get_answer_status( sa ) )
-        # only needs db change if multiple quizzes were executed
-        status = quiz_status( statuses )
-        if status != s.curr_status:
-            s.curr_status = status
-            s.save()
-            
+    # for s in ss:
+    #     statuses = []
+    #     for q in qs:
+    #         sa = get_or_none( StudentAnswers, rollno=s.rollno, q=q.pk )
+    #         statuses.append( get_answer_status( sa ) )
+    #     # only needs db change if multiple quizzes were executed
+    #     status = quiz_status( statuses )
+    #     if status != s.curr_status:
+    #         s.curr_status = status
+    #         s.save()
+
         
     sys.mode = 'QUIZ'
     sys.save()
@@ -746,7 +754,7 @@ class StudentResponse(UpdateView):
                 raise Exception( '[Attack] wrong student is trying to submit '+ str(user_id) + '!=' + str(sa.rollno) )
             sys = get_sys_state()
             if sys.mode != 'QUIZ': 
-                raise Exception( str(sa.rollno) + ' submitting, while quiz is closed.' )
+                raise Exception( str(sa.rollno) + ' submitting question ' + str(sa.q) + ', while quiz is closed.' )
             if sys.activeq1 != sa.q and sys.activeq2 != sa.q and sys.activeq3 != sa.q and sys.activeq4 != sa.q:
                 raise Exception( str(sa.rollno) + ' wrong question being answered.' )
             if sa.answer_time :
@@ -758,7 +766,7 @@ class StudentResponse(UpdateView):
             sa = self.object
             # record student response details
             sa.answer_time = timezone.now() 
-            sa.user_agent = self.request.headers['User-Agent'] #+'::'+self.request.headers['Origin']
+            sa.user_agent = self.request.headers['User-Agent']
             sa.is_correct,c_count = is_answer_correct( sa )
             sa.correct_count = c_count
             sa.save()
