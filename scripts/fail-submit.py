@@ -9,7 +9,7 @@ import codecs
 from datetime import datetime
 
 path_dir = os.path.expanduser( './' )    
-in_file = path_dir + 'debug.log'
+in_file = path_dir + './tmp/random-debug.log'
 
 try:
     with open(in_file, encoding='ISO-8859-1') as in_f:
@@ -27,14 +27,6 @@ answered = re.findall( p, input)
 start_date = datetime.strptime('2023-07-01', '%Y-%m-%d')
 miss_map = {}
 
-quiz_class_map = { 93 :'Lecture2',  # Lecture2
-                   96 :'Lab1    ',  # Lab1
-                   101:'Lecture4',  # Lecture4
-                   98 :'Lecture5',  # Lecture5
-                   99 :'Lecture6',  # Lecture6
-                   100:'Lab2    ',  # Lab2
-                   102:'Lecture7',  # Lecture7
-                  }
 
 quiz_num_map = {'2023-08-03':93,   
                 '2023-08-04':96,   
@@ -54,7 +46,10 @@ for o in missed:
     # date = datetime.strptime(date+' '+time[:-4], '%Y-%m-%d %H:%M:%S')
     date_obj = datetime.strptime(date, '%Y-%m-%d')
     if date_obj > start_date:
-        qid = quiz_num_map[date]
+        if date in quiz_num_map:
+            qid = quiz_num_map[date]
+        else:
+            qid = date
         if qid == 0:
             continue
         if not qid in miss_map:
@@ -73,6 +68,15 @@ for o in answered:
     if date_obj > start_date:
         if rollno in miss_map[quiz]:
             miss_map[quiz].remove(rollno)
+
+quiz_class_map = { 93 :'Lecture2',  # Lecture2
+                   96 :'Lab1    ',  # Lab1
+                   101:'Lecture4',  # Lecture4
+                   98 :'Lecture5',  # Lecture5
+                   99 :'Lecture6',  # Lecture6
+                   100:'Lab2    ',  # Lab2
+                   102:'Lecture7',  # Lecture7
+                  }
 
 print('Late sumbmissions:')
 for d in miss_map:
