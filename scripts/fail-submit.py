@@ -10,6 +10,7 @@ from datetime import datetime
 
 path_dir = os.path.expanduser( './' )    
 in_file = path_dir + './tmp/random-debug.log'
+# in_file = path_dir + './debug.log'
 
 try:
     with open(in_file, encoding='ISO-8859-1') as in_f:
@@ -18,9 +19,14 @@ except IOError as e:
     print( "failed to open" + in_file )
     sys.exit(0)
 
+p1= re.compile('ERROR ([0-9A-Z\-]+) ([0-9:,]+) views ([0-9A-Z]+) submitting question ([0-9]+), while quiz is closed.!')
+missed1 = re.findall( p1, input)
 
 p = re.compile(r'ERROR ([0-9A-Z\-]+) ([0-9:,]+) views ([0-9A-Z]+) submitting, while quiz is closed')
 missed = re.findall( p, input)
+
+missed = missed + missed1
+
 p = re.compile(r'INFO ([0-9A-Z\-]+) ([0-9:,]+) views ([0-9A-Z]+) answered-([0-9]+)')
 answered = re.findall( p, input)
 
@@ -43,13 +49,20 @@ for o in missed:
     date   = o[0]
     time   = o[1]
     rollno = o[2]
+    if len(o) > 3:
+        q = int(o[3])
+    else:
+        q = None
     # date = datetime.strptime(date+' '+time[:-4], '%Y-%m-%d %H:%M:%S')
     date_obj = datetime.strptime(date, '%Y-%m-%d')
     if date_obj > start_date:
         if date in quiz_num_map:
             qid = quiz_num_map[date]
         else:
-            qid = date
+            if q == None:
+                qid = date
+            else:
+                qid = q
         if qid == 0:
             continue
         if not qid in miss_map:
@@ -65,7 +78,7 @@ for o in answered:
     rollno = o[2]
     quiz   = int(o[3])
     date_obj = datetime.strptime(date, '%Y-%m-%d')
-    if date_obj > start_date:
+    if (date_obj > start_date) and (quiz in miss_map):
         if rollno in miss_map[quiz]:
             miss_map[quiz].remove(rollno)
 
@@ -76,6 +89,8 @@ quiz_class_map = { 93 :'Lecture2',  # Lecture2
                    99 :'Lecture6',  # Lecture6
                    100:'Lab2    ',  # Lab2
                    102:'Lecture7',  # Lecture7
+                   105:'Lecture8',  # Lecture8
+                   106:'Lab3',  # Lab
                   }
 
 print('Late sumbmissions:')
