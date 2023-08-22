@@ -870,6 +870,9 @@ def all_status(request):
 
 # view to see a random student
 def call(request):
+    u = who_auth(request)
+    if u != 'prof':
+        return HttpResponse( 'Incorrect login!' )    
     student_list = StudentInfo.objects.exclude( curr_status = 'ABSENT' ).all()
     
     if len(student_list) == 0:

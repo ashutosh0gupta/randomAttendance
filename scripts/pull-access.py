@@ -21,8 +21,9 @@ def pull_files( src, dest ):
     print(cmd)
     returned_value = os.system(cmd) 
 
-pull_files( '/var/log/nginx/access.1.log', './tmp/' )
-pull_files( '/var/log/nginx/access.log', './tmp/' )
+pull_files( '/var/log/nginx/access.log.2.gz', './tmp/' )
+# pull_files( '/var/log/nginx/access.log.1', './tmp/' )
+# pull_files( '/var/log/nginx/access.log', './tmp/' )
 
 
 # scp user@cs433.cse.iitb.ac.in:~/randomAttendance/db.sqlite3 cs433-2022-db.sqlite3
