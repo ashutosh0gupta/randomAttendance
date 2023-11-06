@@ -65,6 +65,7 @@
       <th>Name</th>
       {% endif %}
       <th>Roll No</th>
+      <th>Username</th>
       {% if show_photo %}
       <th>Photo</th>
       {% endif %}
@@ -76,6 +77,7 @@
       <td><a href="{% url 'status' student.rollno %}">{{ student.name }}</a></td>
       {% endif %}
       <td>{{ student.rollno }}</td>
+      <td>{{ student.username }}</td>
       {% if show_photo %}
       <td><img border="0"  src="{% get_media_prefix %}{{student.imagePath}}" WIDTH=100></td>
       {% endif %}      

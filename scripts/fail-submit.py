@@ -33,7 +33,9 @@ answered = re.findall( p, input)
 start_date = datetime.strptime('2023-07-01', '%Y-%m-%d')
 miss_map = {}
 
-
+#-----------------------------------------
+# todo: map deprecated for next semester
+#-----------------------------------------
 quiz_num_map = {'2023-08-03':93,   
                 '2023-08-04':96,   
                 '2023-08-05':0,    # ?? << Nothing was done on the day
@@ -44,6 +46,7 @@ quiz_num_map = {'2023-08-03':93,
                 '2023-08-14':102,
                 }
 
+# simplify this code next semester
 for o in missed:
     # print(o)
     date   = o[0]
@@ -57,6 +60,7 @@ for o in missed:
     date_obj = datetime.strptime(date, '%Y-%m-%d')
     if date_obj > start_date:
         if date in quiz_num_map:
+            # this case is to be removed
             qid = quiz_num_map[date]
         else:
             if q == None:
@@ -82,23 +86,31 @@ for o in answered:
         if rollno in miss_map[quiz]:
             miss_map[quiz].remove(rollno)
 
-quiz_class_map = { 93 :'Lecture2',  # Lecture2
-                   96 :'Lab1    ',  # Lab1
-                   101:'Lecture4',  # Lecture4
-                   98 :'Lecture5',  # Lecture5
-                   99 :'Lecture6',  # Lecture6
-                   100:'Lab2    ',  # Lab2
-                   102:'Lecture7',  # Lecture7
-                   105:'Lecture8',  # Lecture8
-                   106:'Lab3',  # Lab
+quiz_class_map = { 93 :'Lecture2',   # Lecture2
+                   96 :'Lab1    ',   # Lab1
+                   101:'Lecture4',   # Lecture4
+                   98 :'Lecture5',   # Lecture5
+                   99 :'Lecture6',   # Lecture6
+                   100:'Lab2    ',   # Lab2
+                   102:'Lecture7',   # Lecture7
+                   105:'Lecture8',   # Lecture8
+                   106:'Lab3'    ,   # Lab
+                   107:'Lecture9',   # Lab
+                   108:'Lecture10',  # Lab
+                   # 106:'Lecture11',  # fogot to take attendance
+                   109:'Lecture12',  # Lab
+                   113:'Lecture13',  # Lab
+                   114:'Lecture14',  # Lab
+                   97 :'Lab5',       # Lab
                   }
 
 print('Late sumbmissions:')
 for d in miss_map:
-    print(quiz_class_map[d], end=" ")
-    for r in miss_map[d]:
-        print( r, end=" ")
-    print()
+    if miss_map[d]:
+        print(quiz_class_map[d], end=" ")
+        for r in miss_map[d]:
+            print( r, end=" ")
+        print()
 
 # print(miss_map)
 # print(len(out))

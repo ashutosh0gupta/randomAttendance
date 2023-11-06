@@ -783,8 +783,8 @@ class StudentResponse(UpdateView):
             # No timing is saved
             logq.error( '{}!'.format(e) )
             form.add_error( None, '{}!'.format(e) )
-            # messages.error(self.request,'{}!'.format(e))
             return redirect( reverse( 'index' ) )
+            # messages.error(self.request,'{}!'.format(e))
             # return super().form_invalid(form)
 
     def get_success_url(self):
