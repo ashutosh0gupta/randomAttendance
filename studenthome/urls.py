@@ -20,15 +20,15 @@ urlpatterns = [
     re_path(r'^deactivateq/(?P<iid>\d+)/$', views.deactivateq, name='deactivateq'),    
     re_path(r'^answer/(?P<ansid>\d+)/', views.StudentResponse.as_view(), name='answer'),
 
-    # Exam data interface
-    path('examc/', views.examc, name='examc'),
-    path('exame/', views.examc, name='exame'),
-    path('examd/', views.examc, name='examd'),
+    # # Exam data interface
+    # path('examc/', views.examc, name='examc'),
+    # path('exame/', views.examc, name='exame'),
+    # path('examd/', views.examc, name='examd'),
 
-    # Scores upload interface
-    path('scoreupload/', views.score_upload, name='scoreupload'),
-    path('scorecrib/'  , views.score_crib  , name='scorecrib'),
-    path('scoreedit/'  , views.score_edit  , name='scoreedit'),
+    # # Scores upload interface
+    # path('scoreupload/', views.score_upload, name='scoreupload'),
+    # path('scorecrib/'  , views.score_crib  , name='scorecrib'),
+    # path('scoreedit/'  , views.score_edit  , name='scoreedit'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
