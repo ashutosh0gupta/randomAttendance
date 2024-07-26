@@ -2,10 +2,10 @@ from django.db import models
 
 class Call(models.Model):
     call_choices = ('ABSENT', 'PRESENT')
-    created_on = models.DateTimeField(primary_key=True,auto_now_add=True)
-    rollno =  models.CharField(max_length=10)
-    status = models.CharField(max_length=200, default='ABSENT')
-    prevCall = models.ForeignKey('self',null=True,on_delete=models.CASCADE)
+    created_on   = models.DateTimeField(primary_key=True,auto_now_add=True)
+    rollno       = models.CharField(max_length=10)
+    status       = models.CharField(max_length=200, default='ABSENT')
+    prevCall     = models.ForeignKey('self',null=True,on_delete=models.CASCADE)
 
 # Create your models here
 class StudentInfo(models.Model):
@@ -14,13 +14,17 @@ class StudentInfo(models.Model):
                 ('CORRECT', 'Correct'),
                 ('PART_CORRECT', 'Half Correct'),
                 ('WRONG', 'Wrong'))
+    COURSES = ( ('Theory', 'CS213' ),
+                ('LAB'   , 'CS293' ),
+                ('BOTH'  , 'CS293-CS213') )   
     name=models.CharField(max_length=100)
-    imagePath = models.CharField(max_length=200)
-    rollno =  models.CharField(primary_key=True,max_length=10)
-    username =  models.CharField(max_length=32,null=True)
-    presentCount=models.IntegerField(default=0)
+    imagePath   = models.CharField(max_length=200)
+    rollno      = models.CharField(primary_key=True,max_length=10)
+    username    = models.CharField(max_length=32,null=True)
+    presentCount= models.IntegerField(default=0)
     absentCount = models.IntegerField(default=0)
-    awakeCount=models.IntegerField(default=0)
+    awakeCount  = models.IntegerField(default=0)
+    course      = models.CharField(verbose_name='Enrolled Courses', choices=COURSES, null=True, max_length=20)
     curr_status = models.CharField(verbose_name='Current status', choices=CURRENT, default='ABSENT', max_length=20 )
 
 class Question(models.Model):
@@ -80,15 +84,55 @@ class StudentAnswers(models.Model):
     is_correct = models.BooleanField(verbose_name="Answer status", default=False)
     correct_count = models.IntegerField(verbose_name="Number of currect answers", default=0)
     user_agent = models.CharField(verbose_name='Device Used',  max_length=100,null=True )
-    op1 = models.IntegerField(verbose_name="Option number 1",    default=0    )
-    op2 = models.IntegerField(verbose_name="Option number 2",    default=0    )
-    op3 = models.IntegerField(verbose_name="Option number 3",    default=0    )
-    op4 = models.IntegerField(verbose_name="Option number 4",    default=0    )
-    ans1 = models.BooleanField(verbose_name="Answer given 1", default=False)
-    ans2 = models.BooleanField(verbose_name="Answer given 2", default=False)
-    ans3 = models.BooleanField(verbose_name="Answer given 3", default=False)
-    ans4 = models.BooleanField(verbose_name="Answer given 4", default=False)
+    op1 = models.IntegerField ( verbose_name = "Option number 1", default=0    )
+    op2 = models.IntegerField ( verbose_name = "Option number 2", default=0    )
+    op3 = models.IntegerField ( verbose_name = "Option number 3", default=0    )
+    op4 = models.IntegerField ( verbose_name = "Option number 4", default=0    )
+    ans1 = models.BooleanField( verbose_name = "Answer given 1" , default=False)
+    ans2 = models.BooleanField( verbose_name = "Answer given 2" , default=False)
+    ans3 = models.BooleanField( verbose_name = "Answer given 3" , default=False)
+    ans4 = models.BooleanField( verbose_name = "Answer given 4" , default=False)
 
+
+#---------------------------------------------------------
+# Exam interface
+#---------------------------------------------------------
+#
+# Add exam
+# Delete exam
+# Edit exam
+# Upload student scores
+# Edit student scores
+# Upload crib scores
+#--------------------------------------------------------
+
+class ExamMark(models.Model):
+    rollno      = models.CharField(max_length=10)
+    exam        = models.CharField(max_length=10)
+    q           = models.IntegerField( verbose_name="Question Number", default=0    )
+    mark        = models.IntegerField(verbose_name="Marks", default=0 )
+    crib        = models.IntegerField(verbose_name="Crib Marks" ) # Null means; No change
+
+class Exam(models.Model):
+    exam   = models.CharField   ( primary_key=True, max_length=10 )
+    total  = models.IntegerField( verbose_name="Total", default=0    )
+    num_q  = models.IntegerField ( verbose_name="Number of questions", default=0    )
+    mark1  = models.IntegerField ( verbose_name = "Marks Question 1", null=True )
+    mark2  = models.IntegerField ( verbose_name = "Marks Question 2", null=True )
+    mark3  = models.IntegerField ( verbose_name = "Marks Question 3", null=True )
+    mark4  = models.IntegerField ( verbose_name = "Marks Question 4", null=True )
+    mark5  = models.IntegerField ( verbose_name = "Marks Question 5", null=True )
+    mark6  = models.IntegerField ( verbose_name = "Marks Question 6", null=True )
+    mark7  = models.IntegerField ( verbose_name = "Marks Question 7", null=True )
+    mark8  = models.IntegerField ( verbose_name = "Marks Question 8", null=True )
+    mark9  = models.IntegerField ( verbose_name = "Marks Question 9", null=True )
+    mark10 = models.IntegerField ( verbose_name = "Marks Question 10", null=True )
+    
+
+#---------------------------------------------------------
+# Overall system
+#---------------------------------------------------------
+    
 class SystemState(models.Model):
     SYS_MODE = ( ( 'QUIZ', 'Quiz is running'), ('INACTIVE','Inactive') )
     activeq1 = models.IntegerField(verbose_name="Quiz Question 1", default=0    )
