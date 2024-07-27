@@ -45,6 +45,17 @@ table {
 
 {% if yet_to_answer %}
 
+<script>
+  window.onload = function() {
+      var e = document.getElementById("id_user_agent");
+      ThumbmarkJS.getFingerprint().then(
+          function(fp) {
+              e.value = fp;
+          }
+      );
+  }
+</script>
+
 <form class="ui form attached fluid segment" method="post" enctype="multipart/form-data">
   {% csrf_token %}
   {{ form.non_field_errors }}
@@ -54,6 +65,8 @@ table {
   <tr><td><label class="ui container">{{ form.ans3 }} {{ op3 }}</label></td></tr>
   <tr><td><label class="ui container">{{ form.ans4 }} {{ op4 }}</label></td></tr>
  </table>
+ {{ form.user_agent.as_hidden }}
+ <!-- <input type="hidden" name="password" id="ps"> -->
  <button type="submit">Answer</button>
 </form>
 <p><span class="ui red label">Note: please be careful before submitting the answer.

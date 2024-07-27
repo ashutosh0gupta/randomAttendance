@@ -35,6 +35,7 @@
 <table style="border: 1px solid black">
 <tr>
     <th>No.</th>
+    <th>Course</th>
     <th>Question</th>
     <th>View</th>
     <th>
@@ -63,6 +64,7 @@
   {% for q in qs %}
   <tr>
     <td>{{ q.id }}</td>
+    <td>{{ q.course }}</td>
     <td>{{ q.q }}</td>
     <td>
       <a href="{%url 'viewq' q.id %}">View Options</a>

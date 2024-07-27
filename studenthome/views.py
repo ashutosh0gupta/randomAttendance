@@ -93,9 +93,6 @@ def who_auth(request):
     if u.is_anonymous:
         if settings.DEBUG:
             return '190050057'
-            # return '174050004'
-            # return '170050004'
-            # return '170050053'
             # return "prof"
         return None
     if u.username == "akg" or u.username == "omkarvtuppe" or u.username == "ivarnam" or u.username == "krishnas":
@@ -323,7 +320,7 @@ def create_local_users(request):
 #--------------------------------------------------------------------
 # question creation and management
 
-q_fields = ['q']
+q_fields = ['q','course']
 op_fields = []
 ans_fields = []
 for i in range(1,21):
@@ -339,7 +336,7 @@ def clean_ops( ss ):
         
 class CreateQuestion(SuccessMessageMixin,CreateView):
     model = Question
-    fields= ['q','trues','falses'] #q_fields
+    fields= ['q','course','trues','falses'] #q_fields
     # fields= ['q','trues','falses','fillCode','checkCode']
     template_name = 'studenthome/qcreate.html'
 
@@ -381,6 +378,9 @@ class CreateQuestion(SuccessMessageMixin,CreateView):
                 setattr(d, f'op{idx}', f_op)
                 setattr(d, f'ans{idx}', False)
                 idx = idx+1
+
+            # Normalize course names
+            d.course = d.course.replace(" ", "").upper() 
             d.save()
 
             # view options on the command line
@@ -690,7 +690,7 @@ def calculate_student_status(s):
             
 class StudentResponse(UpdateView):
     model = StudentAnswers
-    fields = ['ans1','ans2','ans3','ans4']
+    fields = ['ans1','ans2','ans3','ans4', 'user_agent']
     template_name = 'studenthome/answer.html'
     pk_url_kwarg = 'ansid'
     
@@ -766,7 +766,7 @@ class StudentResponse(UpdateView):
             sa = self.object
             # record student response details
             sa.answer_time = timezone.now() 
-            sa.user_agent = self.request.headers['User-Agent']
+            # sa.user_agent  = self.request.headers['User-Agent']
             sa.is_correct,c_count = is_answer_correct( sa )
             sa.correct_count = c_count
             sa.save()
