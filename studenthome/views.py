@@ -738,6 +738,7 @@ class StudentResponse(UpdateView):
         context["op3"] = get_q_op( q, sa.op3 )
         context["op4"] = get_q_op( q, sa.op4 )
         context["sa"] = sa
+        context["q_course"] = q.course
         context["q_num"] = q_num
         context["prev"] = prv # link to the previous question
         context["next"] = nxt # link to the next question
