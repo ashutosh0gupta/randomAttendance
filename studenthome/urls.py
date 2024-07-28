@@ -16,6 +16,7 @@ urlpatterns = [
     re_path(r'^viewq/(?P<qid>\d+)/', views.viewq, name='viewq'),
     re_path(r'^editq/(?P<qid>\d+)/', views.EditQuestion.as_view(), name='editq'),    
     re_path(r'^deleteq/(?P<qid>\d+)/$', views.deleteq, name='deleteq'),
+    re_path(r'^swapq/(?P<qid1>\d+)/(?P<qid2>\d+)/$', views.swapq, name='swapq'),
     re_path(r'^activateq/(?P<iid>\d+)/(?P<qid>\d+)/$', views.activateq, name='activateq'),
     re_path(r'^deactivateq/(?P<iid>\d+)/$', views.deactivateq, name='deactivateq'),    
     re_path(r'^answer/(?P<ansid>\d+)/', views.StudentResponse.as_view(), name='answer'),

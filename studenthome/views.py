@@ -434,20 +434,65 @@ def deleteq(request, qid):
     if u != 'prof':
         return HttpResponse( 'Incorrect login!' )
     q = get_or_none( Question, pk = int(qid) )
+    # -------------------------------------------
+    # Clear student submissions
+    # -------------------------------------------
     StudentAnswers.objects.filter(q=qid).delete()
     
     if q:
+        # -------------------------------------------
+        # Update attendance count!
+        # -------------------------------------------
         if q.first_activation_time != None:
             # if quiz has been attempted
             sys = get_sys_state()
             sys.num_attendance = sys.num_attendance - 1
             sys.save()
-        messages.success(request,'Question '+str(q.id)+' deleted!')
+        # -------------------------------------------
+        # Delete the question
+        # -------------------------------------------
         q.delete()
+        # -------------------------------------------
+        # Report the deletion
+        # -------------------------------------------
+        messages.success(request,'Question '+str(q.id)+' deleted!')
         logq.info( 'Question ' + str(qid) + ' deleted.' )
  
-    # return HttpResponse( 'Done!' )
+    # -------------------------------------------
+    # Redirect to create quetion page!
+    # -------------------------------------------
     return redirect( reverse( 'createq' ) )
+
+def swapq(request, qid1, qid2 ):
+    u = who_auth(request)
+    if u != 'prof':
+        return HttpResponse( 'Incorrect login!' )
+
+    # -------------------------------------------
+    # Find the questions
+    # -------------------------------------------    
+    q1 = get_or_none( Question, pk = int(qid1) )
+    q2 = get_or_none( Question, pk = int(qid2) )
+
+    # -------------------------------------------
+    # Clear student submissions
+    # -------------------------------------------
+    StudentAnswers.objects.filter(q=qid1).delete()
+    StudentAnswers.objects.filter(q=qid2).delete()
+    
+    if q1 and q2:
+        messages.success(request,f'Questions {q1.id} and {q2.id} swapped!')
+        q1.id = qid2
+        q2.id = qid1
+        q1.save()
+        q2.save()
+        logq.info( f'Questions {q1.id} and {q2.id} swapped!' )
+ 
+    # -------------------------------------------
+    # Redirect to create quetion page!
+    # -------------------------------------------
+    return redirect( reverse( 'createq' ) )
+
 
 def viewq(request, qid):
     u = who_auth(request)
