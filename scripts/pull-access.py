@@ -21,7 +21,8 @@ def pull_files( src, dest ):
     print(cmd)
     returned_value = os.system(cmd) 
 
-pull_files( '/var/log/nginx/access.log.2.gz', './tmp/' )
+pull_files( '/var/log/nginx/access_realip.log*', './tmp/' )
+# pull_files( '/var/log/nginx/access.log.2.gz', './tmp/' )
 # pull_files( '/var/log/nginx/access.log.1', './tmp/' )
 # pull_files( '/var/log/nginx/access.log', './tmp/' )
 

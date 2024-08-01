@@ -17,9 +17,9 @@ from django.utils.crypto import get_random_string
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
 
-
 import logging
 
+import string
 import csv
 import os
 import shutil
@@ -95,15 +95,24 @@ def who_auth(request):
             return '190050057'
             # return "prof"
         return None
-    if u.username == "akg" or u.username == "omkarvtuppe" or u.username == "ivarnam" or u.username == "krishnas":
+    if u.username == "akg" or u.username == "hasmitak" or u.username == "ivarnam" or u.username == "krishnas":
         return "prof"
-    # if studentinfo is not found, the student is not registered in the course.
+    # -----------------------------------
+    # if studentinfo is not found, the student is not
+    # registered in the course OR logging in first time
+    # -----------------------------------
     s = get_or_none( StudentInfo, username = u.username )
     if s == None:
+        # -------------------------------------
+        # Get user roll number via ldap records
+        #  todo: system throws and error if ldap
+        #        is mis-configured
+        # -------------------------------------
         rollno = get_user_rollno( u )
         # print('I am here:' + rollno)
         s = get_or_none( StudentInfo, pk = rollno )
         if s == None:
+            # Student is not registered for the course
             return None
         else:
             s.username = u.username
@@ -258,19 +267,32 @@ def db_import(request):
                 )
                 current_rolls.append( row[1] )
                 if created:
+                    #--------------------------------------------
+                    # for security, random prefix is added to the file paths
+                    #--------------------------------------------
+                    salt = ''.join(random.choices(string.ascii_lowercase, k=10))
+                    #----------------------------------
+                    # Update student records
+                    #----------------------------------
                     student.name = row[2]
-                    student.imagePath = row[3]
+                    student.imagePath = salt+row[3]
                     student.calls = None
                     student.save()
-                    shutil.copy('/tmp/'+row[3],'studenthome/images/'+row[3])
-                    imported += row[1]+"," + row[2]+","+row[3]+"<br>"
+                    #--------------------------------
+                    # Copy photo to web reachable place
+                    #--------------------------------
+                    shutil.copy('/tmp/'+row[3],'studenthome/images/'+salt+row[3])
+                    #------------------------------------
+                    # Colleact info for imported students
+                    #------------------------------------                
+                    imported += row[1]+"," + row[2]+","+salt+row[3]+"<br>"
                 print( "processed: " + row[1] )
     except IOError as e:
         return HttpResponse( "Failed to open file "+csv_file + ".<br> Look into README for importing students!")
-    deleted  = "The following students are not in rolls any more."
-    deleted += "to be deleted students:<br>"
-    deleted += "(To avoid accedental deletion, user needs to do it manually."
-    deleted += "goto to the student page)<br>"
+    deleted  = "The following students are not in the rolls.<br>"
+    # deleted += "to be deleted students:<br>"
+    # deleted += "(To avoid accedental deletion, user needs to do it manually."
+    # deleted += "goto to the student page)<br>"
     student_list = StudentInfo.objects.order_by('rollno')
     any_deleted = False
     for student in student_list:
@@ -392,15 +414,19 @@ class CreateQuestion(SuccessMessageMixin,CreateView):
                     print(uni_op)
             messages.success(self.request,'Created question '+str(d.id)+'!')
 
+            # ---------------------------------
             # bulk create for student resonses
-            ops = get_active_options( d )
-            sas = []
-            for s in StudentInfo.objects.all():
-                op = random.sample( ops, 4 )
-                sas.append( StudentAnswers(rollno=s.rollno, q=d.pk,
-                                           op1 = op[0], op2 = op[1],
-                                           op3 = op[2],op4 = op[3] ) )
-            StudentAnswers.objects.bulk_create( sas )
+            # --------------------------------
+            #
+            # ops = get_active_options( d )
+            # sas = []
+            # for s in StudentInfo.objects.all():
+            #     op = random.sample( ops, 4 )
+            #     sas.append( StudentAnswers(rollno=s.rollno, q=d.pk,
+            #                                op1 = op[0], op2 = op[1],
+            #                                op3 = op[2],op4 = op[3] ) )
+            # StudentAnswers.objects.bulk_create( sas )
+            #
 
             logq.info( 'Question ' + str(d.pk) + ' created.' )
 
@@ -653,7 +679,7 @@ def startq(request):
 
     # ------------------------------------------------------------
     # If questions are old we need to bulk create the answer objects
-    #
+    # ------------------------------------------------------------
     sas = []
     for s in StudentInfo.objects.all():
         for q in qs:
@@ -667,19 +693,7 @@ def startq(request):
     StudentAnswers.objects.bulk_create( sas )
 
     bulk_update_student_status(qs)
-    
-    # for s in ss:
-    #     statuses = []
-    #     for q in qs:
-    #         sa = get_or_none( StudentAnswers, rollno=s.rollno, q=q.pk )
-    #         statuses.append( get_answer_status( sa ) )
-    #     # only needs db change if multiple quizzes were executed
-    #     status = quiz_status( statuses )
-    #     if status != s.curr_status:
-    #         s.curr_status = status
-    #         s.save()
-
-        
+            
     sys.mode = 'QUIZ'
     sys.save()
 
