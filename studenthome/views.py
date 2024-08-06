@@ -95,7 +95,7 @@ def who_auth(request):
             return '190050057'
             # return "prof"
         return None
-    if u.username == "akg" or u.username == "hasmitak" or u.username == "ivarnam" or u.username == "krishnas":
+    if u.username in ["akg", "hasmitak", "ivarnam", "krishnas", "lavinia"]:
         return "prof"
     # -----------------------------------
     # if studentinfo is not found, the student is not
@@ -503,8 +503,8 @@ def swapq(request, qid1, qid2 ):
     # -------------------------------------------
     # Clear student submissions
     # -------------------------------------------
-    StudentAnswers.objects.filter(q=qid1).delete()
-    StudentAnswers.objects.filter(q=qid2).delete()
+    # StudentAnswers.objects.filter(q=qid1).delete()
+    # StudentAnswers.objects.filter(q=qid2).delete()
     
     if q1 and q2:
         messages.success(request,f'Questions {q1.id} and {q2.id} swapped!')
@@ -879,7 +879,8 @@ def all_status(request):
         wrongs[student.rollno] = 0
         for sa in attendances:
             b,corr_count = is_answer_correct( sa )
-            dt = sa.answer_time.strftime("%m-%d")
+            # dt = sa.answer_time.strftime("%m-%d")
+            dt = sa.q
             devs.add( sa.user_agent )
             if dt in attend_count_map:
                 attend_count_map[dt] = attend_count_map[dt] + 1
