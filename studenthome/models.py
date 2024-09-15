@@ -13,9 +13,10 @@ class StudentInfo(models.Model):
                 ('PART_FINISHED', 'Part Finished'),
                 ('CORRECT', 'Correct'),
                 ('PART_CORRECT', 'Half Correct'),
-                ('WRONG', 'Wrong'))
-    COURSES = ( ('Theory', 'CS213' ),
-                ('LAB'   , 'CS293' ),
+                ('WRONG', 'Wrong'))    
+    COURSES = ( ('NONE'  , '-----'      ),
+                ('THEORY', 'CS213'      ),
+                ('LAB'   , 'CS293'      ),
                 ('BOTH'  , 'CS293-CS213') )   
     name=models.CharField(max_length=100)
     imagePath   = models.CharField(max_length=200)
@@ -24,7 +25,9 @@ class StudentInfo(models.Model):
     presentCount= models.IntegerField(default=0)
     absentCount = models.IntegerField(default=0)
     awakeCount  = models.IntegerField(default=0)
-    course      = models.CharField(verbose_name='Enrolled Courses', choices=COURSES, null=True, max_length=20)
+    exam_room   = models.CharField(max_length=32,null=True)
+    exam_seat   = models.CharField(max_length=32,null=True)
+    course      = models.CharField(verbose_name='Enrolled Courses', choices=COURSES, default='BOTH', max_length=20)
     curr_status = models.CharField(verbose_name='Current status', choices=CURRENT, default='ABSENT', max_length=20 )
 
 class Question(models.Model):
@@ -94,6 +97,13 @@ class StudentAnswers(models.Model):
     ans3 = models.BooleanField( verbose_name = "Answer given 3" , default=False)
     ans4 = models.BooleanField( verbose_name = "Answer given 4" , default=False)
 
+
+class BioBreak(models.Model):
+    rollno =  models.CharField(max_length=10)
+    imagePath   = models.CharField(max_length=200,default="")
+    request_time = models.DateTimeField(null=True)
+    activate_time = models.DateTimeField(null=True)
+    returned_time = models.DateTimeField(null=True)
 
 #---------------------------------------------------------
 # Exam interface

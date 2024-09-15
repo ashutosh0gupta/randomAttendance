@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
 from django.template import loader, RequestContext
 from django.http import HttpResponse
-from .models import StudentInfo,Call,Question,StudentAnswers,SystemState
+from .models import StudentInfo,Call,Question,StudentAnswers,SystemState,BioBreak
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin, AccessMixin,UserPassesTestMixin
@@ -16,6 +16,7 @@ from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
+from django.db.models import Q
 
 import logging
 
@@ -925,6 +926,11 @@ def all_status(request):
     return render( request, 'studenthome/all.html', context.flatten() )
 
 
+# def seating(request):
+#     u = who_auth(request)
+#     if u != 'prof':
+#         return HttpResponse( 'Incorrect login!' )
+    
 
 #======================================================
 # Old random views
@@ -1016,3 +1022,93 @@ def status(request, rollno):
         context.push( {'student': student, 'getstatus' : False } )
         return render( request, 'studenthome/index.html', context.flatten() )
 
+#-----------------------------------------
+# Biobreak
+#-----------------------------------------
+
+class AddBioBreak(SuccessMessageMixin,CreateView):
+    model = BioBreak
+    fields= ['rollno']
+    template_name = 'studenthome/biobreak.html'
+
+    def get_context_data( self, **kwargs ):
+        context = super(AddBioBreak,self).get_context_data(**kwargs)
+        context[ "is_auth" ] = True #(who_auth( self.request ) == "prof")
+        bbs = BioBreak.objects.filter(returned_time=None).all().order_by('request_time')
+        if len(bbs) > 0:
+            context[ "bb" ] = bbs[0]
+            context[ "bbtime" ] = int((timezone.now()-bbs[0].activate_time).seconds/60)
+        else:
+            context[ "bb" ] = None            
+        context[ "bbs" ] = bbs[1:] 
+        context[ "sys" ] = get_sys_state()
+        return context
+    
+    def get_success_url(self):
+        return reverse( "biobreak" )
+
+    def form_valid(self,form):
+        try:
+            d = None
+            # TODO: Bring back authentication
+            # u = who_auth(self.request)
+            # if u == None:
+            #     return redirect( reverse("logout") )
+            # if u != 'prof':
+            #     raise Exception( "Wrong kind of login!" )
+            
+            response = super().form_valid(form)
+            d = self.object
+            #----------------------------------------
+            # Check if the student exists
+            #----------------------------------------
+            s = get_or_none( StudentInfo, pk = d.rollno )
+            if s == None:
+                raise Exception( "Student with rollno "+ d.rollno +" is not in the course!" )
+            else:
+                d.imagePath = s.imagePath
+            #----------------------------------------
+            # Check if the student has alredy requested
+            #----------------------------------------
+            bbs = BioBreak.objects.filter(Q(returned_time=None) & Q(rollno=d.rollno)).all()
+            if len(bbs) > 1:
+                raise Exception( "Student with rollno "+ d.rollno +" is already on the queue!" )
+            d.request_time = timezone.now() 
+            d.save()
+
+            #----------------------------------------
+            # If Queue is empty new object gets to go
+            #----------------------------------------
+            bbs = BioBreak.objects.filter(returned_time=None).all().order_by('request_time')
+            nbb = bbs[0]
+            if nbb.activate_time == None:
+                nbb.activate_time = timezone.now()
+                nbb.save()
+
+            messages.success(self.request,'BioBreak Request Added '+str(d.id)+'!')
+
+            logq.info( 'Biobreak request added ' + str(d.pk) + '.' )
+
+            return response
+        except Exception as e:
+            # Form has failed fill gain
+            form.add_error( None, '{}!'.format(e) )
+            if d:
+                d.delete()
+            return super().form_invalid(form)
+
+def biobreak_return(request):
+    bbs = BioBreak.objects.filter(returned_time=None).all().order_by('request_time')
+    bb = bbs[0]
+    bb.returned_time = timezone.now()
+    bb.save()
+    #--------------------------
+    # Update the next person
+    #--------------------------
+    bbs = BioBreak.objects.filter(returned_time=None).all().order_by('request_time')    
+    if len(bbs) > 0:
+        print('Next update!')
+        nbb = bbs[0]
+        nbb.activate_time = timezone.now()
+        nbb.save()
+    return redirect( reverse( 'biobreak' ) )

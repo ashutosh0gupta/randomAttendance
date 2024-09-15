@@ -56,7 +56,7 @@ flat_tds = re.sub(r'b>[\s]*</a>[\s]*</td', r'b></a></td', flat_tds, flags=re.M)
 # 2023 ASC pattern: downloaded via chrome
 # p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){8}<td><img.*src="([^>]*)">')
 
-# 2023 August ASC pattern: downloaded via chrome
+# 2023/2024 August ASC pattern: downloaded via chrome
 p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){9}<td><img.*src="([^>]*)">')
 
 
