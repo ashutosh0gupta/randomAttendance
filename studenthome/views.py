@@ -228,6 +228,7 @@ def index(request):
             logq.info( 'prof Quiz status rendered' )
             return response # render( request, 'studenthome/quiz.html', context.flatten() )
         else:
+            context[ "dayhash" ] = settings.DAYHASH
             return render( request, 'studenthome/dashboard.html', context.flatten() )
     # student is logged in
     if s.mode == "QUIZ":
@@ -1030,26 +1031,36 @@ class AddBioBreak(SuccessMessageMixin,CreateView):
     model = BioBreak
     fields= ['rollno']
     template_name = 'studenthome/biobreak.html'
+    dayhash = settings.DAYHASH
 
     def get_context_data( self, **kwargs ):
         context = super(AddBioBreak,self).get_context_data(**kwargs)
-        context[ "is_auth" ] = True #(who_auth( self.request ) == "prof")
+        context[ "is_auth" ] = (self.kwargs.get('dayhash') == self.dayhash) #(who_auth( self.request ) == "prof")
         bbs = BioBreak.objects.filter(returned_time=None).all().order_by('request_time')
         if len(bbs) > 0:
             context[ "bb" ] = bbs[0]
-            context[ "bbtime" ] = int((timezone.now()-bbs[0].activate_time).seconds/60)
+            if bbs[0].activate_time != None:               
+                context[ "bbtime" ] = int((timezone.now()-bbs[0].activate_time).seconds/60)
+            else:
+                context[ "bbtime" ] = "unknown"
         else:
             context[ "bb" ] = None            
         context[ "bbs" ] = bbs[1:] 
         context[ "sys" ] = get_sys_state()
+        context[ "dayhash" ] = self.dayhash
         return context
     
     def get_success_url(self):
-        return reverse( "biobreak" )
+        return reverse( "biobreak", kwargs={'dayhash': self.kwargs.get('dayhash')} )
 
     def form_valid(self,form):
         try:
             d = None
+
+            dayhash = self.kwargs.get('dayhash')
+            if dayhash != self.dayhash:
+                return HttpResponse( 'Incorrect access!' )
+
             # TODO: Bring back authentication
             # u = who_auth(self.request)
             # if u == None:
@@ -1059,6 +1070,7 @@ class AddBioBreak(SuccessMessageMixin,CreateView):
             
             response = super().form_valid(form)
             d = self.object
+            d.rollno = d.rollno.upper()
             #----------------------------------------
             # Check if the student exists
             #----------------------------------------
@@ -1097,7 +1109,9 @@ class AddBioBreak(SuccessMessageMixin,CreateView):
                 d.delete()
             return super().form_invalid(form)
 
-def biobreak_return(request):
+def biobreak_return(request,dayhash):
+    if dayhash != settings.DAYHASH:
+        return HttpResponse( 'Incorrect access!' )
     bbs = BioBreak.objects.filter(returned_time=None).all().order_by('request_time')
     bb = bbs[0]
     bb.returned_time = timezone.now()
@@ -1107,8 +1121,7 @@ def biobreak_return(request):
     #--------------------------
     bbs = BioBreak.objects.filter(returned_time=None).all().order_by('request_time')    
     if len(bbs) > 0:
-        print('Next update!')
         nbb = bbs[0]
         nbb.activate_time = timezone.now()
         nbb.save()
-    return redirect( reverse( 'biobreak' ) )
+    return redirect( reverse( 'biobreak', kwargs={'dayhash': dayhash}  ) )

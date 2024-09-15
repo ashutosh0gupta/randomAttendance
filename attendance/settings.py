@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 
+import hmac
+import hashlib
+import base64
+from datetime import date
 
 import os
 from dotenv import load_dotenv
@@ -29,6 +33,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
+
+
+def compute_dayhash():
+    today = str.encode(str(date.today()))
+    dig = hmac.new(str.encode(SECRET_KEY), msg=today, digestmod=hashlib.sha256).digest()
+    return base64.b64encode(dig).decode()[:-1]      # py3k-mode
+
+DAYHASH = compute_dayhash()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

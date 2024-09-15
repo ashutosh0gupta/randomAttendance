@@ -31,8 +31,8 @@ urlpatterns = [
     # path('scorecrib/'  , views.score_crib  , name='scorecrib'),
     # path('scoreedit/'  , views.score_edit  , name='scoreedit'),
     
-    path('biobreak/6039101416', views.AddBioBreak.as_view(), name='biobreak'),
-    path('biobreakreturn/6039101416', views.biobreak_return, name='biobreakreturn'),
+    re_path('^biobreak/(?P<dayhash>\w+)/', views.AddBioBreak.as_view(), name='biobreak'),
+    re_path('^biobreakreturn/(?P<dayhash>\w+)/', views.biobreak_return, name='biobreakreturn'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
