@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load mathfilters %}
+{% load utils_filter %}
+
+{% block body_attr %}
+{% endblock %}
+
+{% block pagestyle %}
+<meta http-equiv="refresh" content="30">
+{% endblock %}
+
+{% block content %}
+
+{% if is_auth %}
+<div><a href="{% url 'index'%}" class="ui label blue">Go home</a></div>
+
+<div class="ui container">
+  <h1>Biobreak management</h1>
+
+  <div class="ui container">
+    {% if messages %}
+     {% for message in messages %}
+       <p class=" ui {{ message.tags }} tiny message">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+<form class="ui form attached fluid segment" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="ui button blue" type="submit">Request</button>  
+</form>
+</div>
+
+<div class="ui container">
+
+{% if bb %}
+<h1>Student on biobreak</h1>
+<table style="border: 1px solid black">
+<tr>
+    <th>No.</th>
+    <th>RollNo</th>
+    <th>Photo</th>
+    <th>Out since</th>
+    <th></th>
+  </tr>
+  <tr>
+    <td>{{ bb.id }}</td>
+    <td>{{ bb.rollno }}</td>
+    <td><img border="0"  src="{% get_media_prefix %}{{bb.imagePath}}" WIDTH=100></td>
+    <td>{{ bbtime }} minutes</td>
+    <td>
+      <a href="{%url 'biobreakreturn' %}"  class="ui label blue">Returned</a>
+    </td>
+  </tr>
+  <tr>
+  </tr>
+</table>
+{% endif %}
+
+<h1>Students waiting:</h1>
+
+<table style="border: 1px solid black">
+<tr>
+    <th>No.</th>
+    <th>RollNo</th>
+    <th>Photo</th>
+    <th>Request time</th>
+  </tr>
+  {% for b in bbs %}
+  <tr>
+    <td>{{ b.id }}</td>
+    <td>{{ b.rollno }}</td>
+    <td><img border="0"  src="{% get_media_prefix %}{{b.imagePath}}" WIDTH=100></td>
+    <td>{{ b.request_time | time }}</td>
+  </tr>
+  {% endfor %}
+  <tr>
+  </tr>
+</table>
+</div>
+
+
+{% else %}
+Please <a href="{% url 'admin:index' %}">login</a>!
+
+
+{% endif %}
+
+{% endblock %}
