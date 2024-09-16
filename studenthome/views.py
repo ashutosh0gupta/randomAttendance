@@ -1337,10 +1337,6 @@ def seating(request,cid):
     if u != 'prof':
         return HttpResponse( 'Incorrect login!' )
 
-    for s in StudentInfo.objects.all():
-        s.course = "CS213-CS293"
-        s.save()
-
     available = []
     # -------------------------------------------
     # Collect seats
@@ -1357,7 +1353,7 @@ def seating(request,cid):
     # -------------------------------------------    
     students = StudentInfo.objects.filter( course__contains = cid ).all()
     if len(available) < len(students):
-        messages.error( request, f'Not enough seats! students: {len(available)} seats: {len(students)}' )
+        messages.error( request, f'Not enough seats! students: {len(students)} seats: {len(available)}' )
         return redirect( reverse( 'createexamroom' ) )
     # -------------------------------------------
     # 
