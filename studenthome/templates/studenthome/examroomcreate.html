@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block body_attr %}
+{% endblock %}
+
+{% block pagestyle %}
+{% endblock %}
+
+{% block content %}
+
+{% if is_auth %}
+<div><a href="{% url 'index'%}" class="ui label blue">Go home</a></div>
+
+<div class="ui container">
+  <a href="{%url 'allocateseats' %}" class="ui button blue">Allocate Seats</a>
+</div>
+<br>
+
+<div class="ui container">
+  <h1>Create exam rooms</h1>
+
+  <div class="ui container">
+    {% if messages %}
+     {% for message in messages %}
+       <p class=" ui {{ message.tags }} tiny message">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+<form class="ui form attached fluid segment" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="ui button blue" type="submit">Create</button>  
+</form>
+</div>
+
+<div class="ui container">
+
+
+<h1>Available Exam rooms</h1>
+
+<table style="border: 1px solid black">
+<tr>
+    <th>Name</th>
+    <th>Area</th>
+    <th>Available</th>
+    <th></th>
+    <th></th>
+  </tr>
+  {% for r in examrooms %}
+  <tr>
+    <td>{{ r.name      }}</td>
+    <td>{{ r.area      }}</td>
+    <td>{{ r.available }}</td>
+    <td>
+      <a href="{%url 'editexamroom' r.id %}" onclick="return confirm('Are you sure that you want to edit room {{r.name}}?');">Edit</a>
+    </td>
+    <td>
+      <a href="{%url 'deleteexamroom' r.id %}" onclick="return confirm('Are you sure that you want to delete room {{r.name}}?');">Delete</a>
+    </td>    
+  </tr>
+  {% endfor %}
+  <tr>
+  </tr>
+</table>
+</div>
+
+
+{% else %}
+Please <a href="{% url 'admin:index' %}">login</a>!
+
+
+{% endif %}
+
+{% endblock %}

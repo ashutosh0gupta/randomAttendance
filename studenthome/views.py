@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
 from django.template import loader, RequestContext
 from django.http import HttpResponse
-from .models import StudentInfo,Call,Question,StudentAnswers,SystemState,BioBreak
+from .models import StudentInfo,Call,Question,StudentAnswers,SystemState,BioBreak,ExamRoom
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin, AccessMixin,UserPassesTestMixin
@@ -26,6 +26,7 @@ import os
 import shutil
 import datetime
 import random
+from collections import defaultdict
 # import pylatexenc
 # from pylatexenc.latex2text import LatexNodes2Text
 
@@ -549,7 +550,10 @@ def viewq(request, qid):
     context.push( wrongs )
     return render( request, 'studenthome/viewq.html', context.flatten() )
 
-    
+#------------------------------------
+# System state
+#------------------------------------
+
 def get_sys_state():
     s, created = SystemState.objects.get_or_create(pk = 1)
     return s
@@ -1027,6 +1031,51 @@ def status(request, rollno):
 # Biobreak
 #-----------------------------------------
 
+def biobreak_actives():
+    acts = BioBreak.objects.filter( Q(returned_time=None) & ~Q(activate_time=None)).all().order_by('activate_time')
+    return acts
+
+def biobreak_queue():
+    bbs = BioBreak.objects.filter( Q(returned_time=None) & Q(activate_time=None)).all().order_by('request_time')
+    return bbs
+
+def biobreak_active_by_area():
+    acts = biobreak_actives()
+    acts_dict = defaultdict(list)
+    for act in acts: acts_dict[act.area].append(act)
+    return acts_dict
+
+def biobreak_queue_by_area():
+    bbs = biobreak_queue()
+    bbs_dict = defaultdict(list)
+    for act in bbs: bbs_dict[act.area].append(act)
+    return bbs_dict
+
+def biobreak_next_access():
+    actives_area = biobreak_active_by_area()
+    queue_area  = biobreak_queue_by_area()
+    #-------------------------------------------
+    # Students divided by the area
+    #--------------------------------------------
+    for area in queue_area:
+        queue = queue_area[area]
+        if len(queue) > 0:
+            if area in actives_area:
+                active = len(actives_area[area])
+            else:
+                active = 0
+            #-------------------------------------------
+            # Adaptive control
+            #--------------------------------------------
+            wait = 1+int((timezone.now()-queue[0].request_time).seconds/300)
+            send_next = max( 1, wait ) - active
+            send_next = min(send_next, len(queue))
+            for i in range(0,send_next):
+                nbb = queue[i]
+                nbb.activate_time = timezone.now()
+                nbb.save()
+        
+
 class AddBioBreak(SuccessMessageMixin,CreateView):
     model = BioBreak
     fields= ['rollno']
@@ -1035,17 +1084,16 @@ class AddBioBreak(SuccessMessageMixin,CreateView):
 
     def get_context_data( self, **kwargs ):
         context = super(AddBioBreak,self).get_context_data(**kwargs)
-        context[ "is_auth" ] = (self.kwargs.get('dayhash') == self.dayhash) #(who_auth( self.request ) == "prof")
-        bbs = BioBreak.objects.filter(returned_time=None).all().order_by('request_time')
-        if len(bbs) > 0:
-            context[ "bb" ] = bbs[0]
-            if bbs[0].activate_time != None:               
-                context[ "bbtime" ] = int((timezone.now()-bbs[0].activate_time).seconds/60)
-            else:
-                context[ "bbtime" ] = "unknown"
-        else:
-            context[ "bb" ] = None            
-        context[ "bbs" ] = bbs[1:] 
+        context[ "is_auth" ] = (self.kwargs.get('dayhash') == self.dayhash)
+        biobreak_next_access()
+        bbs  = biobreak_queue()
+        acts = biobreak_actives()
+        remain_time = {}
+        for act in acts:
+            act.out_time = int((timezone.now()-act.activate_time).seconds/60)
+        context[ "remain_time" ] = remain_time             
+        context[ "acts" ] = acts             
+        context[ "bbs" ] = bbs 
         context[ "sys" ] = get_sys_state()
         context[ "dayhash" ] = self.dayhash
         return context
@@ -1060,13 +1108,6 @@ class AddBioBreak(SuccessMessageMixin,CreateView):
             dayhash = self.kwargs.get('dayhash')
             if dayhash != self.dayhash:
                 return HttpResponse( 'Incorrect access!' )
-
-            # TODO: Bring back authentication
-            # u = who_auth(self.request)
-            # if u == None:
-            #     return redirect( reverse("logout") )
-            # if u != 'prof':
-            #     raise Exception( "Wrong kind of login!" )
             
             response = super().form_valid(form)
             d = self.object
@@ -1079,27 +1120,127 @@ class AddBioBreak(SuccessMessageMixin,CreateView):
                 raise Exception( "Student with rollno "+ d.rollno +" is not in the course!" )
             else:
                 d.imagePath = s.imagePath
+                d.area      = s.exam_area
+                d.room      = s.exam_room
+                d.seat      = s.exam_seat
             #----------------------------------------
             # Check if the student has alredy requested
             #----------------------------------------
             bbs = BioBreak.objects.filter(Q(returned_time=None) & Q(rollno=d.rollno)).all()
             if len(bbs) > 1:
                 raise Exception( "Student with rollno "+ d.rollno +" is already on the queue!" )
+            
+            #----------------------------------------
+            # Save the records of the request
+            #----------------------------------------
             d.request_time = timezone.now() 
             d.save()
 
             #----------------------------------------
-            # If Queue is empty new object gets to go
+            # If Queue is empty new reuest gets to go
             #----------------------------------------
-            bbs = BioBreak.objects.filter(returned_time=None).all().order_by('request_time')
-            nbb = bbs[0]
-            if nbb.activate_time == None:
-                nbb.activate_time = timezone.now()
-                nbb.save()
-
+            biobreak_next_access()
+            
             messages.success(self.request,'BioBreak Request Added '+str(d.id)+'!')
 
             logq.info( 'Biobreak request added ' + str(d.pk) + '.' )
+
+            return response
+        except Exception as e:
+            # ---------------------------
+            # Form validation failed, fill again
+            # --------------------------
+            form.add_error( None, '{}!'.format(e) )
+            if d:
+                d.delete()
+            return super().form_invalid(form)
+
+def biobreak_return(request,dayhash,rid):
+    if dayhash != settings.DAYHASH:
+        return HttpResponse( 'Incorrect access!' )
+    bb = get_or_none( BioBreak, pk = rid )
+    if bb:
+        bb.returned_time = timezone.now()
+        bb.save()
+    biobreak_next_access()
+    return redirect( reverse( 'biobreak', kwargs={'dayhash': dayhash}  ) )
+
+def biobreak_urgent(request,dayhash,rid):
+    if dayhash != settings.DAYHASH:
+        return HttpResponse( 'Incorrect access!' )
+    #----------------------------------------------------------------
+    # Give urgent access
+    #----------------------------------------------------------------
+    bb = get_or_none( BioBreak, pk = rid )
+    if bb:
+        bb.activate_time = timezone.now()
+        bb.save()
+    return redirect( reverse( 'biobreak', kwargs={'dayhash': dayhash}  ) )
+
+def biobreak_withdraw(request,dayhash,rid):
+    if dayhash != settings.DAYHASH:
+        return HttpResponse( 'Incorrect access!' )
+    #-----------------------------------------------------------------
+    # Withdraw request by setting both returned_time and activate_time
+    #-----------------------------------------------------------------
+    bb = get_or_none( BioBreak, pk = rid )
+    if bb:
+        time = timezone.now()
+        bb.activate_time = time
+        bb.returned_time = time
+        bb.save()
+    return redirect( reverse( 'biobreak', kwargs={'dayhash': dayhash}  ) )
+
+#-----------------------------------------
+# ExamRooms
+#-----------------------------------------
+
+def clean_seats( ss ):
+    ls = ss.split('\n')
+    ls = [ s.strip() for s in ls]
+    return list(filter( None, ls ))
+
+class CreateExamRoom(SuccessMessageMixin,CreateView):
+    model = ExamRoom
+    fields= ['name','area','seats'] #q_fields
+    template_name = 'studenthome/examroomcreate.html'
+
+    def get_context_data( self, **kwargs ):
+        context = super(CreateExamRoom,self).get_context_data(**kwargs)
+        context[ "is_auth" ] = (who_auth( self.request ) == "prof")
+        context[ "examrooms" ] = ExamRoom.objects.all().order_by("-id")
+        return context
+    
+    def get_success_url(self):
+        return reverse( "createexamroom" )
+
+    def form_valid(self,form):
+        try:
+            d = None
+            u = who_auth(self.request)
+            if u == None:
+                return redirect( reverse("logout") )
+            if u != 'prof':
+                raise Exception( "Wrong kind of login!" )
+            
+            response = super().form_valid(form)
+            d = self.object
+            d.name = d.name.upper() 
+            d.area = d.area.upper()
+            
+            #----------------------------------------
+            # Check if the student has alredy requested
+            #----------------------------------------
+            rooms = ExamRoom.objects.filter( name=d.name ).all()
+            if len(rooms) > 1:
+                raise Exception( "Room "+ d.name +" already exists!" )
+            
+
+            # Normalize course names
+            d.save()
+
+            messages.success(self.request,'Created room '+str(d.name)+'!')
+            logq.info( 'Room ' + str(d.pk) + ' created.' )
 
             return response
         except Exception as e:
@@ -1109,19 +1250,74 @@ class AddBioBreak(SuccessMessageMixin,CreateView):
                 d.delete()
             return super().form_invalid(form)
 
-def biobreak_return(request,dayhash):
-    if dayhash != settings.DAYHASH:
-        return HttpResponse( 'Incorrect access!' )
-    bbs = BioBreak.objects.filter(returned_time=None).all().order_by('request_time')
-    bb = bbs[0]
-    bb.returned_time = timezone.now()
-    bb.save()
-    #--------------------------
-    # Update the next person
-    #--------------------------
-    bbs = BioBreak.objects.filter(returned_time=None).all().order_by('request_time')    
-    if len(bbs) > 0:
-        nbb = bbs[0]
-        nbb.activate_time = timezone.now()
-        nbb.save()
-    return redirect( reverse( 'biobreak', kwargs={'dayhash': dayhash}  ) )
+
+class EditExamRoom(UpdateView):
+    model = ExamRoom
+    fields = ['name','area','available','seats']
+    template_name = 'studenthome/examroomedit.html'
+    pk_url_kwarg = 'rid'
+    
+    def get_context_data( self, **kwargs ):
+        context = super(EditExamRoom,self).get_context_data(**kwargs)
+        context[ "is_auth" ] = (who_auth( self.request ) == "prof")
+        return context
+
+    def get_success_url(self):
+        q = self.object
+        logq.info( 'Question ' + str(q.id) + ' edited.' )
+        return reverse( "createexamroom" )
+
+def delete_exam_room(request, rid):
+    u = who_auth(request)
+    if u != 'prof':
+        return HttpResponse( 'Incorrect login!' )
+    r = get_or_none( ExamRoom, pk = int(rid) )
+    
+    if r:
+        # -------------------------------------------
+        # Delete the room
+        # -------------------------------------------
+        r.delete()
+        # -------------------------------------------
+        # Report the deletion
+        # -------------------------------------------
+        messages.success(request,'Room '+str(r.id)+' deleted!')
+        logq.info( 'Room ' + str(r.id) + ' deleted.' )
+ 
+    # -------------------------------------------
+    # Redirect to create quetion page!
+    # -------------------------------------------
+    return redirect( reverse( 'createexamroom' ) )
+
+@transaction.atomic
+def allocate_seats(request):
+    available = []
+    # -------------------------------------------
+    # Collect seats
+    # -------------------------------------------    
+    for r in ExamRoom.objects.all():
+        if r.available:
+            area = r.area
+            name = r.name
+            seats = clean_seats(r.seats)
+            for s in seats:
+                available.append( (name, area, s) )
+    # -------------------------------------------
+    # 
+    # -------------------------------------------    
+    students = StudentInfo.objects.all()
+    if len(available) < len(students):
+        messages.error( request, 'Not enough seats!' )
+        return redirect( reverse( 'createexamroom' ) )
+    # -------------------------------------------
+    # 
+    # -------------------------------------------
+    i = 0
+    for s in students:
+        room,area,seat= available[i]
+        s.exam_area = area
+        s.exam_room = room
+        s.exam_seat = seat
+        s.save()
+        i = i + 1
+    return redirect( reverse( 'createexamroom' ) )

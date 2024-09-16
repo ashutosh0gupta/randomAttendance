@@ -30,9 +30,23 @@ urlpatterns = [
     # path('scoreupload/', views.score_upload, name='scoreupload'),
     # path('scorecrib/'  , views.score_crib  , name='scorecrib'),
     # path('scoreedit/'  , views.score_edit  , name='scoreedit'),
-    
+
+    #--------------------
+    # Biobreak management
+    #--------------------
     re_path('^biobreak/(?P<dayhash>\w+)/', views.AddBioBreak.as_view(), name='biobreak'),
-    re_path('^biobreakreturn/(?P<dayhash>\w+)/', views.biobreak_return, name='biobreakreturn'),
+    re_path('^biobreakreturn/(?P<dayhash>\w+)/(?P<rid>\d+)/'  , views.biobreak_return  , name='biobreakreturn'  ),
+    re_path('^biobreakurgent/(?P<dayhash>\w+)/(?P<rid>\d+)/'  , views.biobreak_urgent  , name='biobreakurgent'  ),
+    re_path('^biobreakwithdraw/(?P<dayhash>\w+)/(?P<rid>\d+)/', views.biobreak_withdraw, name='biobreakwithdraw'),
+
+    #----------------------
+    # Exam rooms management
+    #----------------------
+    path('createexamroom/', views.CreateExamRoom.as_view(), name='createexamroom'),
+    re_path(r'^editexamroom/(?P<rid>\d+)/', views.EditExamRoom.as_view(), name='editexamroom'),    
+    re_path(r'^deleteqexamroom/(?P<rid>\d+)/$', views.delete_exam_room, name='deleteexamroom'),
+    path('allocateseats/', views.allocate_seats, name='allocateseats'),
+
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -17,7 +17,7 @@
 <div><a href="{% url 'index'%}" class="ui label blue">Go home</a></div>
 
 <div class="ui container">
-  <h1>Biobreak management</h1>
+  <h1>Bio-break management</h1>
 
   <div class="ui container">
     {% if messages %}
@@ -36,37 +36,46 @@
 
 <div class="ui container">
 
-{% if bb %}
-<h1>Student on biobreak</h1>
+<h1>Students on bio break</h1>
 <table style="border: 1px solid black">
 <tr>
     <th>No.</th>
     <th>RollNo</th>
     <th>Photo</th>
+    <th>Area</th>
+    <th>Room</th>
+    <th>Seat</th>
     <th>Out since</th>
     <th></th>
   </tr>
+  {% for a in acts %}
   <tr>
-    <td>{{ bb.id }}</td>
-    <td>{{ bb.rollno }}</td>
-    <td><img border="0"  src="{% get_media_prefix %}{{bb.imagePath}}" WIDTH=100></td>
-    <td>{{ bbtime }} minutes</td>
+    <td>{{ a.id       }}</td>
+    <td>{{ a.rollno   }}</td>
+    <td><img border="0"  src="{% get_media_prefix %}{{a.imagePath}}" WIDTH=100></td>
+    <td>{{ a.area     }}</td>
+    <td>{{ a.room     }}</td>
+    <td>{{ a.seat     }}</td>
+    <td>{{ a.out_time }} minutes</td>
     <td>
-      <a href="{%url 'biobreakreturn' dayhash %}"  class="ui label blue">Returned</a>
+      <a href="{%url 'biobreakreturn' dayhash a.id %}"  class="ui label blue">Returned</a>
     </td>
   </tr>
+  {% endfor %}
   <tr>
   </tr>
 </table>
-{% endif %}
 
-<h1>Students waiting:</h1>
+<h1>Students queue:</h1>
 
 <table style="border: 1px solid black">
 <tr>
     <th>No.</th>
     <th>RollNo</th>
     <th>Photo</th>
+    <th>Area</th>
+    <th>Room</th>
+    <th>Seat</th>
     <th>Request time</th>
   </tr>
   {% for b in bbs %}
@@ -74,7 +83,16 @@
     <td>{{ b.id }}</td>
     <td>{{ b.rollno }}</td>
     <td><img border="0"  src="{% get_media_prefix %}{{b.imagePath}}" WIDTH=100></td>
+    <td>{{ b.area }}</td>
+    <td>{{ b.room }}</td>
+    <td>{{ b.seat }}</td>
     <td>{{ b.request_time | time }}</td>
+    <td>
+      <a href="{%url 'biobreakurgent' dayhash b.id %}"  class="ui label red">Urgent</a>
+    </td>
+    <td>
+      <a href="{%url 'biobreakwithdraw' dayhash b.id %}"  class="ui label blue">Withdraw</a>
+    </td>
   </tr>
   {% endfor %}
   <tr>

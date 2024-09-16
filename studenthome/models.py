@@ -25,6 +25,7 @@ class StudentInfo(models.Model):
     presentCount= models.IntegerField(default=0)
     absentCount = models.IntegerField(default=0)
     awakeCount  = models.IntegerField(default=0)
+    exam_area   = models.CharField(max_length=32,null=True)
     exam_room   = models.CharField(max_length=32,null=True)
     exam_seat   = models.CharField(max_length=32,null=True)
     course      = models.CharField(verbose_name='Enrolled Courses', choices=COURSES, default='BOTH', max_length=20)
@@ -99,11 +100,25 @@ class StudentAnswers(models.Model):
 
 
 class BioBreak(models.Model):
-    rollno =  models.CharField(max_length=10)
-    imagePath   = models.CharField(max_length=200,default="")
-    request_time = models.DateTimeField(null=True)
+    rollno = models.CharField(max_length=10)
+    area   = models.CharField(max_length=50,default="",null=True)
+    room   = models.CharField(max_length=50,default="",null=True)
+    seat   = models.CharField(max_length=50,default="",null=True)
+    imagePath     = models.CharField(max_length=200,default="")
+    request_time  = models.DateTimeField(null=True)
     activate_time = models.DateTimeField(null=True)
     returned_time = models.DateTimeField(null=True)
+    out_time      = models.IntegerField ( verbose_name = "Out time", default=0    )
+
+#---------------------------------------------------------
+# Exam rooms
+#---------------------------------------------------------
+
+class ExamRoom(models.Model):
+    name = models.CharField(max_length=10)
+    area = models.CharField(max_length=50,default="",null=True)
+    seats= models.TextField(verbose_name="Available seats(new line separated)",max_length=3000,null=True)
+    available = models.BooleanField( verbose_name = "Room Available" , default=True)
 
 #---------------------------------------------------------
 # Exam interface

@@ -38,7 +38,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 def compute_dayhash():
     today = str.encode(str(date.today()))
     dig = hmac.new(str.encode(SECRET_KEY), msg=today, digestmod=hashlib.sha256).digest()
-    return base64.b64encode(dig).decode()[:-1]      # py3k-mode
+    dh = base64.b64encode(dig).decode()[:-1]
+    dh = ''.join(e for e in dh if e.isalnum())
+    return dh
 
 DAYHASH = compute_dayhash()
 
