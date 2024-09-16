@@ -1209,10 +1209,10 @@ def clean_seats( ss ):
     ls = [ s.strip() for s in ls]
     return list(filter( None, ls ))
 
-def lhc_sort_seats( seats ):
-    splits = [(s[1:],s[0]) for s in seats]
-    splits.sort()
-    return [ column+row for (row,column) in splits]
+# def lhc_sort_seats( seats ):
+#     splits = [(s[1:],s[0]) for s in seats]
+#     splits.sort()
+#     return [ column+row for (row,column) in splits]
 
 class CreateExamRoom(SuccessMessageMixin,CreateView):
     model = ExamRoom
@@ -1322,11 +1322,6 @@ def seating(request,cid):
             area = r.area
             name = r.name
             seats = clean_seats(r.seats)
-            # ------------------------------------
-            # LHC seats needs to be sorted by rows
-            # ------------------------------------
-            if name[0] == 'L':
-                seats = lhc_sort_seats( seats )
             for s in seats:
                 available.append( (name, area, s) )
     # -------------------------------------------
