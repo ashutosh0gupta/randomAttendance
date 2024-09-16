@@ -104,13 +104,9 @@
   <div class="pagebreak"> </div>
   {% endfor %}
 
- 
-</div>
-
   <div class="pagebreak"> </div>
   <table style="border: 1px solid black">
     <tr>
-      <th>Name</th>
       <th>Roll No</th>
       <th>Room</th>
       <th>Seat</th>
@@ -118,7 +114,6 @@
     {% for room, students in room_map.items %}
     {% for student in students %}
     <tr>
-      <td>{{ student.name      }}</td>
       <td>{{ student.rollno    }}</td>
       <td>{{ student.exam_room }}</td>
       <td>{{ student.exam_seat }}</td>
@@ -128,6 +123,9 @@
     <tr>
     </tr>
   </table>
+ 
+</div>
+
 
 
 {% endblock %}
