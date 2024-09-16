@@ -1354,22 +1354,27 @@ def seating(request,cid):
     # -------------------------------------------
     # Filter students by the course
     # -------------------------------------------    
-    students = StudentInfo.objects.filter( course__contains = cid ).order_by('rollno')
-    if len(available) < len(students):
+    students = StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = False) ).order_by('rollno')
+    pwds = StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = True) ).order_by('rollno')
+    if len(available) < len(students) + len(pwds):
         messages.error( request, f'Not enough seats! students: {len(students)} seats: {len(available)}' )
         return redirect( reverse( 'createexamroom' ) )
     # -------------------------------------------
     # 
     # -------------------------------------------
     i = 0
-    for s in students:
+    def assign_seat(s,i):
         room,area,seat= available[i]
         s.exam_area = area
         s.exam_room = room
         s.exam_seat = seat
         s.save()
-        i = i + 1
+        return i + 1
+        
+    for s in students: i = assign_seat(s,i)
+    for s in pwds    : i = assign_seat(s,i)
 
+        
     # students = StudentInfo.objects.all()
     rooms = ExamRoom.objects.all()
     room_map = {}
