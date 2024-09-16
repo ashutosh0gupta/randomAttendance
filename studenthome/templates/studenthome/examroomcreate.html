@@ -44,6 +44,7 @@
 <tr>
     <th>Name</th>
     <th>Area</th>
+    <th>Capacity</th>
     <th>Available</th>
     <th></th>
     <th></th>
@@ -52,6 +53,7 @@
   <tr>
     <td>{{ r.name      }}</td>
     <td>{{ r.area      }}</td>
+    <td>{{ r.capacity }}</td>
     <td>{{ r.available }}</td>
     <td>
       <a href="{%url 'editexamroom' r.id %}" onclick="return confirm('Are you sure that you want to edit room {{r.name}}?');">Edit</a>

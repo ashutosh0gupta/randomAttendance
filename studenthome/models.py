@@ -120,6 +120,7 @@ class ExamRoom(models.Model):
     area = models.CharField(max_length=50,default="",null=True)
     seats= models.TextField(verbose_name="Available seats(new line separated)",max_length=3000,null=True)
     available = models.BooleanField( verbose_name = "Room Available" , default=True)
+    capacity = models.IntegerField( verbose_name="Capacity", default=0    )
 
 #---------------------------------------------------------
 # Exam interface

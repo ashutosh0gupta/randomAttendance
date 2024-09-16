@@ -1217,6 +1217,9 @@ class CreateExamRoom(SuccessMessageMixin,CreateView):
     def get_context_data( self, **kwargs ):
         context = super(CreateExamRoom,self).get_context_data(**kwargs)
         context[ "is_auth" ] = (who_auth( self.request ) == "prof")
+        for room in ExamRoom.objects.all():
+            room.capacity = len(clean_seats(room.seats))
+            room.save()
         context[ "examrooms" ] = ExamRoom.objects.all().order_by("-id")
         return context
     
