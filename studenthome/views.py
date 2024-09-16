@@ -1211,7 +1211,7 @@ def clean_seats( ss ):
 
 def lhc_sort_seats( seats ):
     splits = [(s[1:],s[0]) for s in seats]
-    splits = splits.sort()
+    splits.sort()
     return [ column+row for (row,column) in splits]
 
 class CreateExamRoom(SuccessMessageMixin,CreateView):
