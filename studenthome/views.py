@@ -1357,7 +1357,7 @@ def seating(request,cid):
     # -------------------------------------------    
     students = StudentInfo.objects.filter( course__contains = cid ).all()
     if len(available) < len(students):
-        messages.error( request, 'Not enough seats!' )
+        messages.error( request, f'Not enough seats! students: {len(available)} seats: {len(students)}' )
         return redirect( reverse( 'createexamroom' ) )
     # -------------------------------------------
     # 
