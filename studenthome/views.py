@@ -1209,6 +1209,11 @@ def clean_seats( ss ):
     ls = [ s.strip() for s in ls]
     return list(filter( None, ls ))
 
+def lhc_sort_seats( seats ):
+    splits = [(s[1:],s[0]) for s in seats]
+    splits = splits.sort()
+    return [ column+row for (row,column) in splits]
+
 class CreateExamRoom(SuccessMessageMixin,CreateView):
     model = ExamRoom
     fields= ['name','area','seats'] #q_fields
@@ -1301,38 +1306,6 @@ def delete_exam_room(request, rid):
     # -------------------------------------------
     return redirect( reverse( 'createexamroom' ) )
 
-# @transaction.atomic
-# def allocate_seats(request,course):    
-#     available = []
-#     # -------------------------------------------
-#     # Collect seats
-#     # -------------------------------------------    
-#     for r in ExamRoom.objects.all():
-#         if r.available:
-#             area = r.area
-#             name = r.name
-#             seats = clean_seats(r.seats)
-#             for s in seats:
-#                 available.append( (name, area, s) )
-#     # -------------------------------------------
-#     # 
-#     # -------------------------------------------    
-#     students = StudentInfo.objects.filter( course_contains == course_ ).all()
-#     if len(available) < len(students):
-#         messages.error( request, 'Not enough seats!' )
-#         return redirect( reverse( 'createexamroom' ) )
-#     # -------------------------------------------
-#     # 
-#     # -------------------------------------------
-#     i = 0
-#     for s in students:
-#         room,area,seat= available[i]
-#         s.exam_area = area
-#         s.exam_room = room
-#         s.exam_seat = seat
-#         s.save()
-#         i = i + 1
-#     return redirect( reverse( 'createexamroom' ) )
 
 @transaction.atomic
 def seating(request,cid):
@@ -1349,6 +1322,11 @@ def seating(request,cid):
             area = r.area
             name = r.name
             seats = clean_seats(r.seats)
+            # ------------------------------------
+            # LHC seats needs to be sorted by rows
+            # ------------------------------------
+            if name[0] == 'L':
+                seats = lhc_sort_seats( seats )
             for s in seats:
                 available.append( (name, area, s) )
     # -------------------------------------------
