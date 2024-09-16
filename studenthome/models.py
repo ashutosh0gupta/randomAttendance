@@ -14,10 +14,10 @@ class StudentInfo(models.Model):
                 ('CORRECT', 'Correct'),
                 ('PART_CORRECT', 'Half Correct'),
                 ('WRONG', 'Wrong'))    
-    COURSES = ( ('NONE'  , '-----'      ),
-                ('THEORY', 'CS213'      ),
-                ('LAB'   , 'CS293'      ),
-                ('BOTH'  , 'CS293-CS213') )   
+    # COURSES = ( ('NONE'  , '-----'      ),
+    #             ('THEORY', 'CS213'      ),
+    #             ('LAB'   , 'CS293'      ),
+    #             ('BOTH'  , 'CS293-CS213') )   
     name=models.CharField(max_length=100)
     imagePath   = models.CharField(max_length=200)
     rollno      = models.CharField(primary_key=True,max_length=10)
@@ -28,7 +28,8 @@ class StudentInfo(models.Model):
     exam_area   = models.CharField(max_length=32,null=True)
     exam_room   = models.CharField(max_length=32,null=True)
     exam_seat   = models.CharField(max_length=32,null=True)
-    course      = models.CharField(verbose_name='Enrolled Courses', choices=COURSES, default='BOTH', max_length=20)
+    # course      = models.CharField(verbose_name='Enrolled Courses', choices=COURSES, default='BOTH', max_length=20)
+    course      = models.CharField(verbose_name='Enrolled Courses', default='---', max_length=20)
     curr_status = models.CharField(verbose_name='Current status', choices=CURRENT, default='ABSENT', max_length=20 )
 
 class Question(models.Model):

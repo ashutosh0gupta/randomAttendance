@@ -10,6 +10,9 @@ import shutil
 import sys
 import codecs
 
+course ='CS213'
+print('TODO: how to read the course title')
+
 path_to_saved_asc_page = '/tmp/'
 dump_path='/tmp/'
 
@@ -85,7 +88,7 @@ for o in out:
     else:
         print ( "Missing photo : "+ rollno )
         student_image_file = "none"       
-    output.write("%s,%s,%s,%s\n" % (index,rollno,name,student_image_file))
+    output.write("%s,%s,%s,%s,%s\n" % (index,rollno,name,student_image_file,course))
 
 print ( "File created : "+ out_file)  
 print ( "Students processed : "+ str(len(out)))

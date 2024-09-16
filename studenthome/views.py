@@ -288,7 +288,12 @@ def db_import(request):
                     #------------------------------------
                     # Colleact info for imported students
                     #------------------------------------                
-                    imported += row[1]+"," + row[2]+","+salt+row[3]+"<br>"
+                    imported += row[1]+"," + row[2]+","+salt+row[3]+","+row[4]+"<br>"
+                #---------------------------------------------
+                # Add course in the course list of the student
+                #---------------------------------------------
+                if not(row[4] in student.course):
+                    student.course = student.course+':'+row[4]
                 print( "processed: " + row[1] )
     except IOError as e:
         return HttpResponse( "Failed to open file "+csv_file + ".<br> Look into README for importing students!")
@@ -930,11 +935,6 @@ def all_status(request):
                     'show_photo' : True, } )
     return render( request, 'studenthome/all.html', context.flatten() )
 
-
-# def seating(request):
-#     u = who_auth(request)
-#     if u != 'prof':
-#         return HttpResponse( 'Incorrect login!' )
     
 
 #======================================================
@@ -1059,17 +1059,26 @@ def biobreak_next_access():
     #--------------------------------------------
     for area in queue_area:
         queue = queue_area[area]
+        #-------------------------------------------
+        # Check if queue is not empty in the area
+        #--------------------------------------------
         if len(queue) > 0:
+            #-------------------------------------------
+            # Check how many are active in the area
+            #--------------------------------------------
             if area in actives_area:
                 active = len(actives_area[area])
             else:
                 active = 0
             #-------------------------------------------
             # Adaptive control
-            #--------------------------------------------
-            wait = 1+int((timezone.now()-queue[0].request_time).seconds/300)
-            send_next = max( 1, wait ) - active
+            #-------------------------------------------
+            wait = 1+int((timezone.now()-queue[0].request_time).seconds/600)
+            send_next = max( 1 - active, wait - active, 0 )
             send_next = min(send_next, len(queue))
+            #-------------------------------------------
+            # Send them for biobreak
+            #-------------------------------------------
             for i in range(0,send_next):
                 nbb = queue[i]
                 nbb.activate_time = timezone.now()
@@ -1289,8 +1298,49 @@ def delete_exam_room(request, rid):
     # -------------------------------------------
     return redirect( reverse( 'createexamroom' ) )
 
+# @transaction.atomic
+# def allocate_seats(request,course):    
+#     available = []
+#     # -------------------------------------------
+#     # Collect seats
+#     # -------------------------------------------    
+#     for r in ExamRoom.objects.all():
+#         if r.available:
+#             area = r.area
+#             name = r.name
+#             seats = clean_seats(r.seats)
+#             for s in seats:
+#                 available.append( (name, area, s) )
+#     # -------------------------------------------
+#     # 
+#     # -------------------------------------------    
+#     students = StudentInfo.objects.filter( course_contains == course_ ).all()
+#     if len(available) < len(students):
+#         messages.error( request, 'Not enough seats!' )
+#         return redirect( reverse( 'createexamroom' ) )
+#     # -------------------------------------------
+#     # 
+#     # -------------------------------------------
+#     i = 0
+#     for s in students:
+#         room,area,seat= available[i]
+#         s.exam_area = area
+#         s.exam_room = room
+#         s.exam_seat = seat
+#         s.save()
+#         i = i + 1
+#     return redirect( reverse( 'createexamroom' ) )
+
 @transaction.atomic
-def allocate_seats(request):
+def seating(request,cid):
+    u = who_auth(request)
+    if u != 'prof':
+        return HttpResponse( 'Incorrect login!' )
+
+    for s in StudentInfo.objects.all():
+        s.course = "CS213-CS293"
+        s.save()
+
     available = []
     # -------------------------------------------
     # Collect seats
@@ -1303,9 +1353,9 @@ def allocate_seats(request):
             for s in seats:
                 available.append( (name, area, s) )
     # -------------------------------------------
-    # 
+    # Filter students by the course
     # -------------------------------------------    
-    students = StudentInfo.objects.all()
+    students = StudentInfo.objects.filter( course__contains = cid ).all()
     if len(available) < len(students):
         messages.error( request, 'Not enough seats!' )
         return redirect( reverse( 'createexamroom' ) )
@@ -1320,4 +1370,14 @@ def allocate_seats(request):
         s.exam_seat = seat
         s.save()
         i = i + 1
-    return redirect( reverse( 'createexamroom' ) )
+
+    # students = StudentInfo.objects.all()
+    rooms = ExamRoom.objects.all()
+    room_map = {}
+    for room in rooms:
+        if room.available:
+            students = StudentInfo.objects.filter( Q(exam_room = room.name)&Q(course__contains = cid) ).all()
+            room_map[room.name] = students
+    context = RequestContext(request)
+    context["room_map"] = room_map
+    return render( request, 'studenthome/seating.html', context.flatten() )
