@@ -1375,7 +1375,7 @@ def seating(request,cid):
     room_map = {}
     for room in rooms:
         if room.available:
-            students = StudentInfo.objects.filter( Q(exam_room = room.name)&Q(course__contains = cid) ).all()
+            students = StudentInfo.objects.filter( Q(exam_room = room.name)&Q(course__contains = cid) )..order_by('rollno')
             room_map[room.name] = students
     context = RequestContext(request)
     context["room_map"] = room_map
