@@ -25,6 +25,7 @@ class StudentInfo(models.Model):
     presentCount= models.IntegerField(default=0)
     absentCount = models.IntegerField(default=0)
     awakeCount  = models.IntegerField(default=0)
+    isPwd       = models.BooleanField(verbose_name="Is PwD?", default=False)
     exam_area   = models.CharField(max_length=32,null=True)
     exam_room   = models.CharField(max_length=32,null=True)
     exam_seat   = models.CharField(max_length=32,null=True)

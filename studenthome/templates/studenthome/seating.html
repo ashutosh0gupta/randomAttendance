@@ -89,8 +89,15 @@
     </tr>
     {% for student in students %}
     <tr>
-      <td>{{ student.name }}</td>
-      <td>{{ student.rollno }}</td>
+      <td>
+        {{ student.name }}
+      </td>
+      <td>
+        {{ student.rollno }}
+        {% if student.isPwd %}
+        **
+        {% endif %}
+      </td>
       <td><img border="0"  src="{% get_media_prefix %}{{student.imagePath}}" WIDTH=100></td>
       <td>{{ student.exam_room }}</td>
       <td>{{ student.exam_seat }}</td>
