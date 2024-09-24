@@ -1055,7 +1055,7 @@ def biobreak_next_access():
     actives_area = biobreak_active_by_area()
     queue_area  = biobreak_queue_by_area()
     #-------------------------------------------
-    # Students divided by the area
+    # Biobreak queue is divided by the area
     #--------------------------------------------
     for area in queue_area:
         queue = queue_area[area]
@@ -1071,7 +1071,8 @@ def biobreak_next_access():
             else:
                 active = 0
             #-------------------------------------------
-            # Adaptive control
+            # Adaptive control: if wait time > 10x minute,
+            # x+1 people can go for biobreak simultaneously
             #-------------------------------------------
             wait = 1+int((timezone.now()-queue[0].request_time).seconds/600)
             send_next = max( 1 - active, wait - active, 0 )
@@ -1225,7 +1226,7 @@ class CreateExamRoom(SuccessMessageMixin,CreateView):
         for room in ExamRoom.objects.all():
             room.capacity = len(clean_seats(room.seats))
             room.save()
-        context[ "examrooms" ] = ExamRoom.objects.all().order_by("-id")
+        context[ "examrooms" ] = ExamRoom.objects.all().order_by("name")
         return context
     
     def get_success_url(self):
@@ -1313,24 +1314,26 @@ def seating(request,cid):
     if u != 'prof':
         return HttpResponse( 'Incorrect login!' )
 
+    # -------------------------------------------
+    # Filter students by the course
+    # -------------------------------------------    
+    students = StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = False) ).order_by('rollno')
+    pwds = StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = True) ).order_by('rollno')
+    total = len(students) + len(pwds)
+    
     available = []
     # -------------------------------------------
     # Collect seats
     # -------------------------------------------    
-    for r in ExamRoom.objects.all():
+    for r in ExamRoom.objects.order_by('name'):
         if r.available:
             area = r.area
             name = r.name
             seats = clean_seats(r.seats)
             for s in seats:
                 available.append( (name, area, s) )
-    # -------------------------------------------
-    # Filter students by the course
-    # -------------------------------------------    
-    students = StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = False) ).order_by('rollno')
-    pwds = StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = True) ).order_by('rollno')
-    if len(available) < len(students) + len(pwds):
-        messages.error( request, f'Not enough seats! students: {len(students)} seats: {len(available)}' )
+    if len(available) < total:
+        messages.error( request, f'Not enough seats! students: {total} seats: {len(available)}' )
         return redirect( reverse( 'createexamroom' ) )
     # -------------------------------------------
     # 
@@ -1357,4 +1360,5 @@ def seating(request,cid):
             room_map[room.name] = students
     context = RequestContext(request)
     context["room_map"] = room_map
+    context["cid"] = cid
     return render( request, 'studenthome/seating.html', context.flatten() )

@@ -9,7 +9,7 @@
 <div>
 
   {% for room, students in room_map.items %}
-  <h1> {{room}}</h1>
+  <h1> {{cid}} : {{room}}</h1>
   <table style="border: 1px solid black">
     <tr>
       <th style="width:80px"> Assigned </th>
@@ -76,6 +76,13 @@
       <td></td>
     </tr>
   </table>
+  <br>
+  <table style="border: 1px solid black">
+    <tr>
+      <th style="width:200px">Number of printed papers</th>
+      <th style="width:100px"></th>
+    </tr>
+  </table>
 
   <div class="pagebreak"> </div>
   <table style="border: 1px solid black">
@@ -98,7 +105,7 @@
         **
         {% endif %}
       </td>
-      <td><img border="0"  src="{% get_media_prefix %}{{student.imagePath}}" WIDTH=100></td>
+      <td><img border="0"  src="{% get_media_prefix %}{{student.imagePath}}" WIDTH=93></td>
       <td>{{ student.exam_room }}</td>
       <td>{{ student.exam_seat }}</td>
       <td></td>
