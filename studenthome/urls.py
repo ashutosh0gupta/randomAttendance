@@ -47,6 +47,14 @@ urlpatterns = [
     re_path(r'^deleteqexamroom/(?P<rid>\d+)/$', views.delete_exam_room, name='deleteexamroom'),
     re_path('allocateseats/(?P<cid>\w+)', views.seating, name='allocateseats'),
 
+    #----------------------
+    # Exam management
+    #----------------------
+    path('createexam/', views.CreateExam.as_view(), name='createexam'),
+    re_path(r'^editexam/(?P<rid>\w+)/', views.EditExam.as_view(), name='editexam'),    
+    re_path(r'^deleteqexam/(?P<rid>\w+)/$', views.delete_exam, name='deleteexam'),
+    # re_path('allocateseats/(?P<cid>\w+)', views.seating, name='allocateseats'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

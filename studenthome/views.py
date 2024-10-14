@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
 from django.template import loader, RequestContext
 from django.http import HttpResponse
-from .models import StudentInfo,Call,Question,StudentAnswers,SystemState,BioBreak,ExamRoom
+from .models import StudentInfo,Call,Question,StudentAnswers,SystemState,BioBreak,ExamRoom,Exam,ExamMark,Crib
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin, AccessMixin,UserPassesTestMixin
@@ -27,6 +27,8 @@ import shutil
 import datetime
 import random
 from collections import defaultdict
+from io import StringIO
+import pandas as pd
 # import pylatexenc
 # from pylatexenc.latex2text import LatexNodes2Text
 
@@ -94,11 +96,22 @@ def who_auth(request):
     u = request.user
     if u.is_anonymous:
         if settings.DEBUG:
+            #------------------------
+            # For testing
+            #------------------------
             return '190050057'
             # return "prof"
         return None
+    #-----------------------------
+    # Profs and the Head TAs
+    #-----------------------------    
     if u.username in ["akg", "hasmitak", "ivarnam", "krishnas", "lavinia"]:
         return "prof"
+    #-----------------------------
+    # Other TAs
+    #-----------------------------    
+    if u.username in []:
+        return "ta"    
     # -----------------------------------
     # if studentinfo is not found, the student is not
     # registered in the course OR logging in first time
@@ -349,6 +362,7 @@ def create_local_users(request):
 
 #--------------------------------------------------------------------
 # question creation and management
+#--------------------------------------------------------------------
 
 q_fields = ['q','course']
 op_fields = []
@@ -368,7 +382,7 @@ class CreateQuestion(SuccessMessageMixin,CreateView):
     model = Question
     fields= ['q','course','trues','falses'] #q_fields
     # fields= ['q','trues','falses','fillCode','checkCode']
-    template_name = 'studenthome/qcreate.html'
+    template_name = 'q/create.html'
 
     def get_context_data( self, **kwargs ):
         context = super(CreateQuestion,self).get_context_data(**kwargs)
@@ -450,7 +464,7 @@ class CreateQuestion(SuccessMessageMixin,CreateView):
 class EditQuestion(UpdateView):
     model = Question
     fields = q_fields
-    template_name = 'studenthome/editq.html'
+    template_name = 'q/edit.html'
     pk_url_kwarg = 'qid'
     
     def get_context_data( self, **kwargs ):
@@ -553,7 +567,7 @@ def viewq(request, qid):
     context.push( ops )
     context.push( corrects )
     context.push( wrongs )
-    return render( request, 'studenthome/viewq.html', context.flatten() )
+    return render( request, 'q/view.html', context.flatten() )
 
 #------------------------------------
 # System state
@@ -618,6 +632,7 @@ def deactivateq(request, iid):
 
 #-----------------------------------------------------------------------------
 # Running quiz
+#-----------------------------------------------------------------------------
 
 def quiz_status( q_statuses ):
     any_part    = 'PART_CORRECT' in q_statuses
@@ -748,6 +763,7 @@ def stopq(request):
 
 #------------------------------------------------------------------------------
 # Student answering quiz
+#------------------------------------------------------------------------------
 
 def calculate_student_status(s):
     statuses = []
@@ -1362,3 +1378,152 @@ def seating(request,cid):
     context["room_map"] = room_map
     context["cid"] = cid
     return render( request, 'studenthome/seating.html', context.flatten() )
+
+#--------------------------------------------------------------------
+# Exam creation and management (BIG TODO)
+#--------------------------------------------------------------------
+
+#----------------------------------------
+# Process marks of the students
+#----------------------------------------
+def process_marks(d):
+    if d.marks:
+        marks = pd.read_csv(StringIO(d.marks))
+        qs = [ (q,int(q[1:])) for q in marks.columns[1:] ]
+        for index, row in marks.iterrows():
+            r = row['Roll No']
+            for qname,qid in qs:
+                em = get_or_none( ExamMark, rollno=r, exam=d.name, q=qid )
+                em.mark = row[qname] 
+                em.save()
+
+
+class CreateExam(SuccessMessageMixin,CreateView):
+    model = Exam
+    fields= ['name','course','weight','mark1', 'mark2', 'mark3', 'mark4', 'mark5', 'mark6', 'mark7', 'mark8', 'mark9', 'mark10','marks'] #q_fields
+    template_name = 'exam/create.html'
+
+    def get_context_data( self, **kwargs ):
+        context = super(CreateExam,self).get_context_data(**kwargs)
+        context[ "is_auth" ] = (who_auth( self.request ) == "prof")
+        # for room in Exam.objects.all():
+        #     room.capacity = len(clean_seats(room.seats))
+        #     room.save()
+        context[ "exams" ] = Exam.objects.all().order_by("name")
+        return context
+    
+    def get_success_url(self):
+        return reverse( "createexam" )
+
+    def form_valid(self,form):
+        try:
+            d = None
+            u = who_auth(self.request)
+            if u == None:
+                return redirect( reverse("logout") )
+            if u != 'prof':
+                raise Exception( "Wrong kind of login!" )
+            
+            response = super().form_valid(form)
+            d = self.object
+            # d.name = d.name.upper() 
+            
+            #----------------------------------------
+            # Check if the exam is already created
+            #----------------------------------------
+            exams = Exam.objects.filter( name=d.name ).all()
+            if len(exams) > 1:
+                raise Exception( "Exam "+ d.name +" already exists!" )
+
+            #----------------------------------------
+            # Process marks for the questions
+            #----------------------------------------
+            num_q = 0
+            total = 0
+            none_found = False
+            for i in range(1,11):
+                num = getattr(d, f"mark{i}" )
+                if num:
+                    num_q = i
+                    total = total + num
+                    if none_found:
+                        raise Exception( "Marks are not contiguous!" )
+                else:
+                    none_found = True
+            d.total = total
+            d.num_q = num_q
+            
+            #----------------------------------------
+            # Process marks of the students
+            #----------------------------------------
+            process_marks(d)
+            
+            #----------------------------------------
+            # Save the exam
+            #----------------------------------------                    
+            d.save()
+            messages.success(self.request,'Created exam '+str(d.name)+'!')
+            logq.info( 'Exam ' + str(d.name) + ' created.' )
+
+            return response
+        except Exception as e:
+            # Form has failed fill gain
+            form.add_error( None, '{}!'.format(e) )
+            if d:
+                d.delete()
+            return super().form_invalid(form)
+
+class EditExam(UpdateView):
+    model = Exam
+    fields = ['name','course','weight','mark1', 'mark2', 'mark3', 'mark4', 'mark5', 'mark6', 'mark7', 'mark8', 'mark9', 'mark10','marks','is_cribs_active']
+    template_name = 'exam/edit.html'
+    pk_url_kwarg = 'rid'
+    
+    def get_context_data( self, **kwargs ):
+        context = super(EditExam,self).get_context_data(**kwargs)
+        context[ "is_auth" ] = (who_auth( self.request ) == "prof")
+        return context
+
+    def get_success_url(self):
+        q = self.object
+        #----------------------------------------
+        # Process marks of the students
+        #----------------------------------------            
+        process_marks(q)
+        logq.info( 'Question ' + str(q.name) + ' edited.' )
+        return reverse( "createexam" )
+
+
+def delete_exam(request, rid):
+    u = who_auth(request)
+    if u != 'prof':
+        return HttpResponse( 'Incorrect login!' )
+    r = get_or_none( Exam, pk = rid )
+    
+    if r:
+        # -------------------------------------------
+        # Delete the room
+        # -------------------------------------------
+        r.delete()
+        # -------------------------------------------
+        # Report the deletion
+        # -------------------------------------------
+        messages.success(request,'Exam '+rid+' deleted!')
+        logq.info( 'Exam ' + rid + ' deleted.' )
+ 
+    # -------------------------------------------
+    # Redirect to create exam page!
+    # -------------------------------------------
+    return redirect( reverse( 'createexam' ) )
+
+def exam_cribs_done(request, rid):
+    u = who_auth(request)
+    if u != 'prof':
+        return HttpResponse( 'Incorrect login!' )
+    e = get_or_none( Exam, pk = rid )
+    if e:
+        e.is_cribs_active = False
+        e.save()
+        messages.success(request,'Cribs for exam '+rid+' deactivated!')
+        logq.info( 'Cribs for exam ' + rid + ' deactivated!' )
+        
