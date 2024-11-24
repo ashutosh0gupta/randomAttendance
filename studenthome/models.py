@@ -136,24 +136,36 @@ class ExamRoom(models.Model):
 #--------------------------------------------------------
 
 class ExamMark(models.Model):
-    rollno      = models.CharField(max_length=10)
-    exam        = models.CharField(max_length=10)
-    q           = models.IntegerField( verbose_name="Question Number", default=0    )
-    mark        = models.IntegerField(verbose_name="Marks", default=0 )
-    crib        = models.IntegerField(verbose_name="Final Marks",null=True )
-    comment     = models.TextField(verbose_name="Comments",max_length=200,null=True)
-
-class Crib(models.Model):
     rollno        = models.CharField(max_length=10)
-    exam          = models.CharField(max_length=10)
-    q             = models.IntegerField( verbose_name="Question Number", default=0    )
-    claim         = models.TextField(verbose_name="Comment",max_length=200,null=True)
+    exam_id       = models.IntegerField(verbose_name = "Exam id", default=0 )
+    q             = models.IntegerField(verbose_name="Question Number", default=0    )
+    marks         = models.IntegerField(verbose_name="Marks", default=0 )
     comment       = models.TextField(verbose_name="Comments",max_length=200,null=True)
+    #-------------------------------
+    # First claim
+    #-------------------------------
+    claim         = models.TextField(verbose_name="Student claim",max_length=200,null=True)
     raise_time    = models.DateTimeField(null=True)
     is_accepted   = models.BooleanField( verbose_name = "Is crib accepted?" , default=False)
     response_time = models.DateTimeField(null=True)
-    mark          = models.IntegerField(verbose_name="Crib Marks",null=True )
+    response      = models.TextField(verbose_name="TA Response",max_length=200,null=True)
+    crib_marks    = models.IntegerField(verbose_name="Crib Marks",null=True )
     ta            = models.CharField(max_length=20)
+    #-------------------------------
+    # Second claim
+    #-------------------------------
+    claim2        = models.TextField(verbose_name="Student claim second time",max_length=200,null=True)
+    raise_time2   = models.DateTimeField(null=True)
+    is_accepted2  = models.BooleanField( verbose_name = "Is crib accepted second time?" , default=False)
+    response_time2= models.DateTimeField(null=True)
+    crib_marks2   = models.IntegerField(verbose_name="Second Crib Marks",null=True )
+    ta2           = models.CharField(max_length=20)
+
+# class Crib(models.Model):
+#     rollno        = models.CharField(max_length=10)
+#     exam          = models.CharField(max_length=10)
+#     course        = models.CharField( max_length=10, default="")
+#     q             = models.IntegerField( verbose_name="Question Number", default=0    )
 
 class Exam(models.Model):
     name   = models.CharField   ( max_length=10 )
@@ -171,6 +183,7 @@ class Exam(models.Model):
     mark8  = models.IntegerField ( verbose_name = "Marks Question 8", null=True, blank=True )
     mark9  = models.IntegerField ( verbose_name = "Marks Question 9", null=True, blank=True )
     mark10 = models.IntegerField ( verbose_name = "Marks Question 10", null=True, blank=True )
+    link   = models.CharField(max_length=100)
     marks  = models.TextField( verbose_name="Student scorse in (CSV) (Header: Roll No,q1,q2,..,qk)", max_length=3000, null=True, blank=True)
     is_cribs_active = models.BooleanField( verbose_name = "Is Cribs active?" , default=True)
     

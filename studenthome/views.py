@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
 from django.template import loader, RequestContext
 from django.http import HttpResponse
-from .models import StudentInfo,Call,Question,StudentAnswers,SystemState,BioBreak,ExamRoom,Exam,ExamMark,Crib
+from .models import StudentInfo,Call,Question,StudentAnswers,SystemState,BioBreak,ExamRoom,Exam,ExamMark
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin, AccessMixin,UserPassesTestMixin
@@ -228,6 +228,7 @@ def index(request):
     context = RequestContext(request)
     s = get_sys_state()
     context["sys"] = s
+    context[ "is_prof" ] = (p == "prof")
     if p == "prof":
         if s.mode == "QUIZ":
             logq.info( 'prof Quiz status request' )
@@ -259,7 +260,19 @@ def index(request):
             return HttpResponse( "Something is wrong!!" )
         return redirect( reverse('answer', kwargs={'ansid':sa.pk}) )
     else:
-        return HttpResponse( "Quiz is not running!! Refresh to check if it is running now!" )
+        s = get_or_none( StudentInfo, rollno=p )
+        context[ "student" ] = s
+
+        scores = {}
+        for c in s.course.split(','):
+            exams = Exam.objects.filter( Q(course = c) )
+            escores = {}
+            for exam in exams:
+                marks = ExamMark.objects.filter( Q(rollno = p)&Q(exam_id = exam.id) )
+                escores[exam] = marks
+            scores[c] = escores
+        context["scores"] = scores
+        return render( request, 'studenthome/dashboard.html', context.flatten() )
     
 
 #---------------------------------------------------------
@@ -1341,7 +1354,7 @@ def seating(request,cid):
     # -------------------------------------------
     # Collect seats
     # -------------------------------------------    
-    for r in ExamRoom.objects.order_by('name'):
+    for r in ExamRoom.objects.order_by('-capacity'):
         if r.available:
             area = r.area
             name = r.name
@@ -1386,6 +1399,7 @@ def seating(request,cid):
 #----------------------------------------
 # Process marks of the students
 #----------------------------------------
+@transaction.atomic
 def process_marks(d):
     if d.marks:
         marks = pd.read_csv(StringIO(d.marks))
@@ -1393,10 +1407,25 @@ def process_marks(d):
         for index, row in marks.iterrows():
             r = row['Roll No']
             for qname,qid in qs:
-                em = get_or_none( ExamMark, rollno=r, exam=d.name, q=qid )
-                em.mark = row[qname] 
+                em,created = ExamMark.objects.get_or_create( rollno=r, exam_id=d.id, q=qid )
+                em.marks = row[qname]
                 em.save()
 
+def process_questions(d):
+    num_q = 0
+    total = 0
+    none_found = False
+    for i in range(1,11):
+        num = getattr(d, f"mark{i}" )
+        if num:
+            num_q = i
+            total = total + num
+            if none_found:
+                raise Exception( "Marks are not contiguous!" )
+        else:
+            none_found = True
+    d.total = total
+    d.num_q = num_q
 
 class CreateExam(SuccessMessageMixin,CreateView):
     model = Exam
@@ -1438,25 +1467,40 @@ class CreateExam(SuccessMessageMixin,CreateView):
             #----------------------------------------
             # Process marks for the questions
             #----------------------------------------
-            num_q = 0
-            total = 0
-            none_found = False
-            for i in range(1,11):
-                num = getattr(d, f"mark{i}" )
-                if num:
-                    num_q = i
-                    total = total + num
-                    if none_found:
-                        raise Exception( "Marks are not contiguous!" )
-                else:
-                    none_found = True
-            d.total = total
-            d.num_q = num_q
+            # num_q = 0
+            # total = 0
+            # none_found = False
+            # for i in range(1,11):
+            #     num = getattr(d, f"mark{i}" )
+            #     if num:
+            #         num_q = i
+            #         total = total + num
+            #         if none_found:
+            #             raise Exception( "Marks are not contiguous!" )
+            #     else:
+            #         none_found = True
+            # d.total = total
+            # d.num_q = num_q
+            process_questions(d)
+
             
+            #----------------------------------------
+            # Create crib link
+            #----------------------------------------
+            salt = str.encode( str(timezone.now())+str(d.id) )
+            dig = hmac.new(str.encode(SECRET_KEY), msg=salt, digestmod=hashlib.sha256).digest()
+            dh = base64.b64encode(dig).decode()[:-1]
+            d.link  = ''.join(e for e in dh if e.isalnum())
+           
             #----------------------------------------
             # Process marks of the students
             #----------------------------------------
             process_marks(d)
+
+            #----------------------------------------
+            # Disable crib at the start
+            #----------------------------------------
+            d.is_cribs_active = False
             
             #----------------------------------------
             # Save the exam
@@ -1490,6 +1534,8 @@ class EditExam(UpdateView):
         # Process marks of the students
         #----------------------------------------            
         process_marks(q)
+
+        process_questions(q)
         logq.info( 'Question ' + str(q.name) + ' edited.' )
         return reverse( "createexam" )
 
@@ -1516,7 +1562,7 @@ def delete_exam(request, rid):
     # -------------------------------------------
     return redirect( reverse( 'createexam' ) )
 
-def exam_cribs_done(request, rid):
+def disable_crib(request, rid):
     u = who_auth(request)
     if u != 'prof':
         return HttpResponse( 'Incorrect login!' )
@@ -1526,4 +1572,57 @@ def exam_cribs_done(request, rid):
         e.save()
         messages.success(request,'Cribs for exam '+rid+' deactivated!')
         logq.info( 'Cribs for exam ' + rid + ' deactivated!' )
-        
+    return redirect( reverse( 'createexam' ) )
+
+def enable_crib(request, rid):
+    u = who_auth(request)
+    if u != 'prof':
+        return HttpResponse( 'Incorrect login!' )
+    e = get_or_none( Exam, pk = rid )
+    if e:
+        e.is_cribs_active = True
+        e.save()
+        messages.success(request,'Cribs for exam '+rid+' activated!')
+        logq.info( 'Cribs for exam ' + rid + ' deactivated!' )
+    return redirect( reverse( 'createexam' ) )
+
+def raise_crib(request, eid):
+    u = who_auth(request)
+    e = get_or_none( ExamMark, pk = eid )
+    if (e == None) or (e.rollno != u):
+        return HttpResponse( 'Incorrect login!' )
+    e.raise_time = timezone.now()
+    e.save()
+    messages.success(request,'Cribs raised by '+e.rollno+' for crib '+ eid +'!')
+    logq.info( 'Cribs raised by '+e.rollno+' for crib '+ eid +'!' )
+    return redirect( reverse( 'index' ) )
+
+def update_crib_marks(request, eid, link):
+    u = who_auth(request)
+    e = get_or_none( ExamMark, pk = eid )
+    if (e == None):
+        return HttpResponse( 'Incorrect crib!' )
+    exam = get_or_none( Exam, pk = e.exam_id )
+    if exam.link != link:
+        return HttpResponse( 'Bad URL!' )        
+    
+    e.raise_time = timezone.now()
+    e.save()
+    messages.success(request,'Cribs for exam '+rid+' deactivated!')
+    logq.info( 'Cribs for exam ' + rid + ' deactivated!' )
+
+class EditExamMark(UpdateView):
+    model = ExamMark
+    fields = ['crib_marks','response']
+    template_name = 'exam/edit.html'
+    pk_url_kwarg = 'eid'
+    
+    def get_context_data( self, **kwargs ):
+        context = super(EditExam,self).get_context_data(**kwargs)
+        context[ "is_auth" ] = (who_auth( self.request ) == "prof")
+        return context
+
+    def get_success_url(self):
+        e = self.object
+        logq.info( 'Crib ' + str(q.name) + ' saved.' )
+        return reverse( "createexam" )

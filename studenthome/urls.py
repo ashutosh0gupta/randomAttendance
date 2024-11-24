@@ -51,9 +51,15 @@ urlpatterns = [
     # Exam management
     #----------------------
     path('createexam/', views.CreateExam.as_view(), name='createexam'),
-    re_path(r'^editexam/(?P<rid>\w+)/', views.EditExam.as_view(), name='editexam'),    
-    re_path(r'^deleteqexam/(?P<rid>\w+)/$', views.delete_exam, name='deleteexam'),
-    # re_path('allocateseats/(?P<cid>\w+)', views.seating, name='allocateseats'),
+    re_path(r'^editexam/(?P<rid>\w+)/', views.EditExam.as_view(), name='editexam' ),    
+    re_path(r'^deleteexam/(?P<rid>\w+)/$', views.delete_exam,   name='deleteexam' ),
+    re_path(r'^enablecrib/(?P<rid>\w+)/$', views.enable_crib,   name='enablecrib' ),
+    re_path(r'^disablecrib/(?P<rid>\w+)/$', views.disable_crib, name='disablecrib'),
+    
+    #----------------------
+    # Crib management
+    #----------------------
+    re_path('raisecrib/(?P<eid>\w+)', views.raise_crib, name='raisecrib'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -42,6 +42,7 @@
     <th>Course</th>
     <th>Total score</th>
     <th>#Questions</th>
+    <th>Crib</th>
     <th></th>
     <th></th>
   </tr>
@@ -51,6 +52,13 @@
     <td>{{ r.course    }}</td>
     <td>{{ r.total     }}</td>
     <td>{{ r.num_q     }}</td>
+    <td>
+      {% if r.is_cribs_active %}
+      <a href="{%url 'raisecrib' r.id %}" class="ui label red">Disable</a>
+      {% else %}
+      <a href="{%url 'raisecrib' r.id %}" class="ui label blue">Enable</a>
+      {% endif %}
+    </td>
     <td>
       <a href="{%url 'editexam' r.id %}" onclick="return confirm('Are you sure that you want to edit exam {{r.name}}?');">Edit</a>
     </td>
