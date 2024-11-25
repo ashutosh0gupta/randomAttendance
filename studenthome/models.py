@@ -184,7 +184,7 @@ class Exam(models.Model):
     mark9  = models.IntegerField ( verbose_name = "Marks Question 9", null=True, blank=True )
     mark10 = models.IntegerField ( verbose_name = "Marks Question 10", null=True, blank=True )
     link   = models.CharField(max_length=100, null=True)
-    marks  = models.TextField( verbose_name="Student scorse in (CSV) (Header: Roll No,q1,q2,..,qk)", max_length=3000, null=True, blank=True)
+    marks  = models.TextField( verbose_name="Student scorse in (CSV) (Header: Roll No,q1,q2,..,qk)", max_length=20000, null=True, blank=True)
     is_cribs_active = models.BooleanField( verbose_name = "Is Cribs active?" , default=True)
     
 
