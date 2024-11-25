@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block body_attr %}
+{% endblock %}
+
+{% block pagestyle %}
+{% endblock %}
+
+{% block content %}
+
+{% if is_auth %}
+<div class="ui container">
+  <h1>Raise crib</h1>
+
+  <div>Question No: {{e.q}}</div>
+  
+  <div>Initial marks: {{e.marks}}</div>
+
+  <div class="ui container">
+    {% if messages %}
+     {% for message in messages %}
+       <p class=" ui {{ message.tags }} tiny message">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Update">
+  </form>
+
+</div>
+
+
+{% else %}
+Please <a href="{% url 'login' %}">login</a>!
+{% endif %}
+
+{% endblock %}

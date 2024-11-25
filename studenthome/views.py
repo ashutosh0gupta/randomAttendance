@@ -29,6 +29,9 @@ import random
 from collections import defaultdict
 from io import StringIO
 import pandas as pd
+import hmac
+import hashlib
+import base64
 # import pylatexenc
 # from pylatexenc.latex2text import LatexNodes2Text
 
@@ -99,7 +102,7 @@ def who_auth(request):
             #------------------------
             # For testing
             #------------------------
-            return '190050057'
+            return '23B0902'
             # return "prof"
         return None
     #-----------------------------
@@ -264,12 +267,13 @@ def index(request):
         context[ "student" ] = s
 
         scores = {}
-        for c in s.course.split(','):
+        for c in s.course.split('-'):
             exams = Exam.objects.filter( Q(course = c) )
             escores = {}
-            for exam in exams:
-                marks = ExamMark.objects.filter( Q(rollno = p)&Q(exam_id = exam.id) )
-                escores[exam] = marks
+            if exams:
+                for exam in exams:
+                    marks = ExamMark.objects.filter( Q(rollno = p)&Q(exam_id = exam.id) )
+                    escores[exam] = marks
             scores[c] = escores
         context["scores"] = scores
         return render( request, 'studenthome/dashboard.html', context.flatten() )
@@ -1487,8 +1491,8 @@ class CreateExam(SuccessMessageMixin,CreateView):
             #----------------------------------------
             # Create crib link
             #----------------------------------------
-            salt = str.encode( str(timezone.now())+str(d.id) )
-            dig = hmac.new(str.encode(SECRET_KEY), msg=salt, digestmod=hashlib.sha256).digest()
+            salt = str(timezone.now())+str(d.id)
+            dig = hmac.new(str.encode(salt), msg=str.encode(salt), digestmod=hashlib.sha256).digest()
             dh = base64.b64encode(dig).decode()[:-1]
             d.link  = ''.join(e for e in dh if e.isalnum())
            
@@ -1586,43 +1590,104 @@ def enable_crib(request, rid):
         logq.info( 'Cribs for exam ' + rid + ' deactivated!' )
     return redirect( reverse( 'createexam' ) )
 
-def raise_crib(request, eid):
-    u = who_auth(request)
-    e = get_or_none( ExamMark, pk = eid )
-    if (e == None) or (e.rollno != u):
-        return HttpResponse( 'Incorrect login!' )
-    e.raise_time = timezone.now()
-    e.save()
-    messages.success(request,'Cribs raised by '+e.rollno+' for crib '+ eid +'!')
-    logq.info( 'Cribs raised by '+e.rollno+' for crib '+ eid +'!' )
-    return redirect( reverse( 'index' ) )
+def view_cribs(request, eid, qid, link):
+    context = RequestContext(request)
+    exam = get_or_none( Exam, pk = eid, link = link )
+    if exam:
+        cribs = ExamMark.objects.filter( Q(q = qid)&(~Q(raise_time = None))&Q(exam_id = exam.id)&Q(response_time = None) ).order_by('raise_time')
+        dones = ExamMark.objects.filter( Q(q = qid)&(~Q(raise_time = None))&Q(exam_id = exam.id)&(~Q(response_time = None)) ).order_by('response_time')
+        context["cribs"] = cribs
+        context["dones"] = dones
+        context["qid"  ] = qid
+        context["link" ] = link
+        context["exam" ] = exam
+        return render( request, 'exammark/cribs.html', context.flatten() )
+    else:
+        return HttpResponse( 'Incorrect access!' )
 
-def update_crib_marks(request, eid, link):
-    u = who_auth(request)
+def exam_crib_links(request, eid, link):
+    context = RequestContext(request)
+    exam = get_or_none( Exam, pk = eid, link = link )
+    if exam:
+        context["exam"] = exam
+        context["qs"] = [i for i in range(1,exam.num_q+1)]
+        return render( request, 'exam/criblinks.html', context.flatten() )
+    else:
+        return HttpResponse( 'Incorrect access!' )
+
+#-------------------------------
+# Crib management
+#-------------------------------
+
+class RaiseCrib(UpdateView):
+    model = ExamMark
+    fields = ['claim']
+    template_name = 'exammark/raise.html'
+    pk_url_kwarg = 'eid'
+    
+    def get_context_data( self, **kwargs ):
+        context = super(RaiseCrib,self).get_context_data(**kwargs)
+        e = self.object
+        context[ "is_auth" ] = (who_auth( self.request ) == e.rollno) and (e.raise_time == None)
+        context[ "e" ] = e
+        return context
+
+    def get_success_url(self):
+        e = self.object
+        e.raise_time = timezone.now()
+        e.save()
+        messages.success(self.request,f'Cribs raised by {e.rollno} for score id {e.id} !')
+        logq.info( f'Cribs raised by {e.rollno} for score id {e.id} !' )
+        return reverse( "index" )
+
+class ResponseCrib(UpdateView):
+    model = ExamMark
+    fields = ['crib_marks','response']
+    template_name = 'exammark/response.html'
+    pk_url_kwarg = 'eid'
+    
+    def get_context_data( self, **kwargs ):
+        context = super(ResponseCrib,self).get_context_data(**kwargs)
+        link = self.kwargs['link']
+        e = self.object
+        exam = get_or_none( Exam, pk = e.exam_id )
+        context[ "is_auth" ] = ( link == exam.link )
+        context[ "e" ] = e
+        context[ "link" ] = link
+        return context
+
+    def get_success_url(self):
+        e = self.object
+        e.is_accepted   = True
+        e.response_time = timezone.now()
+        e.save()
+        exam = get_or_none( Exam, pk = e.exam_id )
+        logq.info( 'Crib for score id ' + str(e.id) + ' is accepted.' )
+        # return redirect( reverse('index') )
+        return reverse('cribs', kwargs={'eid':e.exam_id,'qid':e.q,'link':exam.link})
+
+
+def reject_crib(request, eid, link):
     e = get_or_none( ExamMark, pk = eid )
     if (e == None):
         return HttpResponse( 'Incorrect crib!' )
     exam = get_or_none( Exam, pk = e.exam_id )
     if exam.link != link:
-        return HttpResponse( 'Bad URL!' )        
-    
-    e.raise_time = timezone.now()
+        return HttpResponse( 'Bad URL!' ) 
+    e.is_accepted   = False
+    e.response_time = timezone.now()
     e.save()
-    messages.success(request,'Cribs for exam '+rid+' deactivated!')
-    logq.info( 'Cribs for exam ' + rid + ' deactivated!' )
+    messages.success(request,f'Cribs for scode id {e.id} is rejected!')
+    logq.info( f'Cribs for scode id {e.id} is rejected!' )
+    return redirect( reverse('cribs', kwargs={'eid':e.exam_id,'qid':e.q,'link':exam.link}) )
 
-class EditExamMark(UpdateView):
-    model = ExamMark
-    fields = ['crib_marks','response']
-    template_name = 'exam/edit.html'
-    pk_url_kwarg = 'eid'
-    
-    def get_context_data( self, **kwargs ):
-        context = super(EditExam,self).get_context_data(**kwargs)
-        context[ "is_auth" ] = (who_auth( self.request ) == "prof")
-        return context
-
-    def get_success_url(self):
-        e = self.object
-        logq.info( 'Crib ' + str(q.name) + ' saved.' )
-        return reverse( "createexam" )
+# def raise_crib(request, eid):
+#     u = who_auth(request)
+#     e = get_or_none( ExamMark, pk = eid )
+#     if (e == None) or (e.rollno != u):
+#         return HttpResponse( 'Incorrect login!' )
+#     e.raise_time = timezone.now()
+#     e.save()
+#     messages.success(request,'Cribs raised by '+e.rollno+' for score id '+ eid +'!')
+#     logq.info( 'Cribs raised by '+e.rollno+' for score id '+ eid +'!' )
+#     return redirect( reverse( 'index' ) )

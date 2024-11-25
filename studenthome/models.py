@@ -137,7 +137,7 @@ class ExamRoom(models.Model):
 
 class ExamMark(models.Model):
     rollno        = models.CharField(max_length=10)
-    exam_id       = models.IntegerField(verbose_name = "Exam id", default=0 )
+    exam_id       = models.IntegerField(verbose_name = "Exam id", default=0,null=True)
     q             = models.IntegerField(verbose_name="Question Number", default=0    )
     marks         = models.IntegerField(verbose_name="Marks", default=0 )
     comment       = models.TextField(verbose_name="Comments",max_length=200,null=True)
@@ -183,7 +183,7 @@ class Exam(models.Model):
     mark8  = models.IntegerField ( verbose_name = "Marks Question 8", null=True, blank=True )
     mark9  = models.IntegerField ( verbose_name = "Marks Question 9", null=True, blank=True )
     mark10 = models.IntegerField ( verbose_name = "Marks Question 10", null=True, blank=True )
-    link   = models.CharField(max_length=100)
+    link   = models.CharField(max_length=100, null=True)
     marks  = models.TextField( verbose_name="Student scorse in (CSV) (Header: Roll No,q1,q2,..,qk)", max_length=3000, null=True, blank=True)
     is_cribs_active = models.BooleanField( verbose_name = "Is Cribs active?" , default=True)
     

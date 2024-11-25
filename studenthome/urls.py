@@ -55,11 +55,15 @@ urlpatterns = [
     re_path(r'^deleteexam/(?P<rid>\w+)/$', views.delete_exam,   name='deleteexam' ),
     re_path(r'^enablecrib/(?P<rid>\w+)/$', views.enable_crib,   name='enablecrib' ),
     re_path(r'^disablecrib/(?P<rid>\w+)/$', views.disable_crib, name='disablecrib'),
+    re_path(r'^criblinks/(?P<eid>\w+)/(?P<link>\w+)/$', views.exam_crib_links, name='criblinks'),
     
     #----------------------
     # Crib management
     #----------------------
-    re_path('raisecrib/(?P<eid>\w+)', views.raise_crib, name='raisecrib'),
+    re_path('^raisecrib/(?P<eid>\w+)', views.RaiseCrib.as_view(), name='raisecrib'),
+    re_path('^responsecrib/(?P<eid>\w+)/(?P<link>\w+)', views.ResponseCrib.as_view(), name='responsecrib'),
+    re_path('^rejectcrib/(?P<eid>\w+)/(?P<link>\w+)', views.reject_crib, name='rejectcrib'),
+    re_path('^cribs/(?P<eid>\w+)/(?P<qid>\w+)/(?P<link>\w+)', views.view_cribs, name='cribs'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

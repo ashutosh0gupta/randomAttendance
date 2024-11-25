@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block body_attr %}
+{% endblock %}
+
+{% block pagestyle %}
+{% endblock %}
+
+{% block content %}
+
+{% if is_auth %}
+<div class="ui container">
+  <h1>Response to crib</h1>
+
+  <div><b>Roll No:</b> {{e.rollno}}</div>
+  <div><b>Question No:</b> {{e.q}}</div>  
+  <div><b>Initial Marks:</b> {{e.marks}}</div>
+  <div><b>Claim:</b> {{e.claim}}</div>
+  <br>
+  <div>
+    <a href="{% url 'rejectcrib' e.id link %}" class="ui label red" >Reject</a>
+  </div>
+  <br>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Accept" class="ui label blue">
+    <!-- <button type="submit" class="ui label blue">Accepct</button> -->
+  </form>
+
+  <!-- <button type="submit" name="is_accepted" value="false" class="ui label red">Reject</button> -->
+
+</div>
+
+
+{% else %}
+Please <a href="{% url 'login' %}">login</a>!
+{% endif %}
+
+{% endblock %}

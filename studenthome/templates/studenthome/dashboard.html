@@ -10,6 +10,13 @@
 
 <div class="ui container">
   <h1>Dashboard</h1>
+  <div class="ui container">
+    {% if messages %}
+     {% for message in messages %}
+       <p class=" ui {{ message.tags }} tiny message">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+  </div>
 
 {% if is_prof %}
   
@@ -38,6 +45,7 @@ You are taking courses: {{ student.course }}
 
 {% for course,escores in scores.items %}
   <h1>{{ course }}</h1>
+  {% if escores.items %}
   {% for exam,exam_marks in escores.items %}
     <h3>{{ exam.name }} marks</h3>
     <table style="border: 1px solid black">
@@ -47,16 +55,17 @@ You are taking courses: {{ student.course }}
         <th>TA Crib</th>    
         <th>Instructor Crib</th>    
       </tr>
+      {% if exam_marks %}
       {% for e in exam_marks %}
       <tr>
         <td>{{ e.q      }} </td>
         <td>{{ e.marks  }} </td>
         <td>
           {% if e.response_time %}
-            {% if exam.is_accepted %}
+            {% if e.is_accepted %}
             New marks: {{ e.crib_marks }}
             {% else %}
-            Crib not accepted
+            <span style="color:red">Rejected</span>
             {% endif %}
           {% elif e.raise_time %}
             {% if exam.is_cribs_active %}
@@ -73,24 +82,32 @@ You are taking courses: {{ student.course }}
             {% if exam.is_accepted2 %}
             New marks: {{ e.crib_marks2 }}
             {% else %}
-            Crib not accepted
+          <span style="color:red">Crib not accepted</span>
             {% endif %}
           {% elif e.raise_time2 %}
             {% if exam.is_cribs_active %}
               Goto Instructor
             {% endif %}
           {% elif e.response_time %}
+            In case of error by TA, you may contact the instructor.
+            {% comment %}
             {% if exam.is_cribs_active %}
               <a href="{%url 'raisecrib2' e.id %}" class="ui label blue">Raise crib</a>
             {% endif %}
+            {% endcomment %}
           {% endif %}          
         </td>
       </tr>
       {% endfor %}
+      {% endif %}
     </table>  
   {% endfor %}
+  {% else %}
+    No exams for this course!  
+  {% endif %}
 {% endfor %}  
 <br>
+<h1>Quiz status</h1>
 Quiz is not running!! Refresh to check if it is running now!
 {% endif %}
 </div>
