@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block body_attr %}
+{% endblock %}
+
+{% block pagestyle %}
+{% endblock %}
+
+{% block content %}
+
+<div class="ui container">
+  <h1>Links for cribs for {{exam.name}}</h1>
+  {% for i in qs %}
+  <div>
+    <a href="{%url 'cribs' exam.id i exam.link %}" class="ui label blue" >Cribs for Question {{i}}</a>
+  </div>
+  <br>
+  {% endfor %}
+
+</div>
+
+
+{% endblock %}

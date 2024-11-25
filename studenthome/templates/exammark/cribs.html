@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block body_attr %}
+{% endblock %}
+
+{% block pagestyle %}
+<meta http-equiv="refresh" content="5">
+{% endblock %}
+
+{% block content %}
+
+<div class="ui container">
+
+<h1>Cribs for question {{qid}} of {{exam.name}}</h1>
+
+<table style="border: 1px solid black">
+<tr>
+  <th>Roll No.</th>
+  <th>Marks</th>
+  <th>Claim</th>    
+  <th></th>    
+  </tr>
+  {% for e in cribs %}
+  <tr>
+    <td>{{ e.rollno    }}</td>
+    <td>{{ e.marks     }}</td>
+    <td>{{ e.claim     }}</td>
+    <td>
+      <a href="{%url 'responsecrib' e.id link %}" class="ui label blue">Respond</a>
+    </td>
+  </tr>
+  {% endfor %}
+  <tr>
+  </tr>
+</table>
+
+<h1>Responded Cribs</h1>
+
+<table style="border: 1px solid black">
+<tr>
+  <th>Roll No.</th>
+  <th>Marks</th>
+  <th>Claim</th>    
+  <th>Response</th>    
+  <th>Status</th>    
+  <th></th>    
+  </tr>
+  {% for e in dones %}
+  <tr>
+    <td>{{ e.rollno    }}</td>
+    <td>{{ e.marks     }}</td>
+    <td>{{ e.claim     }}</td>
+    <td>{{ e.response  }}</td>
+    <td>
+      {% if e.is_accepted %}
+      New marks: {{ e.crib_marks }}
+      {% else %}
+      <span style="color:red">Rejected</span>
+      {% endif %}
+    </td>
+    <td>
+      <a href="{%url 'responsecrib' e.id link %}" class="ui label blue">Update Response</a>
+    </td>
+  </tr>
+  {% endfor %}
+  <tr>
+  </tr>
+</table>
+
+</div>
+
+{% endblock %}
