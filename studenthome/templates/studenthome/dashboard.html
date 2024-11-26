@@ -89,7 +89,7 @@ You are taking courses: {{ student.course }}
               Goto Instructor
             {% endif %}
           {% elif e.response_time %}
-            In case of error by TA, you may contact the instructor.
+            In case of an error by TA, you may contact the instructor.
             {% comment %}
             {% if exam.is_cribs_active %}
               <a href="{%url 'raisecrib2' e.id %}" class="ui label blue">Raise crib</a>
