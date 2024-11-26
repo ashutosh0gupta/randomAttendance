@@ -42,6 +42,7 @@
     <th>Course</th>
     <th>Total score</th>
     <th>#Questions</th>
+    <th>View</th>
     <th>Crib</th>
     <th></th>
     <th></th>
@@ -52,6 +53,9 @@
     <td>{{ r.course    }}</td>
     <td>{{ r.total     }}</td>
     <td>{{ r.num_q     }}</td>
+    <td>
+    <a href="{%url 'viewexam' r.id %}" class="ui label blue">View Scores</a>
+    </td>
     <td>
       {% if r.is_cribs_active %}
       <a href="{%url 'criblinks' r.id r.link %}" class="ui label blue">Crib links</a>

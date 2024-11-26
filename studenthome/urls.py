@@ -53,6 +53,7 @@ urlpatterns = [
     path('createexam/', views.CreateExam.as_view(), name='createexam'),
     re_path(r'^editexam/(?P<rid>\w+)/', views.EditExam.as_view(), name='editexam' ),    
     re_path(r'^deleteexam/(?P<rid>\w+)/$', views.delete_exam,   name='deleteexam' ),
+    re_path(r'^viewexam/(?P<rid>\w+)/$', views.view_exam,   name='viewexam' ),
     re_path(r'^enablecrib/(?P<rid>\w+)/$', views.enable_crib,   name='enablecrib' ),
     re_path(r'^disablecrib/(?P<rid>\w+)/$', views.disable_crib, name='disablecrib'),
     re_path(r'^criblinks/(?P<eid>\w+)/(?P<link>\w+)/$', views.exam_crib_links, name='criblinks'),
