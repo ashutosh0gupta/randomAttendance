@@ -139,26 +139,26 @@ class ExamMark(models.Model):
     rollno        = models.CharField(max_length=10)
     exam_id       = models.IntegerField(verbose_name = "Exam id", default=0,null=True)
     q             = models.IntegerField(verbose_name="Question Number", default=0    )
-    marks         = models.IntegerField(verbose_name="Marks", default=0 )
+    marks         = models.DecimalField(verbose_name="Marks", default=0, max_digits = 3, decimal_places = 1)
     comment       = models.TextField(verbose_name="Comments",max_length=200,null=True)
     #-------------------------------
     # First claim
     #-------------------------------
     claim         = models.TextField(verbose_name="Student claim",max_length=200,null=True)
     raise_time    = models.DateTimeField(null=True)
-    is_accepted   = models.BooleanField( verbose_name = "Is crib accepted?" , default=False)
+    is_accepted   = models.BooleanField( verbose_name = "Was crib accepted?" , default=False)
     response_time = models.DateTimeField(null=True)
     response      = models.TextField(verbose_name="TA Response",max_length=200,null=True)
-    crib_marks    = models.IntegerField(verbose_name="Crib Marks",null=True )
+    crib_marks    = models.DecimalField(verbose_name="Crib Marks",null=True, max_digits = 3, decimal_places = 1 )
     ta            = models.CharField(max_length=20)
     #-------------------------------
     # Second claim
     #-------------------------------
     claim2        = models.TextField(verbose_name="Student claim second time",max_length=200,null=True)
     raise_time2   = models.DateTimeField(null=True)
-    is_accepted2  = models.BooleanField( verbose_name = "Is crib accepted second time?" , default=False)
+    is_accepted2  = models.BooleanField( verbose_name = "Was crib accepted second time?" , default=False)
     response_time2= models.DateTimeField(null=True)
-    crib_marks2   = models.IntegerField(verbose_name="Second Crib Marks",null=True )
+    crib_marks2   = models.DecimalField(verbose_name="Second Crib Marks",null=True, max_digits = 3, decimal_places = 1 )
     ta2           = models.CharField(max_length=20)
 
 # class Crib(models.Model):

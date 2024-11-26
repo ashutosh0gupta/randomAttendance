@@ -102,7 +102,7 @@ def who_auth(request):
             #------------------------
             # For testing
             #------------------------
-            return '23B0902'
+            return '23B0922'
             # return "prof"
         return None
     #-----------------------------
@@ -267,7 +267,7 @@ def index(request):
         context[ "student" ] = s
 
         scores = {}
-        for c in s.course.split('-'):
+        for c in s.course.replace(',','-').split('-'):
             exams = Exam.objects.filter( Q(course = c) )
             escores = {}
             if exams:
@@ -1405,11 +1405,11 @@ def seating(request,cid):
 #----------------------------------------
 @transaction.atomic
 def process_marks(d):
-    if d.marks:
-        marks = pd.read_csv(StringIO(d.marks))
+    if d.marks:        
+        marks = pd.read_csv(StringIO(d.marks.upper()))
         qs = [ (q,int(q[1:])) for q in marks.columns[1:] ]
         for index, row in marks.iterrows():
-            r = row['Roll No']
+            r = row['ROLL NO']
             for qname,qid in qs:
                 em,created = ExamMark.objects.get_or_create( rollno=r, exam_id=d.id, q=qid )
                 em.marks = row[qname]
@@ -1628,7 +1628,8 @@ class RaiseCrib(UpdateView):
     def get_context_data( self, **kwargs ):
         context = super(RaiseCrib,self).get_context_data(**kwargs)
         e = self.object
-        context[ "is_auth" ] = (who_auth( self.request ) == e.rollno) and (e.raise_time == None)
+        exam = get_or_none( Exam, pk = e.exam_id )
+        context[ "is_auth" ] = (who_auth( self.request ) == e.rollno) and (e.raise_time == None) and (exam.is_cribs_active == True)
         context[ "e" ] = e
         return context
 
@@ -1651,7 +1652,7 @@ class ResponseCrib(UpdateView):
         link = self.kwargs['link']
         e = self.object
         exam = get_or_none( Exam, pk = e.exam_id )
-        context[ "is_auth" ] = ( link == exam.link )
+        context[ "is_auth" ] = ( link == exam.link ) and (exam.is_cribs_active == True)
         context[ "e" ] = e
         context[ "link" ] = link
         return context
