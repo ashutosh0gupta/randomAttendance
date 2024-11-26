@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block body_attr %}
+{% endblock %}
+
+{% block pagestyle %}
+{% endblock %}
+
+{% block content %}
+
+<div class="ui container">
+  <h1>Score for {{exam.name}}</h1>
+
+<table style="border: 1px solid black">
+  <tr>
+    <th>Roll No</th>
+    <th>Total</th>
+    {% for i in qs %}
+    <th>Q{{i}}</th>    
+    {% endfor %}
+  </tr>
+  {% for student_score in scores %}
+  <tr>
+    {% for score in student_score %}
+    <td>
+      {{score}}
+    </td>
+    {% endfor %}
+    {% endfor %}
+  </tr>
+</table>
+
+</div>
+
+
+{% endblock %}
