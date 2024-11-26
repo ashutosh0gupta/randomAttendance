@@ -1630,7 +1630,7 @@ def enable_crib(request, rid):
 
 def view_cribs(request, eid, qid, link):
     context = RequestContext(request)
-    exam = get_or_none( Exam, pk = eid, link = link )
+    exam = get_or_none( Exam, pk = eid, link = link, is_cribs_active = True )
     if exam:
         cribs = ExamMark.objects.filter( Q(q = qid)&(~Q(raise_time = None))&Q(exam_id = exam.id)&Q(response_time = None) ).order_by('raise_time')
         dones = ExamMark.objects.filter( Q(q = qid)&(~Q(raise_time = None))&Q(exam_id = exam.id)&(~Q(response_time = None)) ).order_by('response_time')
@@ -1641,7 +1641,7 @@ def view_cribs(request, eid, qid, link):
         context["exam" ] = exam
         return render( request, 'exammark/cribs.html', context.flatten() )
     else:
-        return HttpResponse( 'Incorrect access!' )
+        return HttpResponse( 'Crib session for this exam is disabled for now!' )
 
 def exam_crib_links(request, eid, link):
     context = RequestContext(request)
