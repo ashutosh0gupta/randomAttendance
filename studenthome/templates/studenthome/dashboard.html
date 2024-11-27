@@ -63,7 +63,7 @@ You are taking courses: {{ student.course }}
         <td>
           {% if e.response_time %}
             {% if e.is_accepted %}
-            New marks: {{ e.crib_marks }}
+            Crib marks: {{ e.crib_marks }}
             {% else %}
             <span style="color:red">Rejected</span>
             {% endif %}
@@ -80,7 +80,7 @@ You are taking courses: {{ student.course }}
         <td>
           {% if e.response_time2 %}
             {% if e.is_accepted2 %}
-            Final marks: {{ e.crib_marks2 }}
+            Instructor marks: {{ e.crib_marks2 }}
             {% else %}
             <span style="color:red">Rejected</span>
             {% endif %}

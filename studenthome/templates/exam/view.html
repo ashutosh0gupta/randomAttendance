@@ -10,6 +10,8 @@
 
 <div class="ui container">
   <h1>Score for {{exam.name}}</h1>
+  
+<a href="{% url 'createexam' %}" class="ui label blue" >Exams</a>
 
 <table style="border: 1px solid black">
   <tr>
@@ -26,11 +28,26 @@
       {{score}}
     </td>
     {% endfor %}
-    {% endfor %}
   </tr>
+  {% endfor %}
 </table>
 
 </div>
 
+
+
+<div>
+Roll No,Total,
+{% for i in qs %}
+Q{{i}},
+{% endfor %}
+<br>
+{% for student_score in scores %}
+{% for score in student_score %}
+{{score}},
+{% endfor %}
+<br>
+{% endfor %}  
+</div>
 
 {% endblock %}
