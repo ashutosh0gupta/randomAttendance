@@ -52,6 +52,7 @@ urlpatterns = [
     #----------------------
     path('createexam/', views.CreateExam.as_view(), name='createexam'),
     re_path(r'^editexam/(?P<rid>\w+)/', views.EditExam.as_view(), name='editexam' ),    
+    re_path(r'^regradeexam/(?P<rid>\w+)/', views.RegradeExam.as_view(), name='regradeexam' ),    
     re_path(r'^deleteexam/(?P<rid>\w+)/$', views.delete_exam,   name='deleteexam' ),
     re_path(r'^viewexam/(?P<rid>\w+)/$', views.view_exam,   name='viewexam' ),
     re_path(r'^enablecrib/(?P<rid>\w+)/$', views.enable_crib,   name='enablecrib' ),
@@ -62,6 +63,7 @@ urlpatterns = [
     # Crib management
     #----------------------
     re_path('^raisecrib/(?P<eid>\w+)', views.RaiseCrib.as_view(), name='raisecrib'),
+    re_path('^raisecrib2/(?P<eid>\w+)', views.RaiseCrib2.as_view(), name='raisecrib2'),
     re_path('^responsecrib/(?P<eid>\w+)/(?P<link>\w+)', views.ResponseCrib.as_view(), name='responsecrib'),
     re_path('^rejectcrib/(?P<eid>\w+)/(?P<link>\w+)', views.reject_crib, name='rejectcrib'),
     re_path('^cribs/(?P<eid>\w+)/(?P<qid>\w+)/(?P<link>\w+)', views.view_cribs, name='cribs'),

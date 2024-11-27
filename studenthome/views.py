@@ -102,7 +102,7 @@ def who_auth(request):
             #------------------------
             # For testing
             #------------------------
-            return '23B0922'
+            return '23B0942'
             # return "prof"
         return None
     #-----------------------------
@@ -1415,6 +1415,38 @@ def process_marks(d):
                 em.marks = row[qname]
                 em.save()
 
+@transaction.atomic
+def regrade_marks(e):
+    if e.regrade:        
+        marks = pd.read_csv(StringIO(e.regrade.upper()))
+        qs = [ (q,int(q[1:])) for q in marks.columns[1:] ]
+        for index, row in marks.iterrows():
+            r = row['ROLL NO']
+            for qname,qid in qs:
+                em,created = ExamMark.objects.get_or_create( rollno=r, exam_id=e.id, q=qid )
+                update = False
+                # -------------------------------------------------------------
+                # Update only if uploaded marks are different from latest marks 
+                # -------------------------------------------------------------
+                if em.response_time2 and em.is_accepted2:
+                    if em.crib_marks2 != row[qname]:
+                        em.crib_marks2 = row[qname]
+                        em.is_accepted2   = True
+                        em.response_time2 = timezone.now()
+                        em.save()
+                elif em.response_time and em.is_accepted:
+                    if em.crib_marks != row[qname]:
+                        em.crib_marks2 = row[qname]
+                        em.is_accepted2   = True
+                        em.response_time2 = timezone.now()
+                        em.save()
+                else:
+                    if em.marks != row[qname]:
+                        em.crib_marks    = row[qname]
+                        em.is_accepted   = True
+                        em.response_time = timezone.now()
+                        em.save()
+
 def process_questions(d):
     num_q = 0
     total = 0
@@ -1541,6 +1573,27 @@ class EditExam(UpdateView):
 
         process_questions(q)
         logq.info( 'Question ' + str(q.name) + ' edited.' )
+        return reverse( "createexam" )
+
+class RegradeExam(UpdateView):
+    model = Exam
+    fields = ['regrade']
+    template_name = 'exam/regrade.html'
+    pk_url_kwarg = 'rid'
+    
+    def get_context_data( self, **kwargs ):
+        context = super(RegradeExam,self).get_context_data(**kwargs)
+        context[ "is_auth" ] = (who_auth( self.request ) == "prof")
+        return context
+
+    def get_success_url(self):
+        e = self.object
+        #----------------------------------------
+        # Process marks of the students
+        #----------------------------------------            
+        regrade_marks(e)
+        
+        logq.info( 'Exame ' + str(e.name) + ' regraded!' )
         return reverse( "createexam" )
 
 
@@ -1679,6 +1732,29 @@ class RaiseCrib(UpdateView):
         logq.info( f'Cribs raised by {e.rollno} for score id {e.id} !' )
         return reverse( "index" )
 
+
+class RaiseCrib2(UpdateView):
+    model = ExamMark
+    fields = ['claim2']
+    template_name = 'exammark/raise2.html'
+    pk_url_kwarg = 'eid'
+    
+    def get_context_data( self, **kwargs ):
+        context = super(RaiseCrib,self).get_context_data(**kwargs)
+        e = self.object
+        exam = get_or_none( Exam, pk = e.exam_id )
+        context[ "is_auth" ] = (who_auth( self.request ) == e.rollno) and (e.response_time != None) and (e.raise_time2 == None) and (exam.is_cribs_active == True)
+        context[ "e" ] = e
+        return context
+
+    def get_success_url(self):
+        e = self.object
+        e.raise_time = timezone.now()
+        e.save()
+        messages.success(self.request,f'Cribs raised by {e.rollno} for score id {e.id} !')
+        logq.info( f'Cribs raised by {e.rollno} for score id {e.id} !' )
+        return reverse( "index" )
+
 class ResponseCrib(UpdateView):
     model = ExamMark
     fields = ['crib_marks','response']
@@ -1719,6 +1795,8 @@ def reject_crib(request, eid, link):
     messages.success(request,f'Cribs for scode id {e.id} is rejected!')
     logq.info( f'Cribs for scode id {e.id} is rejected!' )
     return redirect( reverse('cribs', kwargs={'eid':e.exam_id,'qid':e.q,'link':exam.link}) )
+
+
 
 # def raise_crib(request, eid):
 #     u = who_auth(request)

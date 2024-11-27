@@ -185,6 +185,7 @@ class Exam(models.Model):
     mark10 = models.IntegerField ( verbose_name = "Marks Question 10", null=True, blank=True )
     link   = models.CharField(max_length=100, null=True)
     marks  = models.TextField( verbose_name="Student scorse in (CSV) (Header: Roll No,q1,q2,..,qk)", max_length=20000, null=True, blank=True)
+    regrade = models.TextField( verbose_name="Student scorse in (CSV) (Header: Roll No,qi)", max_length=20000, null=True, blank=True)
     is_cribs_active = models.BooleanField( verbose_name = "Is Cribs active?" , default=True)
     
 

@@ -79,10 +79,10 @@ You are taking courses: {{ student.course }}
         </td>
         <td>
           {% if e.response_time2 %}
-            {% if exam.is_accepted2 %}
-            New marks: {{ e.crib_marks2 }}
+            {% if e.is_accepted2 %}
+            Final marks: {{ e.crib_marks2 }}
             {% else %}
-          <span style="color:red">Crib not accepted</span>
+            <span style="color:red">Rejected</span>
             {% endif %}
           {% elif e.raise_time2 %}
             {% if exam.is_cribs_active %}
@@ -90,11 +90,9 @@ You are taking courses: {{ student.course }}
             {% endif %}
           {% elif e.response_time %}
             In case of an error by TA, you may contact the instructor.
-            {% comment %}
             {% if exam.is_cribs_active %}
               <a href="{%url 'raisecrib2' e.id %}" class="ui label blue">Raise crib</a>
             {% endif %}
-            {% endcomment %}
           {% endif %}          
         </td>
       </tr>
