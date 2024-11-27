@@ -1623,8 +1623,12 @@ def get_score( exammark ):
     if exammark:
         if exammark.is_accepted2:
             return exammark.crib_marks2,f"{exammark.marks}->{exammark.crib_marks}->{exammark.crib_marks2}"
+        if exammark.raise_time2:
+            return exammark.crib_marks2,f"{exammark.marks}->{exammark.crib_marks}->REJ"
         if exammark.is_accepted:
             return exammark.crib_marks,f"{exammark.marks}->{exammark.crib_marks}"
+        if exammark.raise_time:
+            return exammark.crib_marks2,f"{exammark.marks}->REJ"
         return exammark.marks,f"{exammark.marks}"
     else:
         return 0
