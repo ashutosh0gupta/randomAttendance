@@ -10,8 +10,7 @@ import shutil
 import sys
 import codecs
 
-course ='CS213'
-print('TODO: how to read the course title')
+course ='CSxxx'
 
 path_to_saved_asc_page = '/tmp/'
 dump_path='/tmp/'
@@ -33,6 +32,19 @@ try:
 except IOError as e:
     print( "failed to open" + in_file + "\nHave you downloaded ASC webpage at " + path_to_saved_asc_page + "?" )
     sys.exit(0)
+
+c_pattern = re.compile(r'<b>CS ([0-9]+)')
+out = re.findall( c_pattern, input )
+
+if len(out) != 1:
+    print( 'Error in detecting cours code!' )
+    print(out)
+    
+for o in out:
+    print(o)
+    course = 'CS'+o
+    print('Detected course: ' + course)
+    
 
 flat_tds = re.sub(r'td>[\s]*<td', r'td><td', input, flags=re.M)
 flat_tds = re.sub(r'>[\s]*<a', r'><a', flat_tds, flags=re.M)

@@ -1619,19 +1619,29 @@ def delete_exam(request, rid):
     # -------------------------------------------
     return redirect( reverse( 'createexam' ) )
 
+#--------------------------------------
+# Returns scors,history
+#--------------------------------------
 def get_score( exammark ):
     if exammark:
         if exammark.is_accepted2:
-            return exammark.crib_marks2,f"{exammark.marks}->{exammark.crib_marks}->{exammark.crib_marks2}"
+            if exammark.is_accepted:
+                return exammark.crib_marks2,f"{exammark.marks}->{exammark.crib_marks}->{exammark.crib_marks2}"
+            else:
+                return exammark.crib_marks2,f"{exammark.marks}->REJ->{exammark.crib_marks2}"                
         if exammark.raise_time2:
-            return exammark.crib_marks,f"{exammark.marks}->{exammark.crib_marks}->REJ"
+            if exammark.is_accepted:
+                return exammark.crib_marks,f"{exammark.marks}->{exammark.crib_marks}->REJ"
+            else:
+                return exammark.marks,f"{exammark.marks}->REJ->REJ"
         if exammark.is_accepted:
             return exammark.crib_marks,f"{exammark.marks}->{exammark.crib_marks}"
         if exammark.raise_time:
             return exammark.marks,f"{exammark.marks}->REJ"
         return exammark.marks,f"{exammark.marks}"
     else:
-        return 0
+        logq.info( 'Exammark is not found!' )
+        return 0,"0[Not uploaded]"
 
 def view_exam(request, rid):
     u = who_auth(request)
@@ -1641,21 +1651,32 @@ def view_exam(request, rid):
     
     exam = get_or_none( Exam, pk = rid )
     if exam:
+        # ---------------------------------------------------------
+        # Get students who are registered in the course of the exam
+        # ---------------------------------------------------------
         students = StudentInfo.objects.filter( Q(course__contains = exam.course) ).order_by('rollno')
         scores= []
         for s in students:
             student_score  = [] 
             total = 0
+            # ---------------------------------------------------------
+            # Enumerate all questions of the exam
+            # ---------------------------------------------------------
             for qid in range(1,exam.num_q+1):
-                # scores = ExamMark.objects.filter( Q(exam_id = exam.id)&Q(rollno=s.rollno )&Q(q=qid) )
                 score = get_or_none( ExamMark, exam_id = exam.id, rollno=s.rollno, q=qid )
+                # ----------------------------------------------
+                # Returns latest score and the history of change
+                #-----------------------------------------------
                 marks,history = get_score(score)
                 student_score.append( history )
                 total += marks
             scores.append( [s.rollno,total]+student_score)
+        # -------------------------------
+        # Update context for the template
+        # -------------------------------
         context["scores"] = scores
-        context["exam"] = exam
-        context["qs"] = [i for i in range(1,exam.num_q+1)]
+        context["exam"  ] = exam
+        context["qs"    ] = [i for i in range(1,exam.num_q+1)]
         return render( request, 'exam/view.html', context.flatten() )
     else:
         return HttpResponse( 'Incorrect access!' )
