@@ -102,7 +102,7 @@ def who_auth(request):
             #------------------------
             # For testing
             #------------------------
-            return '23B0942'
+            return '23B0944'
             # return "prof"
         return None
     #-----------------------------
@@ -267,7 +267,7 @@ def index(request):
         context[ "student" ] = s
 
         scores = {}
-        for c in s.course.replace(',','-').split('-'):
+        for c in s.course.split(':'):
             exams = Exam.objects.filter( Q(course = c) )
             escores = {}
             if exams:
@@ -323,7 +323,11 @@ def db_import(request):
                 # Add course in the course list of the student
                 #---------------------------------------------
                 if not(row[4] in student.course):
-                    student.course = student.course+':'+row[4]
+                    if student.course == '---':
+                        student.course = row[4]
+                    else:
+                        student.course = student.course+':'+row[4]
+                    student.save()
                 print( "processed: " + row[1] )
     except IOError as e:
         return HttpResponse( "Failed to open file "+csv_file + ".<br> Look into README for importing students!")
