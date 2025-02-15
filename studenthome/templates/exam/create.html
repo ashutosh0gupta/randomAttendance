@@ -59,6 +59,7 @@
     <td>
       {% if r.is_cribs_active %}
       <a href="{%url 'criblinks' r.id r.link %}" class="ui label blue">Crib links</a>
+      <a href="{%url 'cribs2' r.id %}" class="ui label blue">Appeals</a>
       <a href="{%url 'disablecrib' r.id %}" class="ui label red">Disable</a>
       {% else %}
       <a href="{%url 'enablecrib' r.id %}" class="ui label blue">Enable</a>

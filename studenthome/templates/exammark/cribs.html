@@ -11,13 +11,23 @@
 
 <div class="ui container">
 
-<h1>Cribs for question {{qid}} of {{exam.name}}</h1>
+  <h1>
+    {% if appeal %}
+    Appeals for
+    {% else %}
+    Cribs for question {{qid}} of
+    {% endif %}
+    {{exam.name}}</h1>
 
 <table style="border: 1px solid black">
 <tr>
   <th>Roll No.</th>
   <th>Marks</th>
   <th>Claim</th>    
+  {% if appeal %}
+  <th>TA Decision</th>    
+  <th>Appeal</th>    
+  {% endif %}
   <th></th>    
   </tr>
   {% for e in cribs %}
@@ -25,9 +35,21 @@
     <td>{{ e.rollno    }}</td>
     <td>{{ e.marks     }}</td>
     <td>{{ e.claim     }}</td>
+    {% if appeal %}
+      {% if e.is_accepted %}
+      <td>{{ e.crib_marks }}</td>
+      {% else %}
+      <td> Rejected </td>
+      {% endif %}
+      <td>{{ e.claim2    }}</td>
+      <td>
+        <a href="{%url 'responsecrib2' e.id %}" class="ui label blue">Respond</a>
+      </td>
+    {% else %}
     <td>
       <a href="{%url 'responsecrib' e.id link %}" class="ui label blue">Respond</a>
     </td>
+    {% endif %}
   </tr>
   {% endfor %}
   <tr>
@@ -42,6 +64,10 @@
   <th>Marks</th>
   <th>Claim</th>    
   <th>Response</th>    
+  {% if appeal %}
+  <th>TA Decision</th>    
+  <th>Appeal</th>    
+  {% endif %}
   <th>Status</th>    
   <th></th>    
   </tr>
@@ -58,9 +84,25 @@
       <span style="color:red">Rejected</span>
       {% endif %}
     </td>
+    {% if appeal %}    
+    <td>{{ e.claim2    }}</td>
     <td>
+      {% if e.is_accepted2 %}
+      New marks: {{ e.crib_marks2 }}
+      {% else %}
+      <span style="color:red">Rejected</span>
+      {% endif %}
+    </td>    
+    <td><a href="{%url 'responsecrib2' e.id %}" class="ui label blue">Update Response</a></td>
+    {% else %}
+    <td>
+      {% if e.raise_time2 %}
+      <span style="color:red">Appealed</span>
+      {% else %}
       <a href="{%url 'responsecrib' e.id link %}" class="ui label blue">Update Response</a>
+      {% endif %}
     </td>
+    {% endif %}
   </tr>
   {% endfor %}
   <tr>

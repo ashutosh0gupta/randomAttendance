@@ -158,6 +158,7 @@ class ExamMark(models.Model):
     raise_time2   = models.DateTimeField(null=True)
     is_accepted2  = models.BooleanField( verbose_name = "Was crib accepted second time?" , default=False)
     response_time2= models.DateTimeField(null=True)
+    response2     = models.TextField(verbose_name="Instructor Response",max_length=200,null=True)
     crib_marks2   = models.DecimalField(verbose_name="Second Crib Marks",null=True, max_digits = 3, decimal_places = 1 )
     ta2           = models.CharField(max_length=20)
 

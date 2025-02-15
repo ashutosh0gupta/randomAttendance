@@ -10,7 +10,7 @@
 
 {% if is_auth %}
 <div class="ui container">
-  <h1>Raise appeal</h1>
+  <h1>Update student {{student.rollno}}</h1>
 
   <div class="ui container">
     {% if messages %}
@@ -20,16 +20,6 @@
     {% endif %}
   </div>
   
-  <div>Question No: {{e.q}}</div>
-  
-  <div>Initial marks: {{e.marks}}</div>
-  {% if e.is_accepted %}
-  <div>TA decision: Accepted, New marks: {{e.crib_marks}}</div>
-  {% else %}
-  <div>TA decision: Reject </div>
-  {% endif %}
-
-
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
@@ -40,9 +30,7 @@
 
 
 {% else %}
-Either too many appeals or wrong login!
-<br>
-Please <a href="{% url 'index' %}">Go to Dash board!</a>
+Please <a href="{% url 'login' %}">login</a>!
 {% endif %}
 
 {% endblock %}

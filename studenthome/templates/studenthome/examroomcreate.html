@@ -55,7 +55,15 @@
     <td>{{ r.name      }}</td>
     <td>{{ r.area      }}</td>
     <td>{{ r.capacity }}</td>
-    <td>{{ r.available }}</td>
+    <td>
+      {% if r.available %}
+      Available
+      <a href="{%url 'disableexamroom' r.id %}" class="ui label red">Mark Unavailable</a>
+      {% else %}
+      Unavailable
+      <a href="{%url 'enableexamroom' r.id %}" class="ui label blue">Mark Available</a>
+      {% endif %}
+    </td>
     <td>
       <a href="{%url 'editexamroom' r.id %}" onclick="return confirm('Are you sure that you want to edit room {{r.name}}?');">Edit</a>
     </td>

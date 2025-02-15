@@ -89,9 +89,8 @@ You are taking courses: {{ student.course }}
               Goto Instructor
             {% endif %}
           {% elif e.response_time %}
-            In case of an error by TA, you may contact the instructor.
             {% if exam.is_cribs_active %}
-              <a href="{%url 'raisecrib2' e.id %}" class="ui label blue">Raise crib</a>
+              <a href="{%url 'raisecrib2' e.id %}" class="ui label blue" onclick="return confirm('Are you sure? Please write clearly about your objection to the TA decision. If there is no clarity, the instructor may reduce your marks for repeated frivolous claims. You have only three appeals available in the entire course! ');">Appeal</a>
             {% endif %}
           {% endif %}          
         </td>
@@ -101,7 +100,7 @@ You are taking courses: {{ student.course }}
     </table>  
   {% endfor %}
   {% else %}
-    No exams for this course!  
+    No exam results for this course yet!  
   {% endif %}
 {% endfor %}  
 <br>

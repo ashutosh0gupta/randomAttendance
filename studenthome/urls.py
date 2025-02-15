@@ -17,6 +17,7 @@ urlpatterns = [
     re_path(r'^editq/(?P<qid>\d+)/', views.EditQuestion.as_view(), name='editq'),    
     re_path(r'^deleteq/(?P<qid>\d+)/$', views.deleteq, name='deleteq'),
     re_path(r'^swapq/(?P<qid1>\d+)/(?P<qid2>\d+)/$', views.swapq, name='swapq'),
+    re_path(r'^shiftq/(?P<qid1>\d+)/(?P<qid2>\d+)/$', views.shiftq, name='shiftq'),
     re_path(r'^activateq/(?P<iid>\d+)/(?P<qid>\d+)/$', views.activateq, name='activateq'),
     re_path(r'^deactivateq/(?P<iid>\d+)/$', views.deactivateq, name='deactivateq'),    
     re_path(r'^answer/(?P<ansid>\d+)/', views.StudentResponse.as_view(), name='answer'),
@@ -46,6 +47,8 @@ urlpatterns = [
     re_path(r'^editexamroom/(?P<rid>\d+)/', views.EditExamRoom.as_view(), name='editexamroom'),    
     re_path(r'^deleteqexamroom/(?P<rid>\d+)/$', views.delete_exam_room, name='deleteexamroom'),
     re_path('allocateseats/(?P<cid>\w+)', views.seating, name='allocateseats'),
+    re_path(r'^enableexamroom/(?P<rid>\w+)/$', views.enable_examroom,   name='enableexamroom' ),
+    re_path(r'^disableexamroom/(?P<rid>\w+)/$', views.disable_examroom,   name='disableexamroom' ),
 
     #----------------------
     # Exam management
@@ -67,6 +70,9 @@ urlpatterns = [
     re_path('^responsecrib/(?P<eid>\w+)/(?P<link>\w+)', views.ResponseCrib.as_view(), name='responsecrib'),
     re_path('^rejectcrib/(?P<eid>\w+)/(?P<link>\w+)', views.reject_crib, name='rejectcrib'),
     re_path('^cribs/(?P<eid>\w+)/(?P<qid>\w+)/(?P<link>\w+)', views.view_cribs, name='cribs'),
+    re_path('^cribs2/(?P<eid>\w+)', views.view_cribs2, name='cribs2'),
+    re_path('^responsecrib2/(?P<eid>\w+)', views.ResponseCrib2.as_view(), name='responsecrib2'),
+    re_path('^rejectcrib2/(?P<eid>\w+)', views.reject_crib2, name='rejectcrib2'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

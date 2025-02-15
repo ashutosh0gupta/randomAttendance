@@ -71,7 +71,9 @@ def clean_latex( s ):
     return s
     # return LatexNodes2Text().latex_to_text( s )
 
-
+def log_and_message( request, s ):
+    messages.success( request, s)
+    logq.info( s )
 
 #----------------------------------------------------------------------------
 # VIEWS
@@ -373,7 +375,25 @@ def create_local_users(request):
     created += 'Save this passwords, you will not be able to see them again!'
     logq.info( 'create local user ran!' )
     return HttpResponse(created)
+
+class EditStudentInfo(UpdateView):
+    model = StudentInfo
+    fields = ['course']
+    template_name = 'studentinfo/edit.html'
+    pk_url_kwarg = 'sid'
     
+    def get_context_data( self, **kwargs ):
+        context = super(StudentInfo,self).get_context_data(**kwargs)
+        s = self.object
+        context[ "is_auth" ] = (who_auth( self.request ) == 'prof')
+        context[ "student" ] = s
+        return context
+
+    def get_success_url(self):
+        s = self.object
+        log_and_message( self.request, f'Student {s.rollno} edited!' )
+        return reverse( "all" )
+
 # def question(request):
 #     if is_student(request):
 #         return student_attempt(attempt)
@@ -524,13 +544,15 @@ def deleteq(request, qid):
         # -------------------------------------------
         # Report the deletion
         # -------------------------------------------
-        messages.success(request,'Question '+str(q.id)+' deleted!')
-        logq.info( 'Question ' + str(qid) + ' deleted.' )
+        log_and_message( request, 'Question ' + str(qid) + ' deleted.' )
+        # messages.success(request,'Question '+str(q.id)+' deleted!')
+        # logq.info( 'Question ' + str(qid) + ' deleted.' )
  
     # -------------------------------------------
     # Redirect to create quetion page!
     # -------------------------------------------
     return redirect( reverse( 'createq' ) )
+
 
 def swapq(request, qid1, qid2 ):
     u = who_auth(request)
@@ -557,6 +579,37 @@ def swapq(request, qid1, qid2 ):
         q2.save()
         logq.info( f'Questions {q1.id} and {q2.id} swapped!' )
  
+    # -------------------------------------------
+    # Redirect to create quetion page!
+    # -------------------------------------------
+    return redirect( reverse( 'createq' ) )
+
+def shiftq(request, qid1, qid2 ):
+    u = who_auth(request)
+    if u != 'prof':
+        return HttpResponse( 'Incorrect login!' )
+    qid1= int(qid1)
+    qid2= int(qid2)
+    if qid1 >= qid2:
+        return HttpResponse( 'Incorrect shift parameters!' )
+        
+
+    # -----
+    # The following code is incorrect needs fixing
+    #-----
+    assert(False)
+    for q in range(qid2,qid1,-1):
+        q1 = get_or_none( Question, pk = q )
+        q2 = get_or_none( Question, pk = q-1 )
+        if q1 and q2:
+            messages.success(request,f'Questions {q1.id} and {q2.id} swapped!')
+            q1.id = q-1
+            q2.id = q
+            q1.save()
+            q2.save()
+            logq.info( f'Questions {q1.id} and {q2.id} swapped!' )
+            
+    
     # -------------------------------------------
     # Redirect to create quetion page!
     # -------------------------------------------
@@ -1344,6 +1397,29 @@ def delete_exam_room(request, rid):
     # -------------------------------------------
     return redirect( reverse( 'createexamroom' ) )
 
+def enable_examroom(request, rid):
+    u = who_auth(request)
+    if u != 'prof':
+        return HttpResponse( 'Incorrect login!' )
+    r = get_or_none( ExamRoom, pk = rid )
+    if r:
+        r.available = True
+        r.save()
+        messages.success(request,'Romm '+rid+' is available!')
+        logq.info( 'Room ' + rid + ' is available!' )
+    return redirect( reverse( 'createexamroom' ) )
+
+def disable_examroom(request, rid):
+    u = who_auth(request)
+    if u != 'prof':
+        return HttpResponse( 'Incorrect login!' )
+    r = get_or_none( ExamRoom, pk = rid )
+    if r:
+        r.available = False
+        r.save()
+        messages.success(request,'Romm '+rid+' is unavailable!')
+        logq.info( 'Room ' + rid + ' is unavailable!' )
+    return redirect( reverse( 'createexamroom' ) )
 
 @transaction.atomic
 def seating(request,cid):
@@ -1707,7 +1783,7 @@ def enable_crib(request, rid):
         e.is_cribs_active = True
         e.save()
         messages.success(request,'Cribs for exam '+rid+' activated!')
-        logq.info( 'Cribs for exam ' + rid + ' deactivated!' )
+        logq.info( 'Cribs for exam ' + rid + ' activated!' )
     return redirect( reverse( 'createexam' ) )
 
 def view_cribs(request, eid, qid, link):
@@ -1716,6 +1792,7 @@ def view_cribs(request, eid, qid, link):
     if exam:
         cribs = ExamMark.objects.filter( Q(q = qid)&(~Q(raise_time = None))&Q(exam_id = exam.id)&Q(response_time = None) ).order_by('raise_time')
         dones = ExamMark.objects.filter( Q(q = qid)&(~Q(raise_time = None))&Q(exam_id = exam.id)&(~Q(response_time = None)) ).order_by('response_time')
+        context["appeal"] = False
         context["cribs"] = cribs
         context["dones"] = dones
         context["qid"  ] = qid
@@ -1734,6 +1811,19 @@ def exam_crib_links(request, eid, link):
         return render( request, 'exam/criblinks.html', context.flatten() )
     else:
         return HttpResponse( 'Incorrect access!' )
+
+def view_cribs2(request, eid):
+    if who_auth(request) != 'prof': return HttpResponse( 'Incorrect login!' )    
+    context = RequestContext(request)
+    exam = get_or_none( Exam, pk = eid )
+    cribs = ExamMark.objects.filter( (~Q(raise_time2 = None))&Q(exam_id = exam.id)&Q(response_time2 = None) ).order_by('raise_time2')
+    dones = ExamMark.objects.filter( (~Q(raise_time = None))&Q(exam_id = exam.id)&(~Q(response_time2 = None)) ).order_by('response_time2')
+    context["appeal"] = True
+    context["cribs"] = cribs
+    context["dones"] = dones
+    context["exam" ] = exam
+    return render( request, 'exammark/cribs.html', context.flatten() )
+    
 
 #-------------------------------
 # Crib management
@@ -1769,16 +1859,17 @@ class RaiseCrib2(UpdateView):
     pk_url_kwarg = 'eid'
     
     def get_context_data( self, **kwargs ):
-        context = super(RaiseCrib,self).get_context_data(**kwargs)
+        context = super(RaiseCrib2,self).get_context_data(**kwargs)
         e = self.object
+        old_cribs = ExamMark.objects.filter( (~Q(raise_time2 = None))&Q(rollno = e.rollno) )
         exam = get_or_none( Exam, pk = e.exam_id )
-        context[ "is_auth" ] = (who_auth( self.request ) == e.rollno) and (e.response_time != None) and (e.raise_time2 == None) and (exam.is_cribs_active == True)
+        context[ "is_auth" ] = (len(old_cribs) < 4) and (who_auth( self.request ) == e.rollno) and (e.response_time != None) and (e.raise_time2 == None) and (exam.is_cribs_active == True)
         context[ "e" ] = e
         return context
 
     def get_success_url(self):
         e = self.object
-        e.raise_time = timezone.now()
+        e.raise_time2 = timezone.now()
         e.save()
         messages.success(self.request,f'Cribs raised by {e.rollno} for score id {e.id} !')
         logq.info( f'Cribs raised by {e.rollno} for score id {e.id} !' )
@@ -1797,6 +1888,7 @@ class ResponseCrib(UpdateView):
         exam = get_or_none( Exam, pk = e.exam_id )
         context[ "is_auth" ] = ( link == exam.link ) and (exam.is_cribs_active == True)
         context[ "e" ] = e
+        context[ "appeal" ] = False
         context[ "link" ] = link
         return context
 
@@ -1809,6 +1901,30 @@ class ResponseCrib(UpdateView):
         logq.info( 'Crib for score id ' + str(e.id) + ' is accepted.' )
         # return redirect( reverse('index') )
         return reverse('cribs', kwargs={'eid':e.exam_id,'qid':e.q,'link':exam.link})
+
+class ResponseCrib2(UpdateView):
+    model = ExamMark
+    fields = ['crib_marks2','response2']
+    template_name = 'exammark/response.html'
+    pk_url_kwarg = 'eid'
+    
+    def get_context_data( self, **kwargs ):
+        context = super(ResponseCrib2,self).get_context_data(**kwargs)
+        e = self.object
+        exam = get_or_none( Exam, pk = e.exam_id )
+        context[ "is_auth" ] = ( (who_auth( self.request ) == 'prof') ) and (exam.is_cribs_active == True)
+        context[ "appeal"  ] = True
+        context[ "e"       ] = e
+        return context
+
+    def get_success_url(self):
+        e = self.object
+        e.is_accepted2   = True
+        e.response_time2 = timezone.now()
+        e.save()
+        exam = get_or_none( Exam, pk = e.exam_id )
+        logq.info( 'Crib2 for score id ' + str(e.id) + ' is accepted.' )
+        return reverse('cribs2', kwargs={'eid':e.exam_id})
 
 
 def reject_crib(request, eid, link):
@@ -1824,6 +1940,19 @@ def reject_crib(request, eid, link):
     messages.success(request,f'Cribs for scode id {e.id} is rejected!')
     logq.info( f'Cribs for scode id {e.id} is rejected!' )
     return redirect( reverse('cribs', kwargs={'eid':e.exam_id,'qid':e.q,'link':exam.link}) )
+
+
+def reject_crib2(request, eid):
+    if who_auth(request) != 'prof': return HttpResponse( 'Incorrect login!' )    
+    e = get_or_none( ExamMark, pk = eid )
+    if (e == None):
+        return HttpResponse( 'Incorrect crib!' )
+    e.is_accepted   = False
+    e.response_time = timezone.now()
+    e.save()
+    messages.success(request,f'Appeal for scode id {e.id} is rejected!')
+    logq.info( f'Appeal for scode id {e.id} is rejected!' )
+    return redirect( reverse('cribs', kwargs={'eid':e.exam_id}) )
 
 
 

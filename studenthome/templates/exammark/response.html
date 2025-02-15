@@ -16,10 +16,23 @@
   <div><b>Question No:</b> {{e.q}}</div>  
   <div><b>Initial Marks:</b> {{e.marks}}</div>
   <div><b>Claim:</b> {{e.claim}}</div>
+  {% if appeal %}
+    {% if e.is_accepted %}
+    <div><b>Decision:</b> {{ e.crib_marks }} </div>
+    {% else %}
+    <div><b>Decision:</b> Rejected </div>
+    {% endif %}
+    <div><b>Appeal:</b> {{e.claim2}}</div>
+  <br>
+  <div>
+    <a href="{% url 'rejectcrib2' e.id %}" class="ui label red" >Reject</a>
+  </div>
+  {% else %}
   <br>
   <div>
     <a href="{% url 'rejectcrib' e.id link %}" class="ui label red" >Reject</a>
   </div>
+  {% endif %}
   <br>
   <form method="post">
     {% csrf_token %}
