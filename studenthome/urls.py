@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('all/', views.all_status, name='all'),
     path('import/', views.db_import, name='import'),
+    re_path(r'^editstudentinfo/(?P<sid>\w+)/',views.EditStudentInfo.as_view(),name='editstudentinfo' ),    
     path('createlocal/', views.create_local_users, name='createlocal'),
     re_path(r'^(?P<rollno>\d\d[0-9BDVMbvm]+\d+)/$', views.status, name='status'),
     path('startq/', views.startq, name='startq'),

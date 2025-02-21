@@ -379,11 +379,11 @@ def create_local_users(request):
 class EditStudentInfo(UpdateView):
     model = StudentInfo
     fields = ['course']
-    template_name = 'studentinfo/edit.html'
+    template_name = 'studenthome/studentinfoedit.html'
     pk_url_kwarg = 'sid'
     
     def get_context_data( self, **kwargs ):
-        context = super(StudentInfo,self).get_context_data(**kwargs)
+        context = super(EditStudentInfo,self).get_context_data(**kwargs)
         s = self.object
         context[ "is_auth" ] = (who_auth( self.request ) == 'prof')
         context[ "student" ] = s

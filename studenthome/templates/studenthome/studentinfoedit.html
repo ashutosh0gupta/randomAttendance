@@ -11,7 +11,7 @@
 {% if is_auth %}
 <div class="ui container">
   <h1>Update student {{student.rollno}}</h1>
-
+  
   <div class="ui container">
     {% if messages %}
      {% for message in messages %}
@@ -19,7 +19,7 @@
       {% endfor %}
     {% endif %}
   </div>
-  
+  Name: {{ student.name }}
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}

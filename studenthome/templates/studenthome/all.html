@@ -74,7 +74,7 @@
     {% for student in student_list %}
     <tr>
       {% if show_photo %}
-      <td><a href="{% url 'status' student.rollno %}">{{ student.name }}</a></td>
+      <td><a href="{% url 'editstudentinfo' student.rollno %}">{{ student.name }}</a></td>
       {% endif %}
       <td>{{ student.rollno }}</td>
       <td>{{ student.username }}</td>
@@ -102,7 +102,7 @@
     {% for rollno, cs in print_calls.items %}
     <tr>
       <td>
-        {{ rollno }}
+        <a href="{% url 'editstudentinfo' rollno %}">{{ rollno }}</a>
         <!-- <a href="{% url 'status' rollno %}">{{ rollno }}</a> -->
       </td>
       <td>
