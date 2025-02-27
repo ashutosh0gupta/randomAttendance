@@ -104,7 +104,7 @@ def who_auth(request):
             #------------------------
             # For testing
             #------------------------
-            return '23B0944'
+            return '23B1029'
             # return "prof"
         return None
     #-----------------------------
@@ -1704,20 +1704,44 @@ def delete_exam(request, rid):
 #--------------------------------------
 def get_score( exammark ):
     if exammark:
-        if exammark.is_accepted2:
-            if exammark.is_accepted:
-                return exammark.crib_marks2,f"{exammark.marks}->{exammark.crib_marks}->{exammark.crib_marks2}"
-            else:
-                return exammark.crib_marks2,f"{exammark.marks}->REJ->{exammark.crib_marks2}"                
+        # ---------------------------
+        # Instructor crib
+        # ---------------------------
         if exammark.raise_time2:
             if exammark.is_accepted:
-                return exammark.crib_marks,f"{exammark.marks}->{exammark.crib_marks}->REJ"
+                crib_score = f"{exammark.marks}->{exammark.crib_marks}"
+                past_score = exammark.crib_marks
             else:
-                return exammark.marks,f"{exammark.marks}->REJ->REJ"
-        if exammark.is_accepted:
-            return exammark.crib_marks,f"{exammark.marks}->{exammark.crib_marks}"
+                crib_score = f"{exammark.marks}->REJ"
+                past_score = exammark.marks
+            if exammark.is_accepted2:
+                return exammark.crib_marks2,f"{crib_score}->{exammark.crib_marks2}"
+            elif exammark.response_time2:
+                return past_score,f"{crib_score}->REJ"
+            else:
+                return past_score,f"{crib_score}->RAISED"
+                            
+            # if exammark.is_accepted2:
+            #     if exammark.is_accepted:
+            #         return exammark.crib_marks2,f"{exammark.marks}->{exammark.crib_marks}->{exammark.crib_marks2}"
+            #     else:
+            #         return exammark.crib_marks2,f"{exammark.marks}->REJ->{exammark.crib_marks2}"                
+            # if exammark.raise_time2:
+            #     if exammark.is_accepted:
+            #         return exammark.crib_marks,f"{exammark.marks}->{exammark.crib_marks}->REJ"
+            #     else:
+            #         return exammark.marks,f"{exammark.marks}->REJ->REJ"
+
+        # ---------------------------
+        # TA cribs
+        # ---------------------------
         if exammark.raise_time:
-            return exammark.marks,f"{exammark.marks}->REJ"
+            if exammark.is_accepted:
+                return exammark.crib_marks,f"{exammark.marks}->{exammark.crib_marks}"
+            if exammark.response_time:
+                return exammark.marks,f"{exammark.marks}->REJ"
+            else:
+                return exammark.marks,f"{exammark.marks}->Raised"                
         return exammark.marks,f"{exammark.marks}"
     else:
         logq.info( 'Exammark is not found!' )

@@ -62,10 +62,12 @@ You are taking courses: {{ student.course }}
         <td>{{ e.marks  }} </td>
         <td>
           {% if e.response_time %}
+             Claim: {{e.claim}}<br>
             {% if e.is_accepted %}
-            Crib marks: {{ e.crib_marks }}
+             <span style="color:blue">Response: {{e.response}}</span><br>
+             Crib marks: {{ e.crib_marks }}
             {% else %}
-            <span style="color:red">Rejected</span>
+            <span style="color:red">Respons: Rejected</span>
             {% endif %}
           {% elif e.raise_time %}
             {% if exam.is_cribs_active %}
@@ -79,8 +81,10 @@ You are taking courses: {{ student.course }}
         </td>
         <td>
           {% if e.response_time2 %}
+            Claim: {{e.claim2}}<br>
             {% if e.is_accepted2 %}
-            Instructor marks: {{ e.crib_marks2 }}
+             <span style="color:blue">Response: {{e.response2}}</span><br>
+             Instructor marks: {{ e.crib_marks2 }}
             {% else %}
             <span style="color:red">Rejected</span>
             {% endif %}
