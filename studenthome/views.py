@@ -1486,13 +1486,33 @@ def seating(request,cid):
 @transaction.atomic
 def process_marks(d):
     if d.marks:        
+        # -------------------------------------------
+        # Read CSV file
+        # -------------------------------------------
         marks = pd.read_csv(StringIO(d.marks.upper()))
-        qs = [ (q,int(q[1:])) for q in marks.columns[1:] ]
+        
+        # -------------------------------------------
+        # Detect columns
+        # -------------------------------------------
+        qs = []
+        for q in marks.columns:
+            if q[0] == "Q":
+                qid = int(q[1:])
+                comment = None
+                if f"Comment{qid}" in marks.columns: comment = f"Comment{qid}"
+                qs.append( (q, int(q[1:]), comment ) )
+               
+        # qs = [ (q,int(q[1:]),None) for q in marks.columns[1:] if q[0] == "q" ]
+        
+        # -------------------------------------------
+        # Process marks for each student
+        # -------------------------------------------
         for index, row in marks.iterrows():
             r = row['ROLL NO']
-            for qname,qid in qs:
+            for qname,qid,qcomment in qs:
                 em,created = ExamMark.objects.get_or_create( rollno=r, exam_id=d.id, q=qid )
                 em.marks = row[qname]
+                if qcomment != None: em.comment = row[qcomment]
                 em.save()
 
 @transaction.atomic

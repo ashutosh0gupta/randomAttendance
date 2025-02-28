@@ -47,11 +47,12 @@ You are taking courses: {{ student.course }}
   <h1>{{ course }}</h1>
   {% if escores.items %}
   {% for exam,exam_marks in escores.items %}
-    <h3>{{ exam.name }} marks</h3>
+    <h3>{{ exam.name }} marks (Maximum marks: {{exam.total}}, Weight: {{exam.weight}}%)</h3>
     <table style="border: 1px solid black">
       <tr>
         <th>Question</th>
         <th>Initial Marks</th>
+        <th>Comment</th>    
         <th>TA Crib</th>    
         <th>Instructor Crib</th>    
       </tr>
@@ -60,6 +61,7 @@ You are taking courses: {{ student.course }}
       <tr>
         <td>{{ e.q      }} </td>
         <td>{{ e.marks  }} </td>
+        <td>{{ e.comment}} </td>
         <td>
           {% if e.response_time %}
              Claim: {{e.claim}}<br>
