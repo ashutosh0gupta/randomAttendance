@@ -1971,7 +1971,7 @@ class ResponseCrib2(UpdateView):
         return reverse('cribs2', kwargs={'eid':e.exam_id})
 
 
-def reject_crib(request, eid, link):
+def reject_crib(request, eid, link, reason):
     e = get_or_none( ExamMark, pk = eid )
     if (e == None):
         return HttpResponse( 'Incorrect crib!' )
@@ -1980,6 +1980,7 @@ def reject_crib(request, eid, link):
         return HttpResponse( 'Bad URL!' ) 
     e.is_accepted   = False
     e.response_time = timezone.now()
+    e.response = reason
     e.save()
     messages.success(request,f'Cribs for scode id {e.id} is rejected!')
     logq.info( f'Cribs for scode id {e.id} is rejected!' )

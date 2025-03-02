@@ -30,10 +30,14 @@
   {% else %}
   <br>
   <div>
-    <a href="{% url 'rejectcrib' e.id link %}" class="ui label red" >Reject</a>
+    <p>Reject the claim due to the following reasons:</p>
+    <a href="{% url 'rejectcrib' e.id link 'UnfoundedClaim' %}" class="ui label red" >Unfounded Claim</a>
+    <a href="{% url 'rejectcrib' e.id link 'NoShow'   %}" class="ui label red" >No Show</a>
+    <a href="{% url 'rejectcrib' e.id link 'ExcessiveHaggling'   %}" class="ui label red" >Execessive Haggling</a>
   </div>
   {% endif %}
   <br>
+  <p>Accept the claim due to the following reason:</p>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}

@@ -69,7 +69,7 @@ You are taking courses: {{ student.course }}
              <span style="color:blue">Response: {{e.response}}</span><br>
              Crib marks: {{ e.crib_marks }}
             {% else %}
-            <span style="color:red">Respons: Rejected</span>
+            <span style="color:red">Respons: Rejected (Reason: {{e.response}})</span>
             {% endif %}
           {% elif e.raise_time %}
             {% if exam.is_cribs_active %}
