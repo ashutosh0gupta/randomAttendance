@@ -186,7 +186,7 @@ class Exam(models.Model):
     mark9  = models.IntegerField ( verbose_name = "Marks Question 9", null=True, blank=True )
     mark10 = models.IntegerField ( verbose_name = "Marks Question 10", null=True, blank=True )
     link   = models.CharField(max_length=100, null=True) # security feature
-    marks  = models.TextField( verbose_name="Student scores in (CSV) (Header: ROLL NO,Q1,Q2,..,Qk,Comment1,...,Commentk)", max_length=20000, null=True, blank=True)
+    marks  = models.TextField( verbose_name="Student scores in (CSV) (Header: ROLL NO,Q1,Q2,..,Qk,Comment1,...,Commentk) [ROLL NO contains roll no separated by -]", max_length=20000, null=True, blank=True)
     regrade = models.TextField( verbose_name="Student scores in (CSV) (Header: ROLL NO,Qi)", max_length=20000, null=True, blank=True)
     is_cribs_active = models.BooleanField( verbose_name = "Is Cribs active?" , default=True)
     

@@ -1509,11 +1509,12 @@ def process_marks(d):
         # -------------------------------------------
         for index, row in marks.iterrows():
             r = row['ROLL NO']
-            for qname,qid,qcomment in qs:
-                em,created = ExamMark.objects.get_or_create( rollno=r, exam_id=d.id, q=qid )
-                em.marks = row[qname]
-                if qcomment != None: em.comment = row[qcomment]
-                em.save()
+            for r in r.split("-"): 
+                for qname,qid,qcomment in qs:
+                    em,created = ExamMark.objects.get_or_create( rollno=r, exam_id=d.id, q=qid )
+                    em.marks = row[qname]
+                    if qcomment != None: em.comment = row[qcomment]
+                    em.save()
 
 @transaction.atomic
 def regrade_marks(e):

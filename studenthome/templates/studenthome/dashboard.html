@@ -72,6 +72,7 @@ You are taking courses: {{ student.course }}
             <span style="color:red">Respons: Rejected (Reason: {{e.response}})</span>
             {% endif %}
           {% elif e.raise_time %}
+            Claim: {{e.claim}}<br>
             {% if exam.is_cribs_active %}
               Goto TA
             {% endif %}
@@ -91,6 +92,7 @@ You are taking courses: {{ student.course }}
             <span style="color:red">Rejected</span>
             {% endif %}
           {% elif e.raise_time2 %}
+            Claim: {{e.claim2}}<br>
             {% if exam.is_cribs_active %}
               Goto Instructor
             {% endif %}
