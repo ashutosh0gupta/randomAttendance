@@ -1526,6 +1526,7 @@ def regrade_marks(e):
             for qname,qid in qs:
                 em,created = ExamMark.objects.get_or_create( rollno=r, exam_id=e.id, q=qid )
                 update = False
+                print(f'I am here {em.rollno} {row[qname]} {em.marks} {em.crib_marks} {em.crib_marks2}')
                 # -------------------------------------------------------------
                 # Update only if uploaded marks are different from latest marks 
                 # -------------------------------------------------------------
@@ -1539,12 +1540,14 @@ def regrade_marks(e):
                     if em.crib_marks != row[qname]:
                         em.crib_marks2 = row[qname]
                         em.is_accepted2   = True
+                        em.raise_time2    = timezone.now()
                         em.response_time2 = timezone.now()
                         em.save()
                 else:
                     if em.marks != row[qname]:
                         em.crib_marks    = row[qname]
                         em.is_accepted   = True
+                        em.raise_time     = timezone.now()
                         em.response_time = timezone.now()
                         em.save()
 
@@ -1728,7 +1731,7 @@ def get_score( exammark ):
         # ---------------------------
         # Instructor crib
         # ---------------------------
-        if exammark.raise_time2:
+        if exammark.raise_time2 or exammark.is_accepted2:
             if exammark.is_accepted:
                 crib_score = f"{exammark.marks}->{exammark.crib_marks}"
                 past_score = exammark.crib_marks
@@ -1756,7 +1759,7 @@ def get_score( exammark ):
         # ---------------------------
         # TA cribs
         # ---------------------------
-        if exammark.raise_time:
+        if exammark.raise_time or exammark.is_accepted:
             if exammark.is_accepted:
                 return exammark.crib_marks,f"{exammark.marks}->{exammark.crib_marks}"
             if exammark.response_time:
