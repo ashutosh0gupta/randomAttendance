@@ -1490,7 +1490,7 @@ def process_marks(d):
         # Read CSV file
         # -------------------------------------------
         marks = pd.read_csv(StringIO(d.marks.upper()))
-        
+        print(marks.columns)
         # -------------------------------------------
         # Detect columns
         # -------------------------------------------
@@ -1499,7 +1499,7 @@ def process_marks(d):
             if q[0] == "Q":
                 qid = int(q[1:])
                 comment = None
-                if f"Comment{qid}" in marks.columns: comment = f"Comment{qid}"
+                if f"COMMENT{qid}" in marks.columns: comment = f"COMMENT{qid}"
                 qs.append( (q, int(q[1:]), comment ) )
                
         # qs = [ (q,int(q[1:]),None) for q in marks.columns[1:] if q[0] == "q" ]
