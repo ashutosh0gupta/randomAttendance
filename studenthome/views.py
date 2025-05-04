@@ -1490,7 +1490,7 @@ def process_marks(d):
         # Read CSV file
         # -------------------------------------------
         marks = pd.read_csv(StringIO(d.marks.upper()))
-        print(marks.columns)
+        
         # -------------------------------------------
         # Detect columns
         # -------------------------------------------
