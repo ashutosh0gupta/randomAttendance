@@ -311,6 +311,7 @@ def db_import(request):
                     #----------------------------------
                     student.name = row[2]
                     student.imagePath = salt+row[3]
+                    student.isPwd = (row[5] == 'Yes')
                     student.calls = None
                     student.save()
                     #--------------------------------
@@ -1422,54 +1423,57 @@ def disable_examroom(request, rid):
     return redirect( reverse( 'createexamroom' ) )
 
 @transaction.atomic
-def seating(request,cid):
+def seating(request,cid, isRefresh):
     u = who_auth(request)
     if u != 'prof':
         return HttpResponse( 'Incorrect login!' )
 
-    # -------------------------------------------
-    # Filter students by the course
-    # -------------------------------------------    
-    students = StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = False) ).order_by('rollno')
-    pwds = StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = True) ).order_by('rollno')
-    total = len(students) + len(pwds)
-    
-    available = []
-    # -------------------------------------------
-    # Collect seats
-    # -------------------------------------------    
-    for r in ExamRoom.objects.order_by('-capacity'):
-        if r.available:
-            area = r.area
-            name = r.name
-            seats = clean_seats(r.seats)
-            for s in seats:
-                available.append( (name, area, s) )
-    if len(available) < total:
-        messages.error( request, f'Not enough seats! students: {total} seats: {len(available)}' )
-        return redirect( reverse( 'createexamroom' ) )
-    # -------------------------------------------
-    # 
-    # -------------------------------------------
-    i = 0
-    def assign_seat(s,i):
-        room,area,seat= available[i]
-        s.exam_area = area
-        s.exam_room = room
-        s.exam_seat = seat
-        s.save()
-        return i + 1
-        
-    for s in students: i = assign_seat(s,i)
-    for s in pwds    : i = assign_seat(s,i)
+    if isRefresh == 'refresh':
+        # -------------------------------------------
+        # Filter students by the course
+        # -------------------------------------------    
+        students = StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = False) ).order_by('?')
+        pwds = StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = True) ).order_by('rollno')
+        total = len(students) + len(pwds)
+
+        available = []
+        # -------------------------------------------
+        # Collect seats
+        # -------------------------------------------    
+        for r in ExamRoom.objects.order_by('-capacity'):
+            if r.available:
+                area = r.area
+                name = r.name
+                seats = clean_seats(r.seats)
+                for s in seats:
+                    available.append( (name, area, s) )
+        if len(available) < total:
+            messages.error( request, f'Not enough seats! students: {total} seats: {len(available)}' )
+            return redirect( reverse( 'createexamroom' ) )
+        # -------------------------------------------
+        # Assign seats
+        # -------------------------------------------
+        i = 0
+        def assign_seat(s,i):
+            room,area,seat= available[i]
+            s.exam_area = area
+            s.exam_room = room
+            s.exam_seat = seat
+            s.save()
+            return i + 1
+
+        for s in students: i = assign_seat(s,i)
+        for s in pwds    : i = assign_seat(s,i)
 
         
-    # students = StudentInfo.objects.all()
+    # -------------------------------------------
+    # Disaply assigned seats
+    # -------------------------------------------
     rooms = ExamRoom.objects.all()
     room_map = {}
     for room in rooms:
         if room.available:
-            students = StudentInfo.objects.filter( Q(exam_room = room.name)&Q(course__contains = cid) ).order_by('rollno')
+            students = StudentInfo.objects.filter( Q(exam_room = room.name)&Q(course__contains = cid) ).order_by('exam_seat')
             room_map[room.name] = students
     context = RequestContext(request)
     context["room_map"] = room_map

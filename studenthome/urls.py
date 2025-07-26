@@ -36,10 +36,10 @@ urlpatterns = [
     #--------------------
     # Biobreak management
     #--------------------
-    re_path('^biobreak/(?P<dayhash>\w+)/', views.AddBioBreak.as_view(), name='biobreak'),
-    re_path('^biobreakreturn/(?P<dayhash>\w+)/(?P<rid>\d+)/'  , views.biobreak_return  , name='biobreakreturn'  ),
-    re_path('^biobreakurgent/(?P<dayhash>\w+)/(?P<rid>\d+)/'  , views.biobreak_urgent  , name='biobreakurgent'  ),
-    re_path('^biobreakwithdraw/(?P<dayhash>\w+)/(?P<rid>\d+)/', views.biobreak_withdraw, name='biobreakwithdraw'),
+    re_path(r'^biobreak/(?P<dayhash>\w+)/', views.AddBioBreak.as_view(), name='biobreak'),
+    re_path(r'^biobreakreturn/(?P<dayhash>\w+)/(?P<rid>\d+)/'  , views.biobreak_return  , name='biobreakreturn'  ),
+    re_path(r'^biobreakurgent/(?P<dayhash>\w+)/(?P<rid>\d+)/'  , views.biobreak_urgent  , name='biobreakurgent'  ),
+    re_path(r'^biobreakwithdraw/(?P<dayhash>\w+)/(?P<rid>\d+)/', views.biobreak_withdraw, name='biobreakwithdraw'),
 
     #----------------------
     # Exam rooms management
@@ -47,7 +47,7 @@ urlpatterns = [
     path('createexamroom/', views.CreateExamRoom.as_view(), name='createexamroom'),
     re_path(r'^editexamroom/(?P<rid>\d+)/', views.EditExamRoom.as_view(), name='editexamroom'),    
     re_path(r'^deleteqexamroom/(?P<rid>\d+)/$', views.delete_exam_room, name='deleteexamroom'),
-    re_path('allocateseats/(?P<cid>\w+)', views.seating, name='allocateseats'),
+    re_path(r'allocateseats/(?P<cid>\w+)/(?P<isRefresh>\w+)/', views.seating, name='allocateseats'),
     re_path(r'^enableexamroom/(?P<rid>\w+)/$', views.enable_examroom,   name='enableexamroom' ),
     re_path(r'^disableexamroom/(?P<rid>\w+)/$', views.disable_examroom,   name='disableexamroom' ),
 
@@ -66,14 +66,14 @@ urlpatterns = [
     #----------------------
     # Crib management
     #----------------------
-    re_path('^raisecrib/(?P<eid>\w+)', views.RaiseCrib.as_view(), name='raisecrib'),
-    re_path('^raisecrib2/(?P<eid>\w+)', views.RaiseCrib2.as_view(), name='raisecrib2'),
-    re_path('^responsecrib/(?P<eid>\w+)/(?P<link>\w+)', views.ResponseCrib.as_view(), name='responsecrib'),
-    re_path('^rejectcrib/(?P<eid>\w+)/(?P<link>\w+)/(?P<reason>\w+)', views.reject_crib, name='rejectcrib'),
-    re_path('^cribs/(?P<eid>\w+)/(?P<qid>\w+)/(?P<link>\w+)', views.view_cribs, name='cribs'),
-    re_path('^cribs2/(?P<eid>\w+)', views.view_cribs2, name='cribs2'),
-    re_path('^responsecrib2/(?P<eid>\w+)', views.ResponseCrib2.as_view(), name='responsecrib2'),
-    re_path('^rejectcrib2/(?P<eid>\w+)', views.reject_crib2, name='rejectcrib2'),
+    re_path(r'^raisecrib/(?P<eid>\w+)', views.RaiseCrib.as_view(), name='raisecrib'),
+    re_path(r'^raisecrib2/(?P<eid>\w+)', views.RaiseCrib2.as_view(), name='raisecrib2'),
+    re_path(r'^responsecrib/(?P<eid>\w+)/(?P<link>\w+)', views.ResponseCrib.as_view(), name='responsecrib'),
+    re_path(r'^rejectcrib/(?P<eid>\w+)/(?P<link>\w+)/(?P<reason>\w+)', views.reject_crib, name='rejectcrib'),
+    re_path(r'^cribs/(?P<eid>\w+)/(?P<qid>\w+)/(?P<link>\w+)', views.view_cribs, name='cribs'),
+    re_path(r'^cribs2/(?P<eid>\w+)', views.view_cribs2, name='cribs2'),
+    re_path(r'^responsecrib2/(?P<eid>\w+)', views.ResponseCrib2.as_view(), name='responsecrib2'),
+    re_path(r'^rejectcrib2/(?P<eid>\w+)', views.reject_crib2, name='rejectcrib2'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

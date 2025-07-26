@@ -12,16 +12,21 @@ import codecs
 
 course ='CSxxx'
 
-path_to_saved_asc_page = '/tmp/'
+path_to_saved_asc_page = '~/tmp/'
 dump_path='/tmp/'
 
 path_dir = os.path.expanduser( path_to_saved_asc_page )
 dump_dir = os.path.expanduser( dump_path )
-    
-jpeg_dir= path_dir + '/Welcome to ASC !_files/'
-in_file = path_dir + '/Welcome to ASC !_files/Login.html'
-# jpeg_dir= path_dir + '/Welcome to ASC !_files/CourseList_data'
-# in_file = path_dir + '/Welcome to ASC !_files/CourseList.html'
+
+browser = "firefox"
+
+if browser == "chrome":
+    jpeg_dir= path_dir + '/Welcome to ASC !_files/'
+    in_file = path_dir + '/Welcome to ASC !_files/Login.html'
+else:
+    jpeg_dir= path_dir + '/Welcome to ASC !_files/'
+    # jpeg_dir= path_dir + '/Welcome to ASC !_files/CourseList_data'
+    in_file = path_dir + '/Welcome to ASC !_files/CourseList.html'
 
 out_file = os.path.expanduser(dump_dir+'output.csv')
 output = open(out_file,'w+')
@@ -71,8 +76,8 @@ flat_tds = re.sub(r'b>[\s]*</a>[\s]*</td', r'b></a></td', flat_tds, flags=re.M)
 # 2023 ASC pattern: downloaded via chrome
 # p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){8}<td><img.*src="([^>]*)">')
 
-# 2023/2024 August ASC pattern: downloaded via chrome
-p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){9}<td><img.*src="([^>]*)">')
+# 2023/2024/2025 August ASC pattern: downloaded via chrome
+p = re.compile(r'(\d?\d?\d)</td>.*<td align="center"><a href=[^<>]*><b> ([0-9A-Z]+)</b></a></td><td> ([a-zA-Z \.]*)</td>(<td[^<]*</td>){6}<td align="center"> ([^<>]*)</td>(<td[^<]*</td>){2}<td><img.*src="([^>]*)">')
 
 
 
@@ -92,15 +97,16 @@ for o in out:
     index  = o[0]
     rollno = o[1]
     name   = o[2]
-    photo  = o[4]     # o[3] is junk    
+    pwd    = o[4]     # o[3] is junk    
+    photo  = o[6]     # o[5] is junk
     if os.path.isfile( photo ):
         student_image_file = rollno+".jpeg"
         shutil.copy(photo, dump_dir+student_image_file)
         print ( "File created : "+ dump_dir+student_image_file)
     else:
-        print ( "Missing photo : "+ rollno )
+        print ( f"Missing photo : {rollno} at {photo}" )
         student_image_file = "none"       
-    output.write("%s,%s,%s,%s,%s\n" % (index,rollno,name,student_image_file,course))
+    output.write("%s,%s,%s,%s,%s,%s\n" % (index,rollno,name,student_image_file,course,pwd))
 
 print ( "File created : "+ out_file)  
 print ( "Students processed : "+ str(len(out)))

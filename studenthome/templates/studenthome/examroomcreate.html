@@ -12,11 +12,17 @@
 <div><a href="{% url 'index'%}" class="ui label blue">Go home</a></div>
 
 <div class="ui container">
-  <a href="{%url 'allocateseats' 'CS213'%}" class="ui button blue">Allocate Seats CS213</a>
-  <a href="{%url 'allocateseats' 'CS293'%}" class="ui button blue">Allocate Seats CS293</a>
-  <a href="{%url 'allocateseats' 'CS433'%}" class="ui button blue">Allocate Seats CS433</a>
+  <a href="{%url 'allocateseats' 'CS213' 'view'%}" class="ui button blue">View Seats CS213</a>
+  <a href="{%url 'allocateseats' 'CS293' 'view'%}" class="ui button blue">View Seats CS293</a>
+  <a href="{%url 'allocateseats' 'CS433' 'view'%}" class="ui button blue">View Seats CS433</a>
 </div>
 <br>
+<div class="ui container">
+  On each click the allocation will be rearranged.<br>
+  <a href="{%url 'allocateseats' 'CS213' 'refresh'%}" class="ui button red" onclick="return confirm('Are you sure that you want to rearrange seating?');">Allocate Seats CS213</a>
+  <a href="{%url 'allocateseats' 'CS293' 'refresh'%}" class="ui button red" onclick="return confirm('Are you sure that you want to rearrange seating?');">Allocate Seats CS293</a>
+  <a href="{%url 'allocateseats' 'CS433' 'refresh'%}" class="ui button red" onclick="return confirm('Are you sure that you want to rearrange seating?');">Allocate Seats CS433</a>
+</div>
 
 <div class="ui container">
   <h1>Create exam rooms</h1>
