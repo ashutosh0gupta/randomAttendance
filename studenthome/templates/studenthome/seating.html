@@ -125,14 +125,12 @@
       <th>Room</th>
       <th>Seat</th>
     </tr>
-    {% for room, students in room_map.items %}
-    {% for student in students %}
+    {% for student in students_by_roll %}
     <tr>
       <td>{{ student.rollno    }}</td>
       <td>{{ student.exam_room }}</td>
       <td>{{ student.exam_seat }}</td>
     </tr>
-    {% endfor %}
     {% endfor %}
     <tr>
     </tr>
