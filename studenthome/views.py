@@ -1480,7 +1480,7 @@ def seating(request,cid, isRefresh):
             if available[j][0] != room:
                 i = j # shift seats
                 break
-        if len(pwds) < len(available) - i:
+        if len(pwds) > len(available) - i:
             messages.error( request, f'Not able seat pwd students! Add a room with at least {len(pwds)} seats.' )
             return redirect( reverse( 'createexamroom' ) )
             
