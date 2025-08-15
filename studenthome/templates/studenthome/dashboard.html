@@ -43,6 +43,12 @@
 {% else %}
 You are taking courses: {{ student.course }}
 
+{% if next_exam %}
+<h1>Seating</h1>
+Your seating for the exam on {{next_exam}}: <strong>{{student.exam_room}} {{student.exam_seat}} </strong>
+{% endif %}
+<br>
+
 {% for course,escores in scores.items %}
   <h1>{{ course }}</h1>
   {% if escores.items %}

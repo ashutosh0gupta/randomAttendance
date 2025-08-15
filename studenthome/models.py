@@ -204,3 +204,4 @@ class SystemState(models.Model):
     num_answered = models.IntegerField(verbose_name="Number of students answered", default=0)
     num_attendance = models.IntegerField(verbose_name="Number of attendance", default=0)
     mode = models.CharField(verbose_name='Mode', choices=SYS_MODE, default='INACTIVE', max_length=20 )
+    next_exam = models.DateField(null=True)

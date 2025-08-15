@@ -104,7 +104,7 @@ def who_auth(request):
             #------------------------
             # For testing
             #------------------------
-            return '23B1029'
+            return '23B0945'
             # return "prof"
         return None
     #-----------------------------
@@ -265,11 +265,11 @@ def index(request):
             return HttpResponse( "Something is wrong!!" )
         return redirect( reverse('answer', kwargs={'ansid':sa.pk}) )
     else:
-        s = get_or_none( StudentInfo, rollno=p )
-        context[ "student" ] = s
+        student = get_or_none( StudentInfo, rollno=p )
+        context[ "student" ] = student
 
         scores = {}
-        for c in s.course.split(':'):
+        for c in student.course.split(':'):
             exams = Exam.objects.filter( Q(course = c) )
             escores = {}
             if exams:
@@ -278,6 +278,11 @@ def index(request):
                     escores[exam] = marks
             scores[c] = escores
         context["scores"] = scores
+        
+        if s.next_exam > datetime.date.today():
+            context[ "next_exam" ] = s.next_exam
+        else:
+            context[ "next_exam" ] = None            
         return render( request, 'studenthome/dashboard.html', context.flatten() )
     
 
@@ -704,6 +709,27 @@ def deactivateq(request, iid):
     logq.info( 'Idx ' + iid +' deactivated.' )
     return redirect( reverse( 'createq' ) )
 
+def update_nextexamdate(request, date):
+    if who_auth(request) != 'prof':
+        return HttpResponse( 'Incorrect login!' )
+    sys = get_sys_state()
+    
+
+class EditNextExamDate(UpdateView):
+    model = SystemState
+    fields = ['next_exam']
+    template_name = 'exam/examdate.html'
+    pk_url_kwarg = 'rid'
+    
+    def get_context_data( self, **kwargs ):
+        context = super(EditNextExamDate,self).get_context_data(**kwargs)
+        context[ "is_auth" ] = (who_auth( self.request ) == "prof")
+        return context
+
+    def get_success_url(self):
+        sys = self.object
+        logq.info( 'Next Exam date updated ' + str(sys.next_exam) + ' edited.' )
+        return reverse( "createexam" )
 
 #-----------------------------------------------------------------------------
 # Running quiz

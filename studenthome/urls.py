@@ -62,6 +62,7 @@ urlpatterns = [
     re_path(r'^enablecrib/(?P<rid>\w+)/$', views.enable_crib,   name='enablecrib' ),
     re_path(r'^disablecrib/(?P<rid>\w+)/$', views.disable_crib, name='disablecrib'),
     re_path(r'^criblinks/(?P<eid>\w+)/(?P<link>\w+)/$', views.exam_crib_links, name='criblinks'),
+    re_path(r'^editexamdate/(?P<rid>\w+)/', views.EditNextExamDate.as_view(), name='editexamupdate' ),    
     
     #----------------------
     # Crib management
