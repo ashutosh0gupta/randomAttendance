@@ -119,22 +119,12 @@
   {% endfor %}
 
   <div class="pagebreak"> </div>
-  <table style="border: 1px solid black">
-    <tr>
-      <th>Roll No</th>
-      <th>Room</th>
-      <th>Seat</th>
-    </tr>
-    {% for student in students_by_roll %}
-    <tr>
-      <td>{{ student.rollno    }}</td>
-      <td>{{ student.exam_room }}</td>
-      <td>{{ student.exam_seat }}</td>
-    </tr>
+  Roll No.,Name,Room No.,Seat No.<br>
+  {% for room, students in room_map.items %}
+    {% for student in students %}
+      {{ student.rollno}},{{student.name}},{{ student.exam_room }},{{ student.exam_seat }}<br>
     {% endfor %}
-    <tr>
-    </tr>
-  </table>
+  {% endfor %}
  
 </div>
 

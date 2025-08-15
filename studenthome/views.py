@@ -1522,10 +1522,10 @@ def seating(request,cid, isRefresh):
         if room.available:
             students = StudentInfo.objects.filter( Q(exam_room = room.name)&Q(course__contains = cid) ).order_by('exam_seat')
             room_map[room.name] = students
-    students_by_roll = StudentInfo.objects.filter( Q(course__contains = cid) ).order_by('rollno')
+    # students_by_roll = StudentInfo.objects.filter( Q(course__contains = cid) ).order_by('rollno')
     context = RequestContext(request)
     context["room_map"] = room_map
-    context["students_by_roll"] = students_by_roll
+    # context["students_by_roll"] = students_by_roll
     context["cid"] = cid
     return render( request, 'studenthome/seating.html', context.flatten() )
 
