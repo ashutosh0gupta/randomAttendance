@@ -911,6 +911,16 @@ class StudentResponse(UpdateView):
             sa = None
             sa = self.object
             logq.info( str(sa.rollno) + ' submitting.' )
+            
+            # ----------------------------------------
+            # Check if the answer is already submitted
+            # ----------------------------------------
+            if sa.answer_time :
+                raise Exception( str(sa.rollno) + ' answer is already submitted!' )
+            
+            # ----------------------------------------
+            # Check user/system state is good!
+            # ----------------------------------------
             if who_auth( self.request ) != sa.rollno:
                 user_id = who_auth( self.request )
                 raise Exception( '[Attack] wrong student is trying to submit '+ str(user_id) + '!=' + str(sa.rollno) )
@@ -918,9 +928,7 @@ class StudentResponse(UpdateView):
             if sys.mode != 'QUIZ': 
                 raise Exception( str(sa.rollno) + ' submitting question ' + str(sa.q) + ', while quiz is closed.' )
             if sys.activeq1 != sa.q and sys.activeq2 != sa.q and sys.activeq3 != sa.q and sys.activeq4 != sa.q:
-                raise Exception( str(sa.rollno) + ' wrong question being answered.' )
-            if sa.answer_time :
-                raise Exception( str(sa.rollno) + ' answer is already submitted!' )
+                raise Exception( str(sa.rollno) + ' is answering wrong question.' )
 
             # saving the options
             response = super().form_valid(form)
@@ -1463,6 +1471,19 @@ def seating(request,cid, isRefresh):
             return i + 1
 
         for s in students: i = assign_seat(s,i)
+
+        #-------------------------------------------
+        # All pwd candidate must be in the same room
+        #-------------------------------------------
+        room = available[i][0]
+        for j in range(i,i+len(pwds)):
+            if available[j][0] != room:
+                i = j # shift seats
+                break
+        if len(pwds) < len(available) - i:
+            messages.error( request, f'Not able seat pwd students! Add a room with at least {len(pwds)} seats.' )
+            return redirect( reverse( 'createexamroom' ) )
+            
         for s in pwds    : i = assign_seat(s,i)
         return redirect( reverse('allocateseats', kwargs={'cid':cid,'isRefresh':'view'}) )
         
