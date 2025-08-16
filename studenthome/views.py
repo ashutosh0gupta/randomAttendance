@@ -384,7 +384,7 @@ def create_local_users(request):
 
 class EditStudentInfo(UpdateView):
     model = StudentInfo
-    fields = ['course']
+    fields = ['course','isPwd']
     template_name = 'studenthome/studentinfoedit.html'
     pk_url_kwarg = 'sid'
     
@@ -874,7 +874,13 @@ def calculate_student_status(s):
             sa = get_or_none(StudentAnswers,rollno=s.rollno, q=qid)
             statuses.append( get_answer_status( sa ) )
     return quiz_status( statuses )
-            
+
+@transaction.atomic
+def update_student_status( rollno ):
+    s = get_or_none(StudentInfo, pk=rollno)
+    s.curr_status = calculate_student_status(s)
+    s.save()
+
 class StudentResponse(UpdateView):
     model = StudentAnswers
     fields = ['ans1','ans2','ans3','ans4', 'user_agent']
@@ -955,23 +961,26 @@ class StudentResponse(UpdateView):
                 raise Exception( str(sa.rollno) + ' submitting question ' + str(sa.q) + ', while quiz is closed.' )
             if sys.activeq1 != sa.q and sys.activeq2 != sa.q and sys.activeq3 != sa.q and sys.activeq4 != sa.q:
                 raise Exception( str(sa.rollno) + ' is answering wrong question.' )
-
-            # saving the options
+            
+            # ----------------------------------------
+            # saving the details of answers
+            # ----------------------------------------
             response = super().form_valid(form)
 
             sa = self.object
-            # record student response details
             sa.answer_time = timezone.now() 
-            # sa.user_agent  = self.request.headers['User-Agent']
             sa.is_correct,c_count = is_answer_correct( sa )
             sa.correct_count = c_count
             sa.save()
             logq.info( str(sa.rollno) + ' answer-saved-'+str(c_count)+'.' )
-
+            
+            # ----------------------------------------
             # update student
-            s = get_or_none(StudentInfo, pk=sa.rollno)
-            s.curr_status = calculate_student_status(s)
-            s.save()
+            # ----------------------------------------
+            # s = get_or_none(StudentInfo, pk=sa.rollno)
+            # s.curr_status = calculate_student_status(s)
+            # s.save()
+            update_student_status(sa.rollno)
             
             logq.info( str(sa.rollno) + ' answered-' + str(sa.q) )
             return response
