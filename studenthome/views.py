@@ -20,7 +20,6 @@ from django.db.models import Q
 
 import logging
 
-from multiset import * 
 import string
 import csv
 import os
