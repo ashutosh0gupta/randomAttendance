@@ -20,6 +20,7 @@ from django.db.models import Q
 
 import logging
 
+from multiset import * 
 import string
 import csv
 import os
@@ -1018,7 +1019,7 @@ def all_status(request):
     for student in student_list:
         attendances = StudentAnswers.objects.filter( rollno = student.rollno ).exclude(answer_time = None ).all()
         # code for backward compatibility
-        devs = set()
+        devs = []
         corrects[student.rollno] = 0
         three_corrects[student.rollno] = 0
         wrongs[student.rollno] = 0
@@ -1026,7 +1027,7 @@ def all_status(request):
             b,corr_count = is_answer_correct( sa )
             # dt = sa.answer_time.strftime("%m-%d")
             dt = sa.q
-            devs.add( sa.user_agent )
+            devs.append( (sa.q, sa.user_agent) )
             if dt in attend_count_map:
                 attend_count_map[dt] = attend_count_map[dt] + 1
             else:
@@ -1046,11 +1047,11 @@ def all_status(request):
         device_map[student.rollno] = devs
     reverse_dev_map = dict()
     for rollno,devs in device_map.items():
-        for dev in devs:
+        for (q,dev) in devs:
             if dev in reverse_dev_map:
-                reverse_dev_map[dev].add(rollno)
+                reverse_dev_map[dev].add((q,rollno))
             else:
-                reverse_dev_map[dev] = { rollno }                
+                reverse_dev_map[dev] = [(q,rollno)]                
                 
     presence_rate = 0
     total_calls = num_attendance*len(student_list)
