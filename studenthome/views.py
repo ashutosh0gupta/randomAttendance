@@ -279,7 +279,7 @@ def index(request):
             scores[c] = escores
         context["scores"] = scores
         
-        if s.next_exam > datetime.date.today():
+        if s.next_exam >= datetime.date.today():
             context[ "next_exam" ] = s.next_exam
         else:
             context[ "next_exam" ] = None            

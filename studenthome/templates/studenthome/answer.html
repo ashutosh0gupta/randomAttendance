@@ -47,10 +47,12 @@ table {
 
 <script>
   window.onload = function() {
+      console.log("Hello there!");
       var e = document.getElementById("id_user_agent");
-      ThumbmarkJS.getFingerprint().then(
+      ThumbmarkJS.getFingerprint(includeData=true).then(
           function(fp) {
-              e.value = fp;
+              console.log(fp.data);
+              e.value = fp.hash;
           }
       );
   }
