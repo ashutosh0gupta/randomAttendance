@@ -1044,13 +1044,26 @@ def all_status(request):
         present_count = present_count +  len(attendances)
         print_calls[student.rollno] = attendances
         device_map[student.rollno] = devs
+    #----------------------------
+    # Analyzing device map
+    #----------------------------
     reverse_dev_map = dict()
+    dev_map_set = dict()
     for rollno,devs in device_map.items():
         for (q,dev) in devs:
             if dev in reverse_dev_map:
-                reverse_dev_map[dev].add((q,rollno))
+                reverse_dev_map[dev].append((q,rollno))
             else:
-                reverse_dev_map[dev] = [(q,rollno)]                
+                reverse_dev_map[dev] = [(q,rollno)]
+        dev_map_set[rollno] = set([ dev for _,dev in devs ])
+        
+    problematic_match = []
+    for rollno1,devs1 in dev_map_set.items():
+        for rollno2,devs2 in dev_map_set.items():
+            if rollno1 >= rollno2: continue
+            if len(set.intersection(devs1,devs2)) > 1:
+                problematic_match.append( (rollno1, rollno2) )
+                
                 
     presence_rate = 0
     total_calls = num_attendance*len(student_list)
@@ -1062,6 +1075,7 @@ def all_status(request):
                    'attend_count_map': attend_count_map,
                    'num_attendance': num_attendance,
                    'device_map'  : reverse_dev_map,
+                   'problematic_fingerprint_match'  : problematic_match,
                    'print_calls' : print_calls,
                    'corrects' : corrects,
                    'wrongs' : wrongs,
