@@ -86,17 +86,17 @@
 
   <div class="pagebreak"> </div>
   <table style="border: 1px solid black">
-    <tr>
-      <th style="width:100px">Name</th>
-      <th>Roll No</th>
-      <th>Photo</th>
-      <th>Room</th>
-      <th>Seat</th>
-      <th style="width:200px">Sign</th>
-    </tr>
+    <!-- <tr> -->
+    <!--   <th style="width:100px">Name</th> -->
+    <!--   <th>Roll No</th> -->
+    <!--   <th>Photo</th> -->
+    <!--   <th>Room</th> -->
+    <!--   <th>Seat</th> -->
+    <!--   <th style="width:200px">Sign</th> -->
+    <!-- </tr> -->
     {% for student in students %}
     <tr>
-      <td>
+      <td style="width:100px">
         {{ student.name }}
       </td>
       <td>
@@ -105,10 +105,10 @@
         **
         {% endif %}
       </td>
-      <td><img border="0"  src="{% get_media_prefix %}{{student.imagePath}}" WIDTH=93></td>
-      <td>{{ student.exam_room }}</td>
-      <td>{{ student.exam_seat }}</td>
-      <td></td>
+      <td><img border="0"  src="{% get_media_prefix %}{{student.imagePath}}" WIDTH=90></td>
+      <td style="width:80px">{{ student.exam_room }}</td>
+      <td style="width:30px">{{ student.exam_seat }}</td>
+      <td style="width:200px"></td>
       <!-- <td>{{ student.presentCount }}</td> -->
     </tr>
     {% endfor %}
