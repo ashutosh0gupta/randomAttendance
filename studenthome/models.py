@@ -172,7 +172,7 @@ class ExamMark(models.Model):
 class Exam(models.Model):
     name   = models.CharField   ( max_length=10 )
     course = models.CharField   ( max_length=10, default="")
-    weight = models.DecimalField ( verbose_name = "Weight of the exam", default=0  )
+    weight = models.DecimalField ( verbose_name = "Weight of the exam", default=0,max_digits = 3, decimal_places = 1 )
     total  = models.IntegerField( verbose_name="Total", default=0    )
     num_q  = models.IntegerField ( verbose_name="Number of questions", default=0    )
     mark1  = models.IntegerField ( verbose_name = "Marks Question 1", null=True, blank=True )
