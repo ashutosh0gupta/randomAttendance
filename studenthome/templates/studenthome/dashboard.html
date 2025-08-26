@@ -75,12 +75,12 @@ Your seating for the exam on {{next_exam}}: <strong>{{student.exam_room}} {{stud
              <span style="color:blue">Response: {{e.response}}</span><br>
              Crib marks: {{ e.crib_marks }}
             {% else %}
-            <span style="color:red">Respons: Rejected (Reason: {{e.response}})</span>
+            <span style="color:red">Response: Rejected (Reason: {{e.response}})</span>
             {% endif %}
           {% elif e.raise_time %}
             Claim: {{e.claim}}<br>
             {% if exam.is_cribs_active %}
-              Goto TA
+              Goto TA, Crib Token: {{e.crib_num}}
             {% endif %}
           {% else %}
             {% if exam.is_cribs_active %}

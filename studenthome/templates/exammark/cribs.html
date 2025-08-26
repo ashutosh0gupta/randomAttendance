@@ -21,6 +21,7 @@
 
 <table style="border: 1px solid black">
 <tr>
+  <th>Token No.</th>
   <th>Roll No.</th>
   <th>Marks</th>
   <th>Claim</th>    
@@ -32,6 +33,7 @@
   </tr>
   {% for e in cribs %}
   <tr>
+    <td>{{e.crib_num   }}</td>
     <td>{{ e.rollno    }}</td>
     <td>{{ e.marks     }}</td>
     <td>{{ e.claim     }}</td>

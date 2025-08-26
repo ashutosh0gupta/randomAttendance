@@ -104,7 +104,7 @@ def who_auth(request):
             #------------------------
             # For testing
             #------------------------
-            return '23B0945'
+            return '24B0940'
             # return "prof"
         return None
     #-----------------------------
@@ -1355,7 +1355,7 @@ def biobreak_withdraw(request,dayhash,rid):
 
 def clean_seats( ss ):
     ls = ss.split('\n')
-    ls = [ s.strip() for s in ls]
+    ls = [ s.strip() for s in ls if s[0] != "#"]
     return list(filter( None, ls ))
 
 # def lhc_sort_seats( seats ):
@@ -1651,9 +1651,6 @@ class CreateExam(SuccessMessageMixin,CreateView):
     def get_context_data( self, **kwargs ):
         context = super(CreateExam,self).get_context_data(**kwargs)
         context[ "is_auth" ] = (who_auth( self.request ) == "prof")
-        # for room in Exam.objects.all():
-        #     room.capacity = len(clean_seats(room.seats))
-        #     room.save()
         context[ "exams" ] = Exam.objects.all().order_by("name")
         return context
     
