@@ -152,6 +152,7 @@ class ExamMark(models.Model):
     #-------------------------------
     claim         = models.TextField(verbose_name="Student claim",max_length=200,null=True)
     raise_time    = models.DateTimeField(null=True)
+    crib_num      = models.IntegerField(verbose_name = "Crib Number", default=0,null=True)
     is_accepted   = models.BooleanField( verbose_name = "Was crib accepted?" , default=False)
     response_time = models.DateTimeField(null=True)
     response      = models.TextField(verbose_name="TA Response",max_length=200,null=True)
@@ -162,6 +163,7 @@ class ExamMark(models.Model):
     #-------------------------------
     claim2        = models.TextField(verbose_name="Student claim second time",max_length=200,null=True)
     raise_time2   = models.DateTimeField(null=True)
+    crib_num2     = models.IntegerField(verbose_name = "Appeal Number", default=0,null=True)
     is_accepted2  = models.BooleanField( verbose_name = "Was crib accepted second time?" , default=False)
     response_time2= models.DateTimeField(null=True)
     response2     = models.TextField(verbose_name="Instructor Response",max_length=200,null=True)

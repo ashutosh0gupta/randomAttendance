@@ -1970,6 +1970,8 @@ class RaiseCrib(UpdateView):
     def get_success_url(self):
         e = self.object
         e.raise_time = timezone.now()
+        cribs = ExamMark.objects.filter( Q(q = e.q)&(~Q(raise_time = None))&Q(exam_id = e.exam_id) )
+        e.crib_num = len(cribs)+1
         e.save()
         messages.success(self.request,f'Cribs raised by {e.rollno} for score id {e.id} !')
         logq.info( f'Cribs raised by {e.rollno} for score id {e.id} !' )
