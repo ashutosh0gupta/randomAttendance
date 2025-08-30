@@ -50,6 +50,7 @@ urlpatterns = [
     re_path(r'allocateseats/(?P<cid>\w+)/(?P<isRefresh>\w+)/', views.seating, name='allocateseats'),
     re_path(r'^enableexamroom/(?P<rid>\w+)/$', views.enable_examroom,   name='enableexamroom' ),
     re_path(r'^disableexamroom/(?P<rid>\w+)/$', views.disable_examroom,   name='disableexamroom' ),
+    path('createswitchseat/', views.CreateSwitchSeat.as_view(), name='createswitchseat'),
 
     #----------------------
     # Exam management

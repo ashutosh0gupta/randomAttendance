@@ -29,7 +29,6 @@ class StudentInfo(models.Model):
     exam_area   = models.CharField(max_length=32,null=True)
     exam_room   = models.CharField(max_length=32,null=True)
     exam_seat   = models.CharField(max_length=32,null=True)
-    # course      = models.CharField(verbose_name='Enrolled Courses', choices=COURSES, default='BOTH', max_length=20)
     course      = models.CharField(verbose_name='Enrolled Courses', default='---', max_length=20)
     curr_status = models.CharField(verbose_name='Current status', choices=CURRENT, default='ABSENT', max_length=20 )
 
@@ -117,11 +116,18 @@ class BioBreak(models.Model):
 #---------------------------------------------------------
 
 class ExamRoom(models.Model):
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=12)
     area = models.CharField(max_length=50,default="",null=True)
     seats= models.TextField(verbose_name="Available seats(new line separated)",max_length=3000,null=True)
     available = models.BooleanField( verbose_name = "Room Available" , default=True)
     capacity = models.IntegerField( verbose_name="Capacity", default=0    )
+
+class SwitchSeat(models.Model):
+    rollno = models.CharField(max_length=10)
+    room   = models.CharField(max_length=12)
+    seat   = models.CharField(max_length=12)
+    reason = models.TextField(verbose_name="Reason for move",max_length=100,null=True)
+    time   = models.DateTimeField(null=True)
 
 #---------------------------------------------------------
 # Exam interface

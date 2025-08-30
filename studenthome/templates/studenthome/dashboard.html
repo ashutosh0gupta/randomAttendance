@@ -21,20 +21,23 @@
 {% if is_prof %}
   
 <div>
-<a href="{% url 'startq' %}" class="ui label blue" >Start Quiz</a>
-<a href="{% url 'createq' %}" class="ui label blue" >Questions</a>
+<h3>Daily quiz</h3>
+<a href="{% url 'startq' %}" class="ui button blue" >Start Quiz</a>
+<a href="{% url 'createq' %}" class="ui button blue" >Questions</a>
 </div>
-<br>
+<h3>Exam results</h3>
 <div>
-<a href="{% url 'all' %}" class="ui label blue" >All Students</a>
-<a href="{% url 'biobreak' dayhash %}" class="ui label blue" >BioBreak</a>
-<a href="{% url 'createexamroom' %}" class="ui label blue" >Exam rooms</a>
+<a href="{% url 'all' %}" class="ui button blue" >All Students</a>
+<a href="{% url 'createexam' %}" class="ui button blue" >Exams</a>
+<h3>Exam operations</h3>
+<div>
+<a href="{% url 'createexamroom' %}" class="ui button blue" >Exam rooms</a>
+<a href="{%url 'editexamupdate' '1' %}" class="ui button blue">Update exam date</a>
 </div>
-<br>
+<h3>Exam Day</h3>
 <div>
-<!-- <a href="{% url 'all' %}" class="ui label blue" >All Students</a> -->
-<!-- <a href="{% url 'biobreak' dayhash %}" class="ui label blue" >BioBreak</a> -->
-<a href="{% url 'createexam' %}" class="ui label blue" >Exams</a>
+<a href="{% url 'biobreak' dayhash %}" class="ui button blue" >BioBreak</a>
+<a href="{% url 'createswitchseat' %}" class="ui button blue" >Switch Seat</a>
 </div>
 <br>
 <div>

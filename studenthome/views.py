@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
 from django.template import loader, RequestContext
 from django.http import HttpResponse
-from .models import StudentInfo,Call,Question,StudentAnswers,SystemState,BioBreak,ExamRoom,Exam,ExamMark
+from .models import StudentInfo,Call,Question,StudentAnswers,SystemState,BioBreak,ExamRoom,Exam,ExamMark,SwitchSeat
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin, AccessMixin,UserPassesTestMixin
@@ -1552,6 +1552,58 @@ def seating(request,cid, isRefresh):
     context["cid"] = cid
     return render( request, 'studenthome/seating.html', context.flatten() )
 
+class CreateSwitchSeat(SuccessMessageMixin,CreateView):
+    model = SwitchSeat
+    fields= ['rollno','room','seat','reason']
+    template_name = 'rooms/switchseat.html'
+
+    def get_context_data( self, **kwargs ):
+        context = super(CreateSwitchSeat,self).get_context_data(**kwargs)
+        context[ "is_auth" ] = (who_auth( self.request ) == "prof")
+        start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        end = start + timezone.timedelta(days=1)
+        print(start,end)
+        context[ "switches" ] = SwitchSeat.objects.filter(time__range=(start, end)).order_by("time")
+        # context[ "switches" ] = SwitchSeat.objects.all().order_by("time")
+        return context
+    
+    def get_success_url(self):
+        return reverse( "createswitchseat" )
+
+    def form_valid(self,form):
+        try:
+            d = None
+            u = who_auth(self.request)
+            if u == None:
+                return redirect( reverse("logout") )
+            if u != 'prof':
+                raise Exception( "Wrong kind of login!" )
+            
+            response = super().form_valid(form)
+            d = self.object
+            d.rollno = d.rollno.upper() 
+            
+            s = get_or_none( StudentInfo, pk = d.rollno )
+            if s == None:
+                raise Exception( "Student with rollno "+ d.rollno +" is not in the course!" )
+            else:
+                s.exam_seat = s.exam_seat + '->' + d.room + '-'+ d.seat
+                s.save()
+
+            d.time = timezone.now() 
+            d.save()
+
+            messages.success(self.request,'Created seat switch '+str(d.rollno)+'!')
+            logq.info( 'Created seat switch ' + str(d.pk) + ' created.' )
+
+            return response
+        except Exception as e:
+            # Form has failed fill gain
+            form.add_error( None, '{}!'.format(e) )
+            if d:
+                d.delete()
+            return super().form_invalid(form)
+
 #--------------------------------------------------------------------
 # Exam creation and management (BIG TODO)
 #--------------------------------------------------------------------
@@ -1680,20 +1732,6 @@ class CreateExam(SuccessMessageMixin,CreateView):
             #----------------------------------------
             # Process marks for the questions
             #----------------------------------------
-            # num_q = 0
-            # total = 0
-            # none_found = False
-            # for i in range(1,11):
-            #     num = getattr(d, f"mark{i}" )
-            #     if num:
-            #         num_q = i
-            #         total = total + num
-            #         if none_found:
-            #             raise Exception( "Marks are not contiguous!" )
-            #     else:
-            #         none_found = True
-            # d.total = total
-            # d.num_q = num_q
             process_questions(d)
 
             
@@ -1818,16 +1856,6 @@ def get_score( exammark ):
             else:
                 return past_score,f"{crib_score}->RAISED"
                             
-            # if exammark.is_accepted2:
-            #     if exammark.is_accepted:
-            #         return exammark.crib_marks2,f"{exammark.marks}->{exammark.crib_marks}->{exammark.crib_marks2}"
-            #     else:
-            #         return exammark.crib_marks2,f"{exammark.marks}->REJ->{exammark.crib_marks2}"                
-            # if exammark.raise_time2:
-            #     if exammark.is_accepted:
-            #         return exammark.crib_marks,f"{exammark.marks}->{exammark.crib_marks}->REJ"
-            #     else:
-            #         return exammark.marks,f"{exammark.marks}->REJ->REJ"
 
         # ---------------------------
         # TA cribs
