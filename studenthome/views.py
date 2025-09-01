@@ -1358,6 +1358,11 @@ def clean_seats( ss ):
     ls = [ s.strip() for s in ls if s[0] != "#"]
     return list(filter( None, ls ))
 
+def disabled_seats( ss ):
+    ls = ss.split('\n')
+    ls = [ s.strip() for s in ls if s[0] == "#"]
+    return list(filter( None, ls ))
+
 def remaining_seats( ss, used):
     ls = ss.split('\n')
     disabled = []
@@ -1385,6 +1390,7 @@ class CreateExamRoom(SuccessMessageMixin,CreateView):
         context[ "is_auth" ] = (who_auth( self.request ) == "prof")
         for room in ExamRoom.objects.all():
             room.capacity = len(clean_seats(room.seats))
+            room.disabled = len(disabled_seats(room.seats))
             room.save()
         context[ "examrooms" ] = ExamRoom.objects.all().order_by("name")
         return context

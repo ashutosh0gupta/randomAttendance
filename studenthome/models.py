@@ -121,6 +121,7 @@ class ExamRoom(models.Model):
     seats= models.TextField(verbose_name="Available seats(new line separated)",max_length=3000,null=True)
     available = models.BooleanField( verbose_name = "Room Available" , default=True)
     capacity = models.IntegerField( verbose_name="Capacity", default=0    )
+    disabled = models.IntegerField( verbose_name="#Disabled seats", default=0    )
 
 class SwitchSeat(models.Model):
     rollno = models.CharField(max_length=10)

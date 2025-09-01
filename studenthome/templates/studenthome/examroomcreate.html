@@ -15,6 +15,7 @@
   <a href="{%url 'allocateseats' 'CS213' 'view'%}" class="ui button blue">View Seats CS213</a>
   <a href="{%url 'allocateseats' 'CS293' 'view'%}" class="ui button blue">View Seats CS293</a>
   <a href="{%url 'allocateseats' 'CS433' 'view'%}" class="ui button blue">View Seats CS433</a>
+  <a href="{%url 'allocateseats' 'CS101' 'view'%}" class="ui button blue">View Seats CS101</a>
 </div>
 <br>
 <div class="ui container">
@@ -22,6 +23,7 @@
   <a href="{%url 'allocateseats' 'CS213' 'refresh'%}" class="ui button red" onclick="return confirm('Are you sure that you want to rearrange seating?');">Allocate Seats CS213</a>
   <a href="{%url 'allocateseats' 'CS293' 'refresh'%}" class="ui button red" onclick="return confirm('Are you sure that you want to rearrange seating?');">Allocate Seats CS293</a>
   <a href="{%url 'allocateseats' 'CS433' 'refresh'%}" class="ui button red" onclick="return confirm('Are you sure that you want to rearrange seating?');">Allocate Seats CS433</a>
+  <a href="{%url 'allocateseats' 'CS101' 'refresh'%}" class="ui button red" onclick="return confirm('Are you sure that you want to rearrange seating?');">Allocate Seats CS101</a>
 </div>
 <br>
 
@@ -53,6 +55,7 @@
     <th>Name</th>
     <th>Area</th>
     <th>Capacity</th>
+    <th>Disabled</th>
     <th>Available</th>
     <th></th>
     <th></th>
@@ -61,7 +64,8 @@
   <tr>
     <td>{{ r.name      }}</td>
     <td>{{ r.area      }}</td>
-    <td>{{ r.capacity }}</td>
+    <td>{{ r.capacity  }}</td>
+    <td>{{ r.disabled  }}</td>
     <td>
       {% if r.available %}
       Available
