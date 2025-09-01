@@ -110,7 +110,19 @@
       <td></td>
     </tr>
   </table>
-
+  <div>
+    {% if unused_map|hash:room %}
+    Unused seats : {{unused_map | hash:room}}
+    {% else %}
+    All enabled seats are occupied.
+    {% endif %}
+  </div>
+  <div>
+    {% if disabled_map|hash:room %}
+    Disabled seats : {{disabled_map | hash:room}}
+    {% endif %}
+  </div>
+  
   <div class="pagebreak"> </div>
   <table style="border: 1px solid black">
     <!-- <tr> -->

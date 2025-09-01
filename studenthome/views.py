@@ -1358,6 +1358,18 @@ def clean_seats( ss ):
     ls = [ s.strip() for s in ls if s[0] != "#"]
     return list(filter( None, ls ))
 
+def remaining_seats( ss, used):
+    ls = ss.split('\n')
+    disabled = []
+    unused = []
+    for s in ls:
+        s = s.strip()
+        if s[0] == "#":
+            disabled.append(s)
+        elif not s in used:
+            unused.append(s)
+    return disabled,unused
+
 # def lhc_sort_seats( seats ):
 #     splits = [(s[1:],s[0]) for s in seats]
 #     splits.sort()
@@ -1541,13 +1553,22 @@ def seating(request,cid, isRefresh):
     # -------------------------------------------
     rooms = ExamRoom.objects.all()
     room_map = {}
+    disabled_map = {}
+    unused_map = {}
     for room in rooms:
         if room.available:
             students = StudentInfo.objects.filter( Q(exam_room = room.name)&Q(course__contains = cid) ).order_by('exam_seat')
+            used_seats  = [student.exam_seat for student in students]
+            disabled_seats,unused_seats = remaining_seats( room.seats, used_seats)
             room_map[room.name] = students
+            disabled_map[room.name] = ",".join(disabled_seats)
+            unused_map[room.name] = ",".join(unused_seats)
+            
     # students_by_roll = StudentInfo.objects.filter( Q(course__contains = cid) ).order_by('rollno')
     context = RequestContext(request)
-    context["room_map"] = room_map
+    context[ "room_map"     ] = room_map
+    context[ "disabled_map" ] = disabled_map
+    context[ "unused_map"   ] = unused_map
     # context["students_by_roll"] = students_by_roll
     context["cid"] = cid
     return render( request, 'studenthome/seating.html', context.flatten() )
