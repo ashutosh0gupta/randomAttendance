@@ -10,7 +10,7 @@
 
 {% if is_auth %}
 <div class="ui container">
-  <h1>Regrade exam</h1>
+  <h1>Regrade {{e.name}} for {{e.course}} </h1>
 
   <div class="ui container">
     {% if messages %}
@@ -23,7 +23,7 @@
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Update">
+    <input type="submit" value="Update" onclick="return confirm('Are you sure that you want to regrade {{e.name}} of {{e.course}}?');">
   </form>
 
 </div>

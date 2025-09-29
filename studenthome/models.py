@@ -197,6 +197,7 @@ class Exam(models.Model):
     link   = models.CharField(max_length=100, null=True) # security feature
     marks  = models.TextField( verbose_name="Student scores in (CSV) (Header: ROLL NO,Q1,Q2,..,Qk,Comment1,...,Commentk) [ROLL NO contains roll no separated by -]", max_length=20000, null=True, blank=True)
     regrade = models.TextField( verbose_name="Student scores in (CSV) (Header: ROLL NO,Qi)", max_length=20000, null=True, blank=True)
+    regrade_reason = models.TextField(verbose_name="Why are we regrading?",max_length=200,null=True)
     is_cribs_active = models.BooleanField( verbose_name = "Is Cribs active?" , default=True)
     
 

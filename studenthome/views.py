@@ -1667,7 +1667,10 @@ def process_marks(d):
             for r in r.split("-"): 
                 for qname,qid,qcomment in qs:
                     em,created = ExamMark.objects.get_or_create( rollno=r, exam_id=d.id, q=qid )
-                    em.marks = row[qname]
+                    if pd.isna(row[qname]):
+                        em.marks = 0
+                    else:
+                        em.marks = row[qname]
                     if qcomment != None: em.comment = row[qcomment]
                     em.save()
 
@@ -1679,9 +1682,9 @@ def regrade_marks(e):
         for index, row in marks.iterrows():
             r = row['ROLL NO']
             for qname,qid in qs:
-                em,created = ExamMark.objects.get_or_create( rollno=r, exam_id=e.id, q=qid )
+                em = get_or_none( ExamMark, rollno=r, exam_id=e.id, q=qid )
+                if em == None: continue
                 update = False
-                print(f'I am here {em.rollno} {row[qname]} {em.marks} {em.crib_marks} {em.crib_marks2}')
                 # -------------------------------------------------------------
                 # Update only if uploaded marks are different from latest marks 
                 # -------------------------------------------------------------
@@ -1690,6 +1693,7 @@ def regrade_marks(e):
                         em.crib_marks2 = row[qname]
                         em.is_accepted2   = True
                         em.response_time2 = timezone.now()
+                        em.respnse2 = e.regrade_reason
                         em.save()
                 elif em.response_time and em.is_accepted:
                     if em.crib_marks != row[qname]:
@@ -1697,6 +1701,7 @@ def regrade_marks(e):
                         em.is_accepted2   = True
                         em.raise_time2    = timezone.now()
                         em.response_time2 = timezone.now()
+                        em.respnse2 = e.regrade_reason
                         em.save()
                 else:
                     if em.marks != row[qname]:
@@ -1704,6 +1709,7 @@ def regrade_marks(e):
                         em.is_accepted   = True
                         em.raise_time     = timezone.now()
                         em.response_time = timezone.now()
+                        em.respnse = e.regrade_reason
                         em.save()
 
 def process_questions(d):
@@ -1819,13 +1825,14 @@ class EditExam(UpdateView):
 
 class RegradeExam(UpdateView):
     model = Exam
-    fields = ['regrade']
+    fields = ['regrade','regrade_reason']
     template_name = 'exam/regrade.html'
     pk_url_kwarg = 'rid'
     
     def get_context_data( self, **kwargs ):
         context = super(RegradeExam,self).get_context_data(**kwargs)
         context[ "is_auth" ] = (who_auth( self.request ) == "prof")
+        context[ "e" ] = self.object
         return context
 
     def get_success_url(self):
