@@ -2133,12 +2133,12 @@ def reject_crib2(request, eid):
     e = get_or_none( ExamMark, pk = eid )
     if (e == None):
         return HttpResponse( 'Incorrect crib!' )
-    e.is_accepted   = False
-    e.response_time = timezone.now()
+    e.is_accepted2   = False
+    e.response_time2 = timezone.now()
     e.save()
     messages.success(request,f'Appeal for scode id {e.id} is rejected!')
     logq.info( f'Appeal for scode id {e.id} is rejected!' )
-    return redirect( reverse('cribs', kwargs={'eid':e.exam_id}) )
+    return redirect( reverse('cribs2', kwargs={'eid':e.exam_id}) )
 
 
 
