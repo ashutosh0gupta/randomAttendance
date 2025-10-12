@@ -1772,7 +1772,7 @@ class CreateExam(SuccessMessageMixin,CreateView):
             # Create crib link
             #----------------------------------------
             salt = str(timezone.now())+str(d.id)
-            dig = hmac.new(str.encode(salt), msg=str.encode(salt), digestmod=hashlib.sha256).digest()
+            dig = hmac.new(str.encode(settings.SECRET_KEY), msg=str.encode(salt), digestmod=hashlib.sha256).digest()
             dh = base64.b64encode(dig).decode()[:-1]
             d.link  = ''.join(e for e in dh if e.isalnum())
            
