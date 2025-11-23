@@ -30,6 +30,7 @@ class StudentInfo(models.Model):
     exam_room   = models.CharField(max_length=32,null=True)
     exam_seat   = models.CharField(max_length=32,null=True)
     course      = models.CharField(verbose_name='Enrolled Courses', default='---', max_length=20)
+    total_scores= models.CharField(verbose_name='Total scores in Enrolled Courses', default=None, max_length=200,null=True)
     curr_status = models.CharField(verbose_name='Current status', choices=CURRENT, default='ABSENT', max_length=20 )
 
 class Question(models.Model):
@@ -181,7 +182,7 @@ class ExamMark(models.Model):
 class Exam(models.Model):
     name   = models.CharField   ( max_length=10 )
     course = models.CharField   ( max_length=10, default="")
-    weight = models.DecimalField ( verbose_name = "Weight of the exam", default=0,max_digits = 3, decimal_places = 1 )
+    weight = models.DecimalField ( verbose_name = "Weight of the exam", default=0, max_digits = 4, decimal_places = 2 )
     total  = models.IntegerField( verbose_name="Total", default=0    )
     num_q  = models.IntegerField ( verbose_name="Number of questions", default=0    )
     mark1  = models.IntegerField ( verbose_name = "Marks Question 1", null=True, blank=True )

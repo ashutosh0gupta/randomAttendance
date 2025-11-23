@@ -52,6 +52,11 @@ Your seating for the exam on {{next_exam}}: <strong>{{student.exam_room}} {{stud
 {% endif %}
 <br>
 
+{% if student.total_scores %}
+Your total scores <strong>{{student.total_scores}}  </strong>
+<br>
+{% endif %}
+
 {% for course,escores in scores.items %}
   <h1>{{ course }}</h1>
   {% if escores.items %}

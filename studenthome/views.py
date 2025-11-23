@@ -1803,7 +1803,10 @@ class CreateExam(SuccessMessageMixin,CreateView):
 
 class EditExam(UpdateView):
     model = Exam
-    fields = ['name','course','weight','mark1', 'mark2', 'mark3', 'mark4', 'mark5', 'mark6', 'mark7', 'mark8', 'mark9', 'mark10','marks','is_cribs_active']
+    fields = ['name','course','weight',
+              'mark1', 'mark2', 'mark3', 'mark4', 'mark5',
+              'mark6', 'mark7', 'mark8', 'mark9', 'mark10',
+              'marks','is_cribs_active']
     template_name = 'exam/edit.html'
     pk_url_kwarg = 'rid'
     
@@ -2140,6 +2143,27 @@ def reject_crib2(request, eid):
     logq.info( f'Appeal for scode id {e.id} is rejected!' )
     return redirect( reverse('cribs2', kwargs={'eid':e.exam_id}) )
 
+
+@transaction.atomic
+def compute_total_scores():
+    student_list = StudentInfo.objects.order_by('rollno')    
+    for student in student_list:
+        scores = ""
+        for c in student.course.split(':'):
+            exams = Exam.objects.filter( Q(course = c) )
+            weighted = 0.0
+            if exams:
+                for exam in exams:
+                    total = 0
+                    for qid in range(1,exam.num_q+1):
+                        score = get_or_none( ExamMark, exam_id = exam.id, rollno=student.rollno, q=qid )
+                        marks,_ = get_score(score)
+                        total += marks
+                    weighted += total*exam.weight
+            weighted = round(weighted, 2)
+            scores += f"{c}:{weighted}%,"
+        student.total_scores = scores
+        student.save()
 
 
 # def raise_crib(request, eid):
