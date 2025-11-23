@@ -398,7 +398,7 @@ class EditStudentInfo(UpdateView):
     def form_valid(self,form):
         try:
             u = who_auth( self.request )
-            if  u != "prof": raise Exception( f'[Attack] non prof  {u} modifying student' )
+            if  u != "prof": raise Exception( f'[Attack] non prof  {u} is modifying student' )
             return super().form_valid(form)
         except Exception as e:
             logq.error( '{}!'.format(e) )
@@ -528,6 +528,16 @@ class EditQuestion(UpdateView):
         context = super(EditQuestion,self).get_context_data(**kwargs)
         context[ "is_auth" ] = (who_auth( self.request ) == "prof")
         return context
+
+    def form_valid(self,form):
+        try:
+            u = who_auth( self.request )
+            if  u != "prof": raise Exception( f'[Attack] non prof  {u} is modifying a question' )
+            return super().form_valid(form)
+        except Exception as e:
+            logq.error( '{}!'.format(e) )
+            form.add_error( None, '{}!'.format(e) )
+            return redirect( reverse( 'index' ) )
 
     def get_success_url(self):
         q = self.object
@@ -735,6 +745,16 @@ class EditNextExamDate(UpdateView):
         context = super(EditNextExamDate,self).get_context_data(**kwargs)
         context[ "is_auth" ] = (who_auth( self.request ) == "prof")
         return context
+
+    def form_valid(self,form):
+        try:
+            u = who_auth( self.request )
+            if  u != "prof": raise Exception( f'[Attack] non prof  {u} is modifying a question' )
+            return super().form_valid(form)
+        except Exception as e:
+            logq.error( '{}!'.format(e) )
+            form.add_error( None, '{}!'.format(e) )
+            return redirect( reverse( 'index' ) )
 
     def get_success_url(self):
         sys = self.object
@@ -1456,6 +1476,16 @@ class EditExamRoom(UpdateView):
         context[ "is_auth" ] = (who_auth( self.request ) == "prof")
         return context
 
+    def form_valid(self,form):
+        try:
+            u = who_auth( self.request )
+            if  u != "prof": raise Exception( f'[Attack] non prof  {u} is modifying a question' )
+            return super().form_valid(form)
+        except Exception as e:
+            logq.error( '{}!'.format(e) )
+            form.add_error( None, '{}!'.format(e) )
+            return redirect( reverse( 'index' ) )
+        
     def get_success_url(self):
         q = self.object
         logq.info( 'Question ' + str(q.id) + ' edited.' )
@@ -1703,7 +1733,7 @@ def regrade_marks(e):
                         em.crib_marks2 = row[qname]
                         em.is_accepted2   = True
                         em.response_time2 = timezone.now()
-                        em.respnse2 = e.regrade_reason
+                        em.response2 = e.regrade_reason
                         em.save()
                 elif em.response_time and em.is_accepted:
                     if em.crib_marks != row[qname]:
@@ -1711,7 +1741,7 @@ def regrade_marks(e):
                         em.is_accepted2   = True
                         em.raise_time2    = timezone.now()
                         em.response_time2 = timezone.now()
-                        em.respnse2 = e.regrade_reason
+                        em.response2 = e.regrade_reason
                         em.save()
                 else:
                     if em.marks != row[qname]:
@@ -1719,7 +1749,7 @@ def regrade_marks(e):
                         em.is_accepted   = True
                         em.raise_time     = timezone.now()
                         em.response_time = timezone.now()
-                        em.respnse = e.regrade_reason
+                        em.response = e.regrade_reason
                         em.save()
 
 def process_questions(d):
@@ -1825,11 +1855,22 @@ class EditExam(UpdateView):
         context[ "is_auth" ] = (who_auth( self.request ) == "prof")
         return context
 
+    def form_valid(self,form):
+        try:
+            u = who_auth( self.request )
+            if  u != "prof": raise Exception( f'[Attack] non prof  {u} is modifying an exam' )
+            return super().form_valid(form)
+        except Exception as e:
+            logq.error( '{}!'.format(e) )
+            form.add_error( None, '{}!'.format(e) )
+            return redirect( reverse( 'index' ) )
+
     def get_success_url(self):
         q = self.object
         #----------------------------------------
         # Process marks of the students
-        #----------------------------------------            
+        #----------------------------------------
+        # TODO : does not apply consistency checks 
         process_marks(q)
 
         process_questions(q)
@@ -1847,6 +1888,16 @@ class RegradeExam(UpdateView):
         context[ "is_auth" ] = (who_auth( self.request ) == "prof")
         context[ "e" ] = self.object
         return context
+
+    def form_valid(self,form):
+        try:
+            u = who_auth( self.request )
+            if  u != "prof": raise Exception( f'[Attack] non prof  {u} is regrading an exam!' )
+            return super().form_valid(form)
+        except Exception as e:
+            logq.error( '{}!'.format(e) )
+            form.add_error( None, '{}!'.format(e) )
+            return redirect( reverse( 'index' ) )
 
     def get_success_url(self):
         e = self.object
@@ -2039,6 +2090,17 @@ class RaiseCrib(UpdateView):
         context[ "e" ] = e
         return context
 
+    def form_valid(self,form):
+        try:
+            u = who_auth( self.request )
+            s = self.object
+            if  u != s.rollno: raise Exception( f'[Attack] wrong student is  is modifying a crib {s.rollno} != {u}' )
+            return super().form_valid(form)
+        except Exception as e:
+            logq.error( '{}!'.format(e) )
+            form.add_error( None, '{}!'.format(e) )
+            return redirect( reverse( 'index' ) )
+
     def get_success_url(self):
         e = self.object
         e.raise_time = timezone.now()
@@ -2065,6 +2127,17 @@ class RaiseCrib2(UpdateView):
         context[ "e" ] = e
         return context
 
+    def form_valid(self,form):
+        try:
+            u = who_auth( self.request )
+            s = self.object
+            if  u != s.rollno: raise Exception( f'[Attack] wrong student is  is modifying a crib {s.rollno} != {u}' )
+            return super().form_valid(form)
+        except Exception as e:
+            logq.error( '{}!'.format(e) )
+            form.add_error( None, '{}!'.format(e) )
+            return redirect( reverse( 'index' ) )
+
     def get_success_url(self):
         e = self.object
         e.raise_time2 = timezone.now()
@@ -2090,6 +2163,20 @@ class ResponseCrib(UpdateView):
         context[ "link" ] = link
         return context
 
+    def form_valid(self,form):
+        try:
+            link = self.kwargs['link']
+            e = self.object
+            exam = get_or_none( Exam, pk = e.exam_id )
+            is_auth = ( link == exam.link ) and (exam.is_cribs_active == True)
+            if  not is_auth : raise Exception( f'[Attack] Bad crib response link!' )
+            return super().form_valid(form)
+        except Exception as e:
+            logq.error( '{}!'.format(e) )
+            form.add_error( None, '{}!'.format(e) )
+            return redirect( reverse( 'index' ) )
+
+        
     def get_success_url(self):
         e = self.object
         e.is_accepted   = True
@@ -2115,6 +2202,19 @@ class ResponseCrib2(UpdateView):
         context[ "e"       ] = e
         return context
 
+    def form_valid(self,form):
+        try:
+            link = self.kwargs['link']
+            e = self.object
+            exam = get_or_none( Exam, pk = e.exam_id )
+            is_auth = ( link == exam.link ) and (exam.is_cribs_active == True)
+            if  not is_auth : raise Exception( f'[Attack] Bad crib response link!' )
+            return super().form_valid(form)
+        except Exception as e:
+            logq.error( '{}!'.format(e) )
+            form.add_error( None, '{}!'.format(e) )
+            return redirect( reverse( 'index' ) )
+        
     def get_success_url(self):
         e = self.object
         e.is_accepted2   = True

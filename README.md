@@ -39,8 +39,9 @@ For taking random attendance in the class
   ```
 
 * Use the following shell command to generate a random django-secret-key key
-
+  ```
    $tr -dc 'a-z0-9!@#$%^&*(-_=+)' < /dev/urandom | head -c50
+  ```
 
 4. __Import student data into the db__
 
