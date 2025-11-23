@@ -7,6 +7,7 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('all/', views.all_status, name='all'),
+    path('totalscores/', views.compute_total_scores, name='totalscores'),
     path('import/', views.db_import, name='import'),
     re_path(r'^editstudentinfo/(?P<sid>\w+)/',views.EditStudentInfo.as_view(),name='editstudentinfo' ),    
     path('createlocal/', views.create_local_users, name='createlocal'),

@@ -395,6 +395,16 @@ class EditStudentInfo(UpdateView):
         context[ "student" ] = s
         return context
 
+    def form_valid(self,form):
+        try:
+            u = who_auth( self.request )
+            if  u != "prof": raise Exception( f'[Attack] non prof  {u} modifying student' )
+            return super().form_valid(form)
+        except Exception as e:
+            logq.error( '{}!'.format(e) )
+            form.add_error( None, '{}!'.format(e) )
+            return redirect( reverse( 'index' ) )
+
     def get_success_url(self):
         s = self.object
         log_and_message( self.request, f'Student {s.rollno} edited!' )
@@ -2145,7 +2155,8 @@ def reject_crib2(request, eid):
 
 
 @transaction.atomic
-def compute_total_scores():
+def compute_total_scores(request):
+    if who_auth(request) != 'prof': return HttpResponse( 'Incorrect login!' )
     student_list = StudentInfo.objects.order_by('rollno')    
     for student in student_list:
         scores = ""
@@ -2154,16 +2165,17 @@ def compute_total_scores():
             weighted = 0.0
             if exams:
                 for exam in exams:
-                    total = 0
+                    total = 0.0
                     for qid in range(1,exam.num_q+1):
                         score = get_or_none( ExamMark, exam_id = exam.id, rollno=student.rollno, q=qid )
                         marks,_ = get_score(score)
-                        total += marks
-                    weighted += total*exam.weight
+                        total += float(marks)
+                    weighted += float(total)*float(exam.weight)/float(exam.total)
             weighted = round(weighted, 2)
             scores += f"{c}:{weighted}%,"
         student.total_scores = scores
         student.save()
+    return redirect( reverse( 'index' ) )
 
 
 # def raise_crib(request, eid):
