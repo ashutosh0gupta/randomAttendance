@@ -1480,7 +1480,7 @@ class EditExamRoom(UpdateView):
         try:
             u = who_auth( self.request )
             if  u != "prof": raise Exception( f'[Attack] non prof  {u} is modifying a question' )
-            return super().form_valid(form)
+            return super().form_valid(form)            
         except Exception as e:
             logq.error( '{}!'.format(e) )
             form.add_error( None, '{}!'.format(e) )
@@ -1870,10 +1870,9 @@ class EditExam(UpdateView):
         #----------------------------------------
         # Process marks of the students
         #----------------------------------------
-        # TODO : does not apply consistency checks 
         process_marks(q)
-
         process_questions(q)
+        q.save()
         logq.info( 'Question ' + str(q.name) + ' edited.' )
         return reverse( "createexam" )
 
@@ -2257,10 +2256,12 @@ def reject_crib2(request, eid):
 @transaction.atomic
 def compute_total_scores(request):
     if who_auth(request) != 'prof': return HttpResponse( 'Incorrect login!' )
-    student_list = StudentInfo.objects.order_by('rollno')    
+    student_list = StudentInfo.objects.order_by('rollno')
+    compute_for_courses = ['CS213']
     for student in student_list:
         scores = ""
         for c in student.course.split(':'):
+            if not c in compute_for_courses: continue 
             exams = Exam.objects.filter( Q(course = c) )
             weighted = 0.0
             if exams:
