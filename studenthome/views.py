@@ -2262,7 +2262,7 @@ def compute_total_scores(request):
         if student.rollno in do_not_compute_for_students: continue
         scores = ""
         for c in student.course.split(':'):
-            if c in compute_for_courses: continue 
+            if c in do_not_compute_for_courses: continue 
             exams = Exam.objects.filter( Q(course = c) )
             weighted = 0.0
             if exams:
