@@ -28,16 +28,23 @@
   {% if appeal %}
   <th>TA Decision</th>    
   <th>Appeal</th>    
+  <th>Appeal Time</th>
+  {% else %}
+  <th>Raise Time</th>
   {% endif %}
   <th></th>    
   </tr>
   {% for e in cribs %}
   <tr>
     <td>{{e.crib_num   }}</td>
+    {% if appeal %}
+    {% else %}
+    {% endif %}
     <td>{{ e.rollno    }}</td>
     <td>{{ e.marks     }}</td>
     <td>{{ e.claim     }}</td>
     {% if appeal %}
+      <td>{{ e.raise_time2}}</td>
       {% if e.is_accepted %}
       <td>{{ e.crib_marks }}</td>
       {% else %}
@@ -48,6 +55,7 @@
         <a href="{%url 'responsecrib2' e.id %}" class="ui label blue">Respond</a>
       </td>
     {% else %}
+    <td>{{ e.raise_time}}</td>
     <td>
       <a href="{%url 'responsecrib' e.id link %}" class="ui label blue">Respond</a>
     </td>
