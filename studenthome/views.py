@@ -2206,7 +2206,7 @@ class ResponseCrib2(UpdateView):
             link = self.kwargs['link']
             e = self.object
             exam = get_or_none( Exam, pk = e.exam_id )
-            is_auth = ( link == exam.link ) and (exam.is_cribs_active == True)
+            is_auth = ( (who_auth( self.request ) == 'prof') ) and (exam.is_cribs_active == True)
             if  not is_auth : raise Exception( f'[Attack] Bad crib response link!' )
             return super().form_valid(form)
         except Exception as e:
@@ -2258,7 +2258,9 @@ def compute_total_scores(request):
     if who_auth(request) != 'prof': return HttpResponse( 'Incorrect login!' )
     student_list = StudentInfo.objects.order_by('rollno')
     compute_for_courses = ['CS213']
+    do_not_compute_for_students = ['24B1004', '24B0989', '210050102', '24B0956', '24B1001', '24B1087', '24B0910', '24B1030', '23B1054', '24B1050', '24B1053', '24B1017']
     for student in student_list:
+        if student.rollno in do_not_compute_for_students: continue
         scores = ""
         for c in student.course.split(':'):
             if not c in compute_for_courses: continue 
