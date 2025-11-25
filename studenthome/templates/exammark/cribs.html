@@ -69,6 +69,7 @@
   {% if appeal %}
   <th>TA Decision</th>    
   <th>Appeal</th>    
+  <th>Instructor Response</th>    
   {% endif %}
   <th>Status</th>    
   <th></th>    
@@ -88,6 +89,7 @@
     </td>
     {% if appeal %}    
     <td>{{ e.claim2    }}</td>
+    <td>{{ e.response2 }}</td>
     <td>
       {% if e.is_accepted2 %}
       New marks: {{ e.crib_marks2 }}
