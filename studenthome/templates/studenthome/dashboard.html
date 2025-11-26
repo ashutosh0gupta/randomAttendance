@@ -54,7 +54,11 @@ Your seating for the exam on {{next_exam}}: <strong>{{student.exam_room}} {{stud
 <br>
 
 {% if student.total_scores %}
-Your total scores <strong>{{student.total_scores}}  </strong>
+Your total scores: <strong>{{student.total_scores}}  </strong>
+<br>
+{% endif %}
+{% if student.absent %}
+Your accepted claims: <strong>{{student.absent}}  </strong>
 <br>
 {% endif %}
 
