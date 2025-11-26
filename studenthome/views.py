@@ -384,7 +384,7 @@ def create_local_users(request):
 
 class EditStudentInfo(UpdateView):
     model = StudentInfo
-    fields = ['course','isPwd']
+    fields = ['course','absent','isPwd']
     template_name = 'studenthome/studentinfoedit.html'
     pk_url_kwarg = 'sid'
     
@@ -1217,6 +1217,10 @@ def biobreak_queue():
     bbs = BioBreak.objects.filter( Q(returned_time=None) & Q(activate_time=None)).all().order_by('request_time')
     return bbs
 
+def biobreak_returned():
+    bbs = BioBreak.objects.filter( ~Q(returned_time=None) ).all().order_by('request_time')
+    return bbs
+
 def biobreak_active_by_area():
     acts = biobreak_actives()
     acts_dict = defaultdict(list)
@@ -1275,6 +1279,7 @@ class AddBioBreak(SuccessMessageMixin,CreateView):
         context[ "is_auth" ] = (self.kwargs.get('dayhash') == self.dayhash)
         biobreak_next_access()
         bbs  = biobreak_queue()
+        # bbs = biobreak_returned()
         acts = biobreak_actives()
         remain_time = {}
         for act in acts:
@@ -2251,6 +2256,17 @@ def reject_crib2(request, eid):
     logq.info( f'Appeal for scode id {e.id} is rejected!' )
     return redirect( reverse('cribs2', kwargs={'eid':e.exam_id}) )
 
+def read_absents(student):
+    absents = {}
+    for course in student.course.split(':'): absents[course] = []
+    if student.absent:
+        for absent in student.absent.split(','):
+            ab = absent.split(':')
+            if len(ab) == 2 and ab[0] in student.course:
+                course = ab[0]
+                exam   = ab[1]
+                absents[course].append(exam)
+    return absents
 
 @transaction.atomic
 def compute_total_scores(request):
@@ -2260,19 +2276,24 @@ def compute_total_scores(request):
     do_not_compute_for_students = ['24B1004', '24B0989', '210050102', '24B0956', '24B1001', '24B1087', '24B0910', '24B1030', '23B1054', '24B1050', '24B1053', '24B1017']
     for student in student_list:
         if student.rollno in do_not_compute_for_students: continue
+        absents = read_absents(student)
         scores = ""
         for c in student.course.split(':'):
             if c in do_not_compute_for_courses: continue 
             exams = Exam.objects.filter( Q(course = c) )
+            missed   = 0.0
             weighted = 0.0
             if exams:
                 for exam in exams:
+                    if exam.name in absents[c]:
+                        missed += float(exam.weight)
                     total = 0.0
                     for qid in range(1,exam.num_q+1):
                         score = get_or_none( ExamMark, exam_id = exam.id, rollno=student.rollno, q=qid )
                         marks,_ = get_score(score)
                         total += float(marks)
                     weighted += float(total)*float(exam.weight)/float(exam.total)
+            if missed > 0: weighted = weighted*100/(100-missed)
             weighted = round(weighted, 2)
             scores += f"{c}:{weighted}%,"
         student.total_scores = scores

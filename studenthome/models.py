@@ -32,6 +32,7 @@ class StudentInfo(models.Model):
     course      = models.CharField(verbose_name='Enrolled Courses', default='---', max_length=20)
     total_scores= models.CharField(verbose_name='Total scores in Enrolled Courses', default=None, max_length=200,null=True)
     curr_status = models.CharField(verbose_name='Current status', choices=CURRENT, default='ABSENT', max_length=20 )
+    absent      = models.CharField(verbose_name='Absent in Exams (Format: CSXXX:ExamName,CSYYY:ExamName2)', default=None, max_length=100,null=True)
 
 class Question(models.Model):
     q=models.CharField(verbose_name="Question", max_length=1000)

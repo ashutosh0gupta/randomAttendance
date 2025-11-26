@@ -70,6 +70,8 @@
       <th>Photo</th>
       {% endif %}
       <th>Courses</th>
+      <th>Absent</th>
+      <th>Scores</th>
     </tr>
     {% for student in student_list %}
     <tr>
@@ -82,6 +84,8 @@
       <td><img border="0"  src="{% get_media_prefix %}{{student.imagePath}}" WIDTH=100></td>
       {% endif %}      
       <td>{{ student.course }}</td>
+      <td>{{ student.absent }}</td>
+      <td>{{ student.total_scores }}</td>
     </tr>
     {% endfor %}
     <tr>
