@@ -2272,7 +2272,7 @@ def read_absents(student):
 def compute_total_scores(request):
     if who_auth(request) != 'prof': return HttpResponse( 'Incorrect login!' )
     student_list = StudentInfo.objects.order_by('rollno')
-    do_not_compute_for_courses = ['CS293']
+    do_not_compute_for_courses = ['CS213']
     do_not_compute_for_students = ['24B1004', '24B0989', '210050102', '24B0956', '24B1001', '24B1087', '24B0910', '24B1030', '23B1054', '24B1050', '24B1053', '24B1017']
     for student in student_list:
         if student.rollno in do_not_compute_for_students: continue
@@ -2283,6 +2283,7 @@ def compute_total_scores(request):
             exams = Exam.objects.filter( Q(course = c) )
             missed   = 0.0
             weighted = 0.0
+            calculation = []
             if exams:
                 for exam in exams:
                     if exam.name in absents[c]:
@@ -2292,10 +2293,15 @@ def compute_total_scores(request):
                         score = get_or_none( ExamMark, exam_id = exam.id, rollno=student.rollno, q=qid )
                         marks,_ = get_score(score)
                         total += float(marks)
-                    weighted += float(total)*float(exam.weight)/float(exam.total)
-            if missed > 0: weighted = weighted*100/(100-missed)
+                    exam_score = float(total)*float(exam.weight)/float(exam.total)
+                    weighted += exam_score
+                    calculation.append(f"({exam.total}/{exam.weight}){total}")
+            calculation = "+".join(calculation)
+            if missed > 0:
+                weighted = weighted*100/(100-missed)
+                calculation = f"100/(100-{missed})({calculation})"
             weighted = round(weighted, 2)
-            scores += f"{c}:{weighted}%,"
+            scores += f"{c}:{calculation}={weighted}%,"
         student.total_scores = scores
         student.save()
     return redirect( reverse( 'index' ) )
