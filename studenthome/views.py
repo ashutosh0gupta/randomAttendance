@@ -110,7 +110,7 @@ def who_auth(request):
     #-----------------------------
     # Profs and the Head TAs
     #-----------------------------    
-    if u.username in ["akg", "hasmitak", "ivarnam", "krishnas", "lavinia"]:
+    if u.username in ["akg", "firuza", "ivarnam"]:
         return "prof"
     #-----------------------------
     # Other TAs
