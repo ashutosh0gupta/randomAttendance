@@ -41,6 +41,11 @@ table {
 <h1>Options</h1>
 {% else %}
 <h1>{{q_course}} Q {{q_num}}: {{q_name}}</h1>
+<p>
+  {%if q_code %}
+    <pre><code>{{q_code}}</code></pre>
+  {% endif %}
+</p>
 {% endif %}
 
 {% if yet_to_answer %}

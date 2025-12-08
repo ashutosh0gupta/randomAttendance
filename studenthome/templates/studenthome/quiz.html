@@ -11,7 +11,11 @@
 
 <div class="ui container">
 
-<h1 style=font-size:50px>Q : {{q}}</h1>
+<h1> Q : {{q}}</h1>
+
+{% if q_code %}
+<p><pre><code>{{q_code}}</code></pre></p>
+{% endif %}
 
 {% for s in students %}
 {% if s.curr_status == 'ABSENT' %}

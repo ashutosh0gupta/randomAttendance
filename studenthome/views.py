@@ -241,6 +241,7 @@ def index(request):
             # question on the screen
             if( q != None ):
                 context["q"] = clean_latex( q.q) # LatexNodes2Text().latex_to_text( q.q )
+                context["q_code"] = q.code
             else:
                 context["q"] = ""
             context[ "students" ] = StudentInfo.objects.all()
@@ -421,7 +422,7 @@ class EditStudentInfo(UpdateView):
 # question creation and management
 #--------------------------------------------------------------------
 
-q_fields = ['q','course']
+q_fields = ['q','code','course']
 op_fields = []
 ans_fields = []
 for i in range(1,21):
@@ -437,7 +438,7 @@ def clean_ops( ss ):
         
 class CreateQuestion(SuccessMessageMixin,CreateView):
     model = Question
-    fields= ['q','course','trues','falses'] #q_fields
+    fields= ['q','code','course','trues','falses'] #q_fields
     # fields= ['q','trues','falses','fillCode','checkCode']
     template_name = 'q/create.html'
 
@@ -962,6 +963,7 @@ class StudentResponse(UpdateView):
         context["op4"] = get_q_op( q, sa.op4 )
         context["sa"] = sa
         context["q_course"] = q.course
+        context["q_code"] = q.code
         context["q_num"] = q_num
         context["prev"] = prv # link to the previous question
         context["next"] = nxt # link to the next question

@@ -9,7 +9,7 @@
 {% block content %}
 
 <div class="ui container">
-  <h1>Dashboard</h1>
+  <h1>Dashboard  <a href="{% url 'logout' %}" class="ui label red" >Logout</a> </h1>
   <div class="ui container">
     {% if messages %}
      {% for message in messages %}
@@ -42,7 +42,6 @@
 </div>
 <br>
 <div>
-<a href="{% url 'logout' %}" class="ui label red" >Logout</a>
 </div>
 {% else %}
 You are taking courses: {{ student.course }}

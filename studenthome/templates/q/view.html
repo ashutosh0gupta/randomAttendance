@@ -32,6 +32,10 @@ table {
 
 <h1>{{ q.q }} </h1>
 
+{% if q.code %}
+<pre><code>{{ q.code }}</code></pre>
+{% endif %}
+
 <div>
   <table>
     {% include 'studenthome/qoption.html' with op=op1 ans=q.ans1 corrects=c_num_1 wrongs=w_num_1 %}
