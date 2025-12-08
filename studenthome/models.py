@@ -36,7 +36,7 @@ class StudentInfo(models.Model):
 
 class Question(models.Model):
     q=models.CharField(verbose_name="Question", max_length=1000)
-    code=models.TextField(verbose_name="Code", max_length=1000,null=True)
+    code=models.TextField(verbose_name="Code", max_length=1000,null=True,blank=True)
     course = models.CharField(verbose_name="Course",max_length=10,null=True)
     trues=models.TextField(verbose_name="True Options(new line separated)",max_length=3000,null=True)
     falses=models.TextField(verbose_name="False Options (new line separated)",max_length=3000,null=True)
