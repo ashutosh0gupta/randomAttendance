@@ -363,6 +363,7 @@ def create_local_users(request):
     sas = []
     m = {}
     created = ''
+    num_created = 0
     for s in StudentInfo.objects.all():
         u = get_or_none( User, username=s.rollno )
         if u == None: 
@@ -376,6 +377,10 @@ def create_local_users(request):
             # sas.append( User( username=s.rollno,  password= passwd) )
             print( s.rollno + "," + passwd )
             created += s.rollno + "," + passwd+"<br>"
+            num_created += 1
+            if num_created > 100:
+                created += "---- More students to be processed; RUN AGAIN --<br>"
+                break;
     User.objects.bulk_create( sas )
     if created == '':
         created = 'No users were created! All already exist!'
