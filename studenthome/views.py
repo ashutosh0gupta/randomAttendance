@@ -302,6 +302,7 @@ def db_import(request):
     try:
         with open(csv_file) as f:
             reader = csv.reader(f)
+            num_created = 1
             for row in reader:
                 student, created = StudentInfo.objects.get_or_create(
                     rollno=row[1]
@@ -328,6 +329,7 @@ def db_import(request):
                     # Colleact info for imported students
                     #------------------------------------                
                     imported += row[1]+"," + row[2]+","+salt+row[3]+","+row[4]+"<br>"
+                    num_created += 1
                 #---------------------------------------------
                 # Add course in the course list of the student
                 #---------------------------------------------
@@ -338,6 +340,9 @@ def db_import(request):
                         student.course = student.course+':'+row[4]
                     student.save()
                 print( "processed: " + row[1] )
+                if num_created > 100:
+                    impported += "---- There may be more students; Run again ---- <br>"
+                    break
     except IOError as e:
         return HttpResponse( "Failed to open file "+csv_file + ".<br> Look into README for importing students!")
     deleted  = "The following students are not in the rolls.<br>"
@@ -363,7 +368,7 @@ def create_local_users(request):
     sas = []
     m = {}
     created = ''
-    num_created = 0
+    num_created = 1
     for s in StudentInfo.objects.all():
         u = get_or_none( User, username=s.rollno )
         if u == None: 
@@ -380,7 +385,7 @@ def create_local_users(request):
             num_created += 1
             if num_created > 100:
                 created += "---- More students to be processed; RUN AGAIN --<br>"
-                break;
+                break
     User.objects.bulk_create( sas )
     if created == '':
         created = 'No users were created! All already exist!'
