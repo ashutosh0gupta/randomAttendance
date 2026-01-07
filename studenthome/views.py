@@ -104,7 +104,7 @@ def who_auth(request):
             #------------------------
             # For testing
             #------------------------
-            return '24B0940'
+            return '23B1212'
             # return "prof"
         return None
     #-----------------------------
@@ -125,7 +125,7 @@ def who_auth(request):
     if s == None:
         # -------------------------------------
         # Get user roll number via ldap records
-        #  todo: system throws and error if ldap
+        #  todo: throws an error if ldap
         #        is mis-configured
         # -------------------------------------
         rollno = get_user_rollno( u )
@@ -688,8 +688,8 @@ def get_sys_state():
     s, created = SystemState.objects.get_or_create(pk = 1)
     return s
 
-def get_active_q( i ):
-    sys = get_sys_state()
+def get_active_q( i, sys = None ):
+    if sys == None: sys = get_sys_state()
     op = sys._meta.get_field("activeq"+str(i))
     return op.value_from_object( sys )
 
@@ -713,8 +713,8 @@ def activateq(request, iid, qid):
     iid=int(iid)
     qid = int(qid)
     for i in range(1,5):
-        print(iid)
-        print(i)
+        # print(iid)
+        # print(i)
         if iid == i:
             # update qid
             put_active_q( iid, qid )
@@ -907,20 +907,36 @@ def stopq(request):
 # Student answering quiz
 #------------------------------------------------------------------------------
 
-def calculate_student_status(s):
+def calculate_student_status(s, known_sa = None, sys = None):
     statuses = []
     for i in range(1,5):
-        qid = get_active_q( i )
+        qid = get_active_q( i, sys )
         if qid > 0:
-            sa = get_or_none(StudentAnswers,rollno=s.rollno, q=qid)
+            if known_sa.q == qid:
+                sa = known_sa
+            else:
+                sa = get_or_none(StudentAnswers,rollno=s.rollno, q=qid)
             statuses.append( get_answer_status( sa ) )
     return quiz_status( statuses )
 
-@transaction.atomic
+# @transaction.atomic
 def update_student_status( rollno ):
     s = get_or_none(StudentInfo, pk=rollno)
     s.curr_status = calculate_student_status(s)
     s.save()
+
+# @transaction.atomic
+# def update_student_answer( sa ):
+#     sa.answer_time = timezone.now() 
+#     sa.is_correct,c_count = is_answer_correct( sa )
+#     sa.correct_count = c_count
+#     sa.save()
+#     logq.info( str(sa.rollno) + ' answer-saved-'+str(c_count)+'.' )
+            
+#     # ----------------------------------------
+#     # update student
+#     # ----------------------------------------
+#     update_student_status(sa.rollno)
 
 class StudentResponse(UpdateView):
     model = StudentAnswers
@@ -937,6 +953,7 @@ class StudentResponse(UpdateView):
         nxt = None
         prv = None
         q_num = 1
+        is_old_quiz = True
         for i in range(1,5):
             qid = get_active_q( i )
             if idx > 0 and qid > 0:
@@ -946,9 +963,12 @@ class StudentResponse(UpdateView):
                 prv = get_or_none(StudentAnswers,rollno=sa.rollno, q=qid)
                 q_num = q_num + 1
             if qid == sa.q:
+                is_old_quiz = False
                 idx = i
+        if is_old_quiz:
+            prv = None
         
-        get_sys_state()
+        # get_sys_state()
         # populate context
         q = get_or_none( Question, pk=sa.q )
         sys = get_sys_state()
@@ -977,20 +997,22 @@ class StudentResponse(UpdateView):
         context["q_num"] = q_num
         context["prev"] = prv # link to the previous question
         context["next"] = nxt # link to the next question
+        context["is_old_quiz"] = is_old_quiz
 
         return context
 
+    @transaction.atomic
     def form_valid(self,form):
         try:
-            sa = None
             sa = self.object
-            logq.info( str(sa.rollno) + ' submitting.' )
-            
+
             # ----------------------------------------
             # Check if the answer is already submitted
             # ----------------------------------------
             if sa.answer_time :
-                raise Exception( str(sa.rollno) + ' answer is already submitted!' )
+                raise Exception( str(sa.rollno) + ' has already submitted!' )
+            else:
+                logq.info( str(sa.rollno) + ' submitting.' )
             
             # ----------------------------------------
             # Check user/system state is good!
@@ -1007,24 +1029,34 @@ class StudentResponse(UpdateView):
             # ----------------------------------------
             # saving the details of answers
             # ----------------------------------------
+            # update_student_answer( sa )
+            # sa = self.object
             response = super().form_valid(form)
-
+            
             sa = self.object
             sa.answer_time = timezone.now() 
             sa.is_correct,c_count = is_answer_correct( sa )
             sa.correct_count = c_count
-            sa.save()
-            logq.info( str(sa.rollno) + ' answer-saved-'+str(c_count)+'.' )
+            # logq.info( str(sa.rollno) + ' answer-saved-'+str(c_count)+'.' )
             
             # ----------------------------------------
             # update student
             # ----------------------------------------
-            # s = get_or_none(StudentInfo, pk=sa.rollno)
-            # s.curr_status = calculate_student_status(s)
+            s = get_or_none(StudentInfo, pk=sa.rollno)
+            s.curr_status = calculate_student_status(s, sa, sys)
+
+            def f():
+                sa.save()
+                s.save()
+                
+            with transaction.atomic():
+                transaction.on_commit(f)
+            # sa.save()
             # s.save()
-            update_student_status(sa.rollno)
             
-            logq.info( str(sa.rollno) + ' answered-' + str(sa.q) )
+            # update_student_status(sa.rollno)
+            logq.info( str(sa.rollno) + ' answered-' + str(sa.q)+'-'+str(c_count) )
+            
             return response
         except Exception as e:
             # No timing is saved

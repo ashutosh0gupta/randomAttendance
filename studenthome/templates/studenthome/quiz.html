@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block pagestyle %}
-<meta http-equiv="refresh" content="180">
+<meta http-equiv="refresh" content="300">
 {% endblock %}
 
 {% block content %}
@@ -17,6 +17,7 @@
 <p><pre><code>{{q_code}}</code></pre></p>
 {% endif %}
 
+<div style="line-height:16px;font-size:12px">
 {% for s in students %}
 {% if s.curr_status == 'ABSENT' %}
 <font color="lightgray">{{s.rollno}}</font>
@@ -30,11 +31,11 @@
 <font color="red">{{s.rollno}}</font>
 {% endif %}
 {% endfor %}
-
+</div>
 
 <p><a href="{% url 'stopq' %}" class="ui label blue" >Stop quiz</a></p>
 
-The page will refresh in every 180 seconds.
+The page will refresh in every 300 seconds.
 <!-- <a href="{% url 'logout' %}" class="ui label blue" >Logout</a> -->
 
 </div>

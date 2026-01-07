@@ -32,80 +32,80 @@ table {
 
 {% if is_auth %}
 
-<h1>RollNo. {{ sa.rollno }}
-  <a href="{% url 'index' %}" class="ui label blue" >Home</a>
-  <a href="{% url 'logout' %}" class="ui label red" >Logout</a>
-</h1>
+  {% if is_old_quiz %}
+    <a href="{% url 'index' %}" class="ui label blue" >At wrong URL. Click here to go to the current quiz</a>
+  {% else %}
+  <h1>RollNo. {{ sa.rollno }}
+    <a href="{% url 'index' %}" class="ui label blue" >Home</a>
+    <a href="{% url 'logout' %}" class="ui label red" >Logout</a>
+  </h1>
 
-{% if in_class %}
-<h1>Options</h1>
-{% else %}
-<h1>{{q_course}} Q {{q_num}}: {{q_name}}</h1>
-<p>
-  {%if q_code %}
-    <pre><code>{{q_code}}</code></pre>
+  {% if in_class %}
+    <h1>Options</h1>
+  {% else %}
+    <h1>{{q_course}} Q {{q_num}}: {{q_name}}</h1>
+    <p>
+      {%if q_code %}
+        <pre><code>{{q_code}}</code></pre>
+      {% endif %}
+    </p>
   {% endif %}
-</p>
-{% endif %}
 
-{% if yet_to_answer %}
+  {% if yet_to_answer %}
 
-<script>
-  window.onload = function() {
-      var e = document.getElementById("id_user_agent");
-      ThumbmarkJS.getFingerprint(includeData=true).then(
-          function(fp) {
-              //console.log(fp.data);
-              e.value = fp.hash;
-          }
-      );
-  }
-</script>
+  <script>
+    window.onload = function() {
+        var e = document.getElementById("id_user_agent");
+        ThumbmarkJS.getFingerprint(includeData=true).then(
+            function(fp) {
+                //console.log(fp.data);
+                e.value = fp.hash;
+            }
+        );
+    }
+  </script>
 
-<form class="ui form attached fluid segment" method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  {{ form.non_field_errors }}
- <table>
-  <tr><td><label class="ui container">{{ form.ans1 }} {{ op1 }}</label></td></tr>
-  <tr><td><label class="ui container">{{ form.ans2 }} {{ op2 }}</label></td></tr>
-  <tr><td><label class="ui container">{{ form.ans3 }} {{ op3 }}</label></td></tr>
-  <tr><td><label class="ui container">{{ form.ans4 }} {{ op4 }}</label></td></tr>
- </table>
- {{ form.user_agent.as_hidden }}
- <!-- <input type="hidden" name="password" id="ps"> -->
- <button type="submit">Answer</button>
-</form>
-<p><span class="ui red label">Note: Please be careful before submitting the answer.
-    You will not be able to change the answers. All false answer is possible.</span></p>
+  <form class="ui form attached fluid segment" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+      <table>
+        <tr><td><label class="ui container">{{ form.ans1 }} {{ op1 }}</label></td></tr>
+        <tr><td><label class="ui container">{{ form.ans2 }} {{ op2 }}</label></td></tr>
+        <tr><td><label class="ui container">{{ form.ans3 }} {{ op3 }}</label></td></tr>
+        <tr><td><label class="ui container">{{ form.ans4 }} {{ op4 }}</label></td></tr>
+      </table>
+    {{ form.user_agent.as_hidden }}
+    <!-- <input type="hidden" name="password" id="ps"> -->
+    <button type="submit">Answer</button>
+  </form>
+  <p><span class="ui red label">Note: Please be careful before submitting the answer.
+      You will not be able to change the answers. All false answer is possible.</span></p>
 
-{% else %}
-You have answered the following:
-<table>
-  {% include 'studenthome/qoption.html' with op=op1 ans=sa.ans1 q_ans=q_ans1 %}
-  {% include 'studenthome/qoption.html' with op=op2 ans=sa.ans2 q_ans=q_ans2 %}
-  {% include 'studenthome/qoption.html' with op=op3 ans=sa.ans3 q_ans=q_ans3 %}
-  {% include 'studenthome/qoption.html' with op=op4 ans=sa.ans4 q_ans=q_ans4 %}
-</table>
+  {% else %}
+    You have answered the following:
+    <table>
+      {% include 'studenthome/qoption.html' with op=op1 ans=sa.ans1 q_ans=q_ans1 %}
+      {% include 'studenthome/qoption.html' with op=op2 ans=sa.ans2 q_ans=q_ans2 %}
+      {% include 'studenthome/qoption.html' with op=op3 ans=sa.ans3 q_ans=q_ans3 %}
+      {% include 'studenthome/qoption.html' with op=op4 ans=sa.ans4 q_ans=q_ans4 %}
+    </table>
     {% if prev %}
-    <a href="{%url 'answer' prev.id %}" class="ui label blue">Previous question</a>
+      <a href="{%url 'answer' prev.id %}" class="ui label blue">Previous question</a>
     {% else %}
-    <span class="ui label gray">Previous question</span>
+      <span class="ui label gray">Previous question</span>
     {% endif %}
     {% if next %}
-    <a href="{%url 'answer' next.id %}" class="ui label blue">Next question</a>
+      <a href="{%url 'answer' next.id %}" class="ui label blue">Next question</a>
     {% else %}
-    <span class="ui label gray">Next question</span>
+      <span class="ui label gray">Next question</span>
     {% endif %}
-    {% endif %}
-    <div>
-      Please click on home if your are viewing old quiz!
-    </div>
+  {% endif %}
+  <div>
+  </div>
+  {% endif %}
 {% else %}
     Please <a href="{% url 'login' %}">login</a>!
 {% endif %}
 
- <!-- To change student, please logout and login again. -->
- <!-- <div> -->
- <!-- </div> -->
 
 {% endblock %}
