@@ -264,6 +264,9 @@ def index(request):
                     break
         if sa == None:
             return HttpResponse( "Something is wrong!!" )
+        if sa.answer_time != None and (timezone.now()-sa.answer_time).total_seconds() < 30:
+            url = reverse('index')
+            return HttpResponse( f'<h3>Submitted.</h3><a href="{url}">Wait for 30 seconds to  see the results!</a>' )
         return redirect( reverse('answer', kwargs={'ansid':sa.pk}) )
     else:
         student = get_or_none( StudentInfo, rollno=p )
@@ -1048,14 +1051,17 @@ class StudentResponse(UpdateView):
             def f():
                 sa.save()
                 s.save()
+                logq.info( str(sa.rollno) + ' answered-' + str(sa.q)+'-'+str(c_count) )
+            for i in range(0,3):
+                try:
+                    with transaction.atomic():
+                        transaction.on_commit(f)
+                    break
+                except Exception as e:
+                    logq.error( f'{e} - Retry for {sa.rollno}!' )
                 
-            with transaction.atomic():
-                transaction.on_commit(f)
-            # sa.save()
-            # s.save()
             
-            # update_student_status(sa.rollno)
-            logq.info( str(sa.rollno) + ' answered-' + str(sa.q)+'-'+str(c_count) )
+            logq.info( str(sa.rollno) + ' responded ' )
             
             return response
         except Exception as e:
@@ -1063,12 +1069,10 @@ class StudentResponse(UpdateView):
             logq.error( '{}!'.format(e) )
             form.add_error( None, '{}!'.format(e) )
             return redirect( reverse( 'index' ) )
-            # messages.error(self.request,'{}!'.format(e))
-            # return super().form_invalid(form)
 
     def get_success_url(self):
-        return reverse('answer', kwargs={'ansid':self.object.id})
-        # return reverse( "index" )
+        # return reverse('answer', kwargs={'ansid':self.object.id})
+        return reverse( "index" )
 
 
 #-------------------------------------------------------
