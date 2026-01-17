@@ -302,6 +302,7 @@ def db_import(request):
     csv_file = os.path.expanduser('/tmp/output.csv')
     current_rolls = []
     os.makedirs('studenthome/images/', exist_ok=True)
+    course = "***"
     try:
         with open(csv_file) as f:
             reader = csv.reader(f)
@@ -311,6 +312,7 @@ def db_import(request):
                     rollno=row[1]
                 )
                 current_rolls.append( row[1] )
+                course = row[4]
                 if created:
                     #--------------------------------------------
                     # for security, random prefix is added to the file paths
@@ -355,7 +357,7 @@ def db_import(request):
     student_list = StudentInfo.objects.order_by('rollno')
     any_deleted = False
     for student in student_list:
-        if student.rollno not in current_rolls:
+        if (student.rollno not in current_rolls) and (course in student.course):
             deleted += "<a href=\"/" + student.rollno + "\">" + student.rollno + "</a><br>"
             any_deleted = True
     if not any_deleted:
