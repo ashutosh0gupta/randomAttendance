@@ -763,7 +763,7 @@ class EditNextExamDate(UpdateView):
     def form_valid(self,form):
         try:
             u = who_auth( self.request )
-            if  u != "prof": raise Exception( f'[Attack] non prof  {u} is modifying a question' )
+            if  u != "prof": raise Exception( f'[Attack] non prof  {u} is modifying exam date' )
             return super().form_valid(form)
         except Exception as e:
             logq.error( '{}!'.format(e) )
@@ -2019,7 +2019,7 @@ def get_score( exammark ):
                 return exammark.marks,f"{exammark.marks}->Raised"                
         return exammark.marks,f"{exammark.marks}"
     else:
-        logq.info( 'Exammark is not found!' )
+        # logq.info( 'Exammark is not found!' ) # cluttering the logs
         return 0,"0[Not uploaded]"
 
 def view_exam(request, rid):
@@ -2146,7 +2146,7 @@ class RaiseCrib(UpdateView):
         try:
             u = who_auth( self.request )
             s = self.object
-            if  u != s.rollno: raise Exception( f'[Attack] wrong student is  is modifying a crib {s.rollno} != {u}' )
+            if  u != s.rollno: raise Exception( f'[Attack] wrong student is modifying a crib {s.rollno} != {u}' )
             return super().form_valid(form)
         except Exception as e:
             logq.error( '{}!'.format(e) )
@@ -2183,7 +2183,7 @@ class RaiseCrib2(UpdateView):
         try:
             u = who_auth( self.request )
             s = self.object
-            if  u != s.rollno: raise Exception( f'[Attack] wrong student is  is modifying a crib {s.rollno} != {u}' )
+            if  u != s.rollno: raise Exception( f'[Attack] wrong student is modifying a crib {s.rollno} != {u}' )
             return super().form_valid(form)
         except Exception as e:
             logq.error( '{}!'.format(e) )

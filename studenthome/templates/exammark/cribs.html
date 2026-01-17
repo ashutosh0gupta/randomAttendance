@@ -24,6 +24,7 @@
   <th>Token No.</th>
   <th>Roll No.</th>
   <th>Marks</th>
+  <th>Comment</th>
   <th>Claim</th>    
   {% if appeal %}
   <th>TA Decision</th>    
@@ -42,6 +43,7 @@
     {% endif %}
     <td>{{ e.rollno    }}</td>
     <td>{{ e.marks     }}</td>
+    <td>{{ e.comment   }}</td>
     <td>{{ e.claim     }}</td>
     {% if appeal %}
       <td>{{ e.raise_time2}}</td>
