@@ -104,7 +104,7 @@ def who_auth(request):
             #------------------------
             # For testing
             #------------------------
-            return '23B1212'
+            return '25B1818'
             # return "prof"
         return None
     #-----------------------------
@@ -139,7 +139,10 @@ def who_auth(request):
             s.save()
             return s.rollno
     else:
-        return s.rollno
+        if s.isEnabled:
+            return s.rollno
+        else:
+            return None
 
 def get_q_op( q, idx ):
     op = q._meta.get_field("op"+str(idx))
@@ -400,7 +403,7 @@ def create_local_users(request):
 
 class EditStudentInfo(UpdateView):
     model = StudentInfo
-    fields = ['course','absent','isPwd']
+    fields = ['course','absent','isPwd','isEnabled']
     template_name = 'studenthome/studentinfoedit.html'
     pk_url_kwarg = 'sid'
     
@@ -889,21 +892,22 @@ def stopq(request):
     s1 = None
     s2 = None
     s3 = None
-    if len(student_list) > 3:
+    s4 = None
+    s5 = None
+    if len(student_list) > 5:
         #todo: remove this loop
         s_list = []
         for s in student_list:
             s_list.append(s)
-        s1,s2,s3 = random.sample( s_list, 3 )
+        s1,s2,s3,s4,s5 = random.sample( s_list, 5 )
     else:
-        if len(student_list) > 2:
-            s3 = student_list[2]
-        if len(student_list) > 1:
-            s2 = student_list[1]            
-        if len(student_list) > 0:
-            s1 = student_list[0]
+        if len(student_list) > 4: s5 = student_list[4]
+        if len(student_list) > 3: s4 = student_list[3]
+        if len(student_list) > 2: s3 = student_list[2]
+        if len(student_list) > 1: s2 = student_list[1]            
+        if len(student_list) > 0: s1 = student_list[0]
     context = RequestContext(request)
-    context.push( {'s1': s1, 's2': s2, 's3': s3 } )
+    context.push( {'s1': s1, 's2': s2, 's3': s3, 's4': s4, 's5': s5 } )
     logq.info( 'Quiz for Question ' + str(sys.activeq1) + str(sys.activeq2) + str(sys.activeq3) +str(sys.activeq4) + ' is stopped.' )
 
     return render( request, 'studenthome/results.html', context.flatten() )

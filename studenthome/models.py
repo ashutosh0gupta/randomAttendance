@@ -18,7 +18,7 @@ class StudentInfo(models.Model):
     #             ('THEORY', 'CS213'      ),
     #             ('LAB'   , 'CS293'      ),
     #             ('BOTH'  , 'CS293-CS213') )   
-    name=models.CharField(max_length=100)
+    name        = models.CharField(max_length=100)
     imagePath   = models.CharField(max_length=200)
     rollno      = models.CharField(primary_key=True,max_length=10)
     username    = models.CharField(max_length=32,null=True)
@@ -33,6 +33,7 @@ class StudentInfo(models.Model):
     total_scores= models.CharField(verbose_name='Total scores in Enrolled Courses', default=None, max_length=200,null=True)
     curr_status = models.CharField(verbose_name='Current status', choices=CURRENT, default='ABSENT', max_length=20 )
     absent      = models.CharField(verbose_name='Absent in Exams (Format: CSXXX:ExamName,CSYYY:ExamName2)', default=None, max_length=100,null=True)
+    isEnabled   = models.BooleanField(verbose_name="Is Account Enabled?", default=True)
 
 class Question(models.Model):
     q=models.CharField(verbose_name="Question", max_length=1000)
