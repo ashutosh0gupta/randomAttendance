@@ -956,6 +956,8 @@ class StudentResponse(UpdateView):
     def get_context_data( self, **kwargs ):
         context = super(StudentResponse,self).get_context_data(**kwargs)
         sa = self.object
+        q = get_or_none( Question, pk=sa.q )
+        sys = get_sys_state()
         
         # identifiy the next and previous quiz id 
         idx = 0
@@ -976,11 +978,11 @@ class StudentResponse(UpdateView):
                 idx = i
         if is_old_quiz:
             prv = None
-        
+
+        if (sys.mode != 'QUIZ'): is_old_quiz = True
+            
         # get_sys_state()
         # populate context
-        q = get_or_none( Question, pk=sa.q )
-        sys = get_sys_state()
         if sa.answer_time :
             context[ "yet_to_answer" ] = False
             context[ "q_ans1" ] = get_q_ans( q, sa.op1 )
@@ -1010,7 +1012,7 @@ class StudentResponse(UpdateView):
 
         return context
 
-    @transaction.atomic
+    #@transaction.atomic
     def form_valid(self,form):
         try:
             sa = self.object
@@ -2293,8 +2295,8 @@ def reject_crib(request, eid, link, reason):
     e.response_time = timezone.now()
     e.response = reason
     e.save()
-    messages.success(request,f'Cribs for scode id {e.id} is rejected!')
-    logq.info( f'Cribs for scode id {e.id} is rejected!' )
+    messages.success(request,f'Cribs for score id {e.id} is rejected!')
+    logq.info( f'Cribs for score id {e.id} is rejected!' )
     return redirect( reverse('cribs', kwargs={'eid':e.exam_id,'qid':e.q,'link':exam.link}) )
 
 

@@ -33,7 +33,10 @@ table {
 {% if is_auth %}
 
   {% if is_old_quiz %}
-    <a href="{% url 'index' %}" class="ui label blue" >At wrong URL. Click here to go to the current quiz</a>
+    <h1>
+     <a href="{% url 'index' %}" class="ui label blue" >This quiz is closed, click to see currect state!</a>
+   </h2>
+ 
   {% else %}
   <h1>RollNo. {{ sa.rollno }}
     <a href="{% url 'index' %}" class="ui label blue" >Home</a>

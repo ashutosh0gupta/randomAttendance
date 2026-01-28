@@ -19,7 +19,10 @@
     {% endif %}
     {{exam.name}}</h1>
 
-<table style="border: 1px solid black">
+  <!-- style="border: 1px solid black" -->
+  
+  
+<table id="cribs" class="display">
 <tr>
   <th>Token No.</th>
   <th>Roll No.</th>
@@ -48,9 +51,9 @@
     {% if appeal %}
       <td>{{ e.raise_time2}}</td>
       {% if e.is_accepted %}
-      <td>{{ e.crib_marks }}</td>
+      <td>{{e.response}}<br>Crib marks: {{ e.crib_marks }}</td>
       {% else %}
-      <td> Rejected </td>
+      <td>{{e.response}}<br>Rejected </td>
       {% endif %}
       <td>{{ e.claim2    }}</td>
       <td>
@@ -74,6 +77,7 @@
 <tr>
   <th>Roll No.</th>
   <th>Marks</th>
+  <th>Comment</th>
   <th>Claim</th>    
   <th>Response</th>    
   {% if appeal %}
@@ -88,6 +92,7 @@
   <tr>
     <td>{{ e.rollno    }}</td>
     <td>{{ e.marks     }}</td>
+    <td>{{ e.comment   }}</td>
     <td>{{ e.claim     }}</td>
     <td>{{ e.response  }}</td>
     <td>
