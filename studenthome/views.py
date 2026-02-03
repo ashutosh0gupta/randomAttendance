@@ -104,7 +104,7 @@ def who_auth(request):
             #------------------------
             # For testing
             #------------------------
-            return '25B1818'
+            return '25B2297'
             # return "prof"
         return None
     #-----------------------------
@@ -285,8 +285,11 @@ def index(request):
                     escores[exam] = marks
             scores[c] = escores
         context["scores"] = scores
-        
-        if s.next_exam >= datetime.date.today():
+
+        # --------------------------------------------------------
+        # Check if the exam in the future. if yes, show seat number
+        # --------------------------------------------------------
+        if s.next_exam != None and s.next_exam >= datetime.date.today():
             context[ "next_exam" ] = s.next_exam
         else:
             context[ "next_exam" ] = None            
@@ -1112,7 +1115,8 @@ def all_status(request):
             b,corr_count = is_answer_correct( sa )
             # dt = sa.answer_time.strftime("%m-%d")
             dt = sa.q
-            devs.append( (sa.q, sa.user_agent) )
+            # Disabled counting device map
+            if False: devs.append( (sa.q, sa.user_agent) ) 
             if dt in attend_count_map:
                 attend_count_map[dt] = attend_count_map[dt] + 1
             else:
@@ -1133,22 +1137,23 @@ def all_status(request):
     #----------------------------
     # Analyzing device map
     #----------------------------
-    reverse_dev_map = dict()
-    dev_map_set = dict()
-    for rollno,devs in device_map.items():
-        for (q,dev) in devs:
-            if dev in reverse_dev_map:
-                reverse_dev_map[dev].append((q,rollno))
-            else:
-                reverse_dev_map[dev] = [(q,rollno)]
-        dev_map_set[rollno] = set([ dev for _,dev in devs ])
-        
     problematic_match = []
-    for rollno1,devs1 in dev_map_set.items():
-        for rollno2,devs2 in dev_map_set.items():
-            if rollno1 >= rollno2: continue
-            if len(set.intersection(devs1,devs2)) > 1:
-                problematic_match.append( (rollno1, rollno2) )
+    reverse_dev_map = dict()
+    if False:
+        dev_map_set = dict()
+        for rollno,devs in device_map.items():
+            for (q,dev) in devs:
+                if dev in reverse_dev_map:
+                    reverse_dev_map[dev].append((q,rollno))
+                else:
+                    reverse_dev_map[dev] = [(q,rollno)]
+            dev_map_set[rollno] = set([ dev for _,dev in devs ])
+
+        for rollno1,devs1 in dev_map_set.items():
+            for rollno2,devs2 in dev_map_set.items():
+                if rollno1 >= rollno2: continue
+                if len(set.intersection(devs1,devs2)) > 1:
+                    problematic_match.append( (rollno1, rollno2) )
                 
                 
     presence_rate = 0
