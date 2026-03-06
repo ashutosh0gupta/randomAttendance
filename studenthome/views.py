@@ -2098,6 +2098,24 @@ def enable_crib(request, rid):
         logq.info( 'Cribs for exam ' + rid + ' activated!' )
     return redirect( reverse( 'createexam' ) )
 
+def view_cribs_ticker(request, eid):
+    context = RequestContext(request)
+    exam = get_or_none( Exam, pk = eid, is_cribs_active = True)
+    if exam:
+        called = {}
+        for qid in range(1,exam.num_q+1):
+            query = Q(q = qid)&(~Q(raise_time = None))&Q(exam_id = exam.id)&Q(response_time = None)
+            top_crib = ExamMark.objects.filter( query ).order_by( 'crib_num' )
+            if len(top_crib) > 0:
+                called[qid] = top_crib[0].crib_num
+            else:
+                called[qid] = "--"
+        context["called" ] = called
+        context["exam" ] = exam
+        return render( request, 'exammark/ticker.html', context.flatten() )
+    else:
+        return HttpResponse( 'Crib session for this exam is disabled for now!' )
+    
 def view_cribs(request, eid, qid, link):
     context = RequestContext(request)
     exam = get_or_none( Exam, pk = eid, link = link, is_cribs_active = True )
