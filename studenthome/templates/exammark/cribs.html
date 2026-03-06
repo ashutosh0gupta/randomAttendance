@@ -37,6 +37,7 @@
   <th>Raise Time</th>
   {% endif %}
   <th></th>    
+  <th></th>    
   </tr>
   {% for e in cribs %}
   <tr>
@@ -59,10 +60,18 @@
       <td>
         <a href="{%url 'responsecrib2' e.id %}" class="ui label blue">Respond</a>
       </td>
+      <td></td>
     {% else %}
     <td>{{ e.raise_time}}</td>
     <td>
       <a href="{%url 'responsecrib' e.id link %}" class="ui label blue">Respond</a>
+    </td>
+    <td>
+      {% if e.ta_called %}      
+      Called
+      {% else %}
+      <a href="{%url 'callforcrib' e.id link %}" class="ui label blue">Call</a>
+      {% endif %}
     </td>
     {% endif %}
   </tr>

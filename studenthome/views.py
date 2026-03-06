@@ -2104,17 +2104,32 @@ def view_cribs_ticker(request, eid):
     if exam:
         called = {}
         for qid in range(1,exam.num_q+1):
-            query = Q(q = qid)&(~Q(raise_time = None))&Q(exam_id = exam.id)&Q(response_time = None)
+            query = Q(q = qid)&(~Q(raise_time = None))&Q(exam_id = exam.id)&Q(response_time = None)&Q(ta_called = True)
             top_crib = ExamMark.objects.filter( query ).order_by( 'crib_num' )
             if len(top_crib) > 0:
-                called[qid] = top_crib[0].crib_num
+                cribs = []
+                for c in top_crib:
+                    cribs.append(c.crib_num)                    
+                called[qid] = cribs
             else:
-                called[qid] = "--"
+                called[qid] = ["--"]
         context["called" ] = called
         context["exam" ] = exam
         return render( request, 'exammark/ticker.html', context.flatten() )
     else:
         return HttpResponse( 'Crib session for this exam is disabled for now!' )
+    
+def call_for_crib(request, eid, link):
+    e = get_or_none( ExamMark, pk = eid )
+    if (e == None):
+        return HttpResponse( 'Incorrect crib!' )
+    exam = get_or_none( Exam, pk = e.exam_id )
+    if exam.link != link:
+        return HttpResponse( 'Bad URL!' ) 
+    e.ta_called   = True
+    e.save()
+    logq.info( f'TA called for crib {e.id}!' )
+    return redirect( reverse('cribs', kwargs={'eid':e.exam_id,'qid':e.q,'link':exam.link}) )
     
 def view_cribs(request, eid, qid, link):
     context = RequestContext(request)

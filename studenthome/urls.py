@@ -78,6 +78,7 @@ urlpatterns = [
     re_path(r'^responsecrib2/(?P<eid>\w+)', views.ResponseCrib2.as_view(), name='responsecrib2'),
     re_path(r'^rejectcrib2/(?P<eid>\w+)', views.reject_crib2, name='rejectcrib2'),
     re_path(r'^ticker/(?P<eid>\w+)', views.view_cribs_ticker, name='ticker'),
+    re_path(r'^callforcrib/(?P<eid>\w+)/(?P<link>\w+)', views.call_for_crib, name='callforcrib'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

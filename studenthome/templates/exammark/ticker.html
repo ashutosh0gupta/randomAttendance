@@ -14,8 +14,12 @@
   <h1> Cribs ticker for {{exam.name}} </h1>
 
 
-{% for q, token in called.items %} 
-  <span class="ui button blue" >Q{{q}} <br><br> {{token}}</span>
+{% for q, tokens in called.items %} 
+  <span class="ui button blue" >Q{{q}} <br>
+   {% for token in tokens %} 
+    <br> {{token}}
+   {% endfor %}
+  </span>
 {% endfor %}
   <!-- style="border: 1px solid black" -->
  
