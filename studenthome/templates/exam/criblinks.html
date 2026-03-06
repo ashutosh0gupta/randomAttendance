@@ -10,6 +10,7 @@
 
 <div class="ui container">
   <h1>Links for cribs for {{exam.name}}</h1>
+  <a href="{%url 'ticker' exam.id %}" class="ui label green" >Ticker link</a>
   {% for i in qs %}
   <div>
     <a href="{%url 'cribs' exam.id i exam.link %}" class="ui label blue" >Cribs for Question {{i}}</a>
