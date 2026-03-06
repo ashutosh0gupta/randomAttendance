@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block body_attr %}
+{% endblock %}
+
+{% block pagestyle %}
+<meta http-equiv="refresh" content="5">
+{% endblock %}
+
+{% block content %}
+
+<div class="ui container">
+
+  <h1> Cribs ticker for {{exam.name}} </h1>
+
+
+{% for q, token in called.items %} 
+  <span class="ui button blue" >Q{{q}} <br><br> {{token}}</span>
+{% endfor %}
+  <!-- style="border: 1px solid black" -->
+ 
+</div>
+
+{% endblock %}
