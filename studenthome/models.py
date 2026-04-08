@@ -122,7 +122,7 @@ class BioBreak(models.Model):
 class ExamRoom(models.Model):
     name = models.CharField(max_length=12)
     area = models.CharField(max_length=50,default="",null=True)
-    seats= models.TextField(verbose_name="Available seats(new line separated)",max_length=3000,null=True)
+    seats= models.TextField(verbose_name="Available seats(new line separated); Use # to comment",max_length=3000,null=True)
     available = models.BooleanField( verbose_name = "Room Available" , default=True)
     capacity = models.IntegerField( verbose_name="Capacity", default=0    )
     disabled = models.IntegerField( verbose_name="#Disabled seats", default=0    )
