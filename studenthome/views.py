@@ -1614,16 +1614,18 @@ def seating(request,cid, isRefresh):
         # Filter students by the course
         # -------------------------------------------        
         students = StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = False) ).order_by('?')
-        if datetime.date.today().year == 2026:
-            #--------------------------------
-            # TO BE REMOVED AFTER 2026 CS101
-            #--------------------------------
-            filtered_students = ( Q(rollno__contains = 'B06') | Q(rollno__contains = 'B07') | Q(rollno__contains = 'B18') )
-            filtered = list(StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = False) & filtered_students ).order_by('?'))
-            others = list(StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = False) & (~filtered_students) ).order_by('?'))
-            print(len(filtered))
-            print(len(others))
-            students = filtered + others
+        
+        # if datetime.date.today().year == 2026:
+        #     #--------------------------------
+        #     # TO BE REMOVED AFTER 2026 CS101
+        #     #--------------------------------
+        #     filtered_students = ( Q(rollno__contains = 'B06') | Q(rollno__contains = 'B07') | Q(rollno__contains = 'B18') )
+        #     filtered = list(StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = False) & filtered_students ).order_by('?'))
+        #     others = list(StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = False) & (~filtered_students) ).order_by('?'))
+        #     print(len(filtered))
+        #     print(len(others))
+        #     students = filtered + others
+
         pwds = StudentInfo.objects.filter( Q(course__contains = cid) & Q(isPwd = True) ).order_by('rollno')
         total = len(students) + len(pwds)
 
@@ -1631,20 +1633,21 @@ def seating(request,cid, isRefresh):
         # Collect seats
         # -------------------------------------------    
         rooms = ExamRoom.objects.filter( Q(available = True) ).order_by('-capacity')
-        if datetime.date.today().year == 2026:
-            #--------------------------------
-            # TO BE REMOVED AFTER 2026 CS101
-            #--------------------------------
-            rooms = list( ExamRoom.objects.filter( Q(available = True) ).order_by('name') )
-            shifted_rooms = []
-            bits = None
-            for r in rooms:
-                if r.name == "A-BITS":
-                    bits = r
-                else:
-                    shifted_rooms.append(r)
-            if(bits): shifted_rooms.append(bits)
-            rooms = shifted_rooms
+        
+        # if datetime.date.today().year == 2026:
+        #     #--------------------------------
+        #     # TO BE REMOVED AFTER 2026 CS101
+        #     #--------------------------------
+        #     rooms = list( ExamRoom.objects.filter( Q(available = True) ).order_by('name') )
+        #     shifted_rooms = []
+        #     bits = None
+        #     for r in rooms:
+        #         if r.name == "A-BITS":
+        #             bits = r
+        #         else:
+        #             shifted_rooms.append(r)
+        #     if(bits): shifted_rooms.append(bits)
+        #     rooms = shifted_rooms
                 
         available = []
         for r in rooms:
@@ -2132,7 +2135,7 @@ def view_cribs_ticker(request, eid):
             if len(top_crib) > 0:
                 cribs = []
                 for c in top_crib:
-                    cribs.append(c.crib_num)                    
+                    cribs.append(c.crib_num)
                 called[qid] = cribs
             else:
                 called[qid] = ["--"]
