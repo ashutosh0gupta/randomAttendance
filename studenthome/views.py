@@ -104,7 +104,7 @@ def who_auth(request):
             #------------------------
             # For testing
             #------------------------
-            return '25B2297'
+            return '25B0707'
             # return "prof"
         return None
     #-----------------------------
@@ -2406,7 +2406,7 @@ def compute_total_scores(request):
     for student in student_list:
         if student.rollno in do_not_compute_for_students: continue
         absents = read_absents(student)
-        scores = ""
+        scores = ""           
         for c in student.course.split(':'):
             if c in do_not_compute_for_courses: continue 
             exams = Exam.objects.filter( Q(course = c) )
@@ -2415,10 +2415,12 @@ def compute_total_scores(request):
             calculation = [[],[]]
             max_marks = [0.0,0.0] 
             if exams:
+                absent_count = 0
                 for exam in exams:
                     bucket_id = missed_bucket(exam.name)
                     if exam.name in absents[c]:
                         missed[bucket_id] += float(exam.weight)
+                        absent_count += 1
                     total = 0.0
                     for qid in range(1,exam.num_q+1):
                         score = get_or_none( ExamMark, exam_id = exam.id, rollno=student.rollno, q=qid )
@@ -2427,14 +2429,23 @@ def compute_total_scores(request):
                     exam_score = float(total)*float(exam.weight)/float(exam.total)
                     weighted[bucket_id] += exam_score
                     max_marks[bucket_id] += float(exam.weight)
-                    calculation[bucket_id].append(f"({exam.total}/{exam.weight}){total}")
+                    calculation[bucket_id].append(f"({exam.weight}/{exam.total}){total}")
+                if absent_count != len(absents[c]):
+                    print(f'Some absents did not match for {student.rollno}:  {absent_count} {absents[c]}')
+            final_score = 0.0
             for i in range(len(calculation)):
-                calculation[i] = "+".join(calculation[i])
+                calculation[i] = " + ".join(calculation[i])
                 if missed[i] > 0:
                     weighted[i] = weighted[i]*max_marks[i]/(max_marks[i]-missed[i])
                     calculation[i] = f"{max_marks[i]}/({max_marks[i]}-{missed[i]})({calculation[i]})"
-                weighted[i] = round(weighted[i], 2)
-                scores += f"{c}:{calculation[i]}={weighted[i]}%,"
+                final_score += weighted[i]
+                # scores += f"{calculation[i]}={weighted[i]}"
+            final_score = round(final_score, 2)
+            calculation = "+".join(calculation)
+            scores += f"{c}:{calculation}={final_score}%"
+            if sum(missed) >= 25:
+                print(f'Some absents did not match for {student.rollno}:  {absents[c]}')
+                scores = f"{c}:MISSED MORE THAN 25%, FINAL SCORE CANNOT BE CALCULATED"
         student.total_scores = scores
         student.save()
     return redirect( reverse( 'index' ) )
