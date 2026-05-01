@@ -2417,6 +2417,7 @@ def compute_total_scores(request):
             weighted = [0.0,0.0]
             calculation = [[],[]]
             max_marks = [0.0,0.0] 
+            marks = ExamMark.objects.filter( Q(rollno = student.rollno) )
             if exams:
                 absent_count = 0
                 for exam in exams:
@@ -2425,9 +2426,8 @@ def compute_total_scores(request):
                         missed[bucket_id] += float(exam.weight)
                         absent_count += 1
                     total = 0.0
-                    marks = ExamMark.objects.filter( Q(rollno = student.rollno)&Q(exam_id = exam.id) )
-                    for s in marks: #qid in range(1,exam.num_q+1):
-                        # score = get_or_none( ExamMark, exam_id = exam.id, rollno=student.rollno, q=qid )
+                    for s in marks:
+                        if s.exam_id != exam.id: continue
                         mark,_ = get_score(s)                    
                         total += float(mark)
                     exam_score = float(total)*float(exam.weight)/float(exam.total)
@@ -2446,7 +2446,7 @@ def compute_total_scores(request):
             final_score = round(final_score, 2)
             calculation = "+".join(calculation)
             scores += f"{c}:{calculation}={final_score}%"
-            # print(f"{student.rollno}:{final_score}")
+            print(f"{student.rollno}:{final_score}")
             if sum(missed) >= 25:
                 # print(f'Some absents did not match for {student.rollno}:  {absents[c]}')
                 scores = f"{c}:MISSED MORE THAN 25%, FINAL SCORE CANNOT BE CALCULATED"
