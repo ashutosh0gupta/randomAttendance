@@ -104,7 +104,7 @@ def who_auth(request):
             #------------------------
             # For testing
             #------------------------
-            return '25B0707'
+            return '25B4233'
             # return "prof"
         return None
     #-----------------------------
@@ -2391,9 +2391,12 @@ def read_absents(student):
                 absents[course].append(exam)
     return absents
 
+
 @transaction.atomic
 def compute_total_scores(request):
     if who_auth(request) != 'prof': return HttpResponse( 'Incorrect login!' )
+    print("Computing scores")
+    t = timezone.now()
     student_list = StudentInfo.objects.order_by('rollno')
     do_not_compute_for_courses = ['CS213']
     do_not_compute_for_students = []
@@ -2422,10 +2425,11 @@ def compute_total_scores(request):
                         missed[bucket_id] += float(exam.weight)
                         absent_count += 1
                     total = 0.0
-                    for qid in range(1,exam.num_q+1):
-                        score = get_or_none( ExamMark, exam_id = exam.id, rollno=student.rollno, q=qid )
-                        marks,_ = get_score(score)
-                        total += float(marks)
+                    marks = ExamMark.objects.filter( Q(rollno = student.rollno)&Q(exam_id = exam.id) )
+                    for s in marks: #qid in range(1,exam.num_q+1):
+                        # score = get_or_none( ExamMark, exam_id = exam.id, rollno=student.rollno, q=qid )
+                        mark,_ = get_score(s)                    
+                        total += float(mark)
                     exam_score = float(total)*float(exam.weight)/float(exam.total)
                     weighted[bucket_id] += exam_score
                     max_marks[bucket_id] += float(exam.weight)
@@ -2439,15 +2443,16 @@ def compute_total_scores(request):
                     weighted[i] = weighted[i]*max_marks[i]/(max_marks[i]-missed[i])
                     calculation[i] = f"{max_marks[i]}/({max_marks[i]}-{missed[i]})({calculation[i]})"
                 final_score += weighted[i]
-                # scores += f"{calculation[i]}={weighted[i]}"
             final_score = round(final_score, 2)
             calculation = "+".join(calculation)
             scores += f"{c}:{calculation}={final_score}%"
+            # print(f"{student.rollno}:{final_score}")
             if sum(missed) >= 25:
-                print(f'Some absents did not match for {student.rollno}:  {absents[c]}')
+                # print(f'Some absents did not match for {student.rollno}:  {absents[c]}')
                 scores = f"{c}:MISSED MORE THAN 25%, FINAL SCORE CANNOT BE CALCULATED"
         student.total_scores = scores
         student.save()
+    print(timezone.now()-t)
     return redirect( reverse( 'index' ) )
 
 
