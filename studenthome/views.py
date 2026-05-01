@@ -2385,6 +2385,9 @@ def read_absents(student):
             if len(ab) == 2 and ab[0] in student.course:
                 course = ab[0]
                 exam   = ab[1]
+                # remove * at the end
+                if exam[-1] == "*":
+                    exam = exam[:-1]
                 absents[course].append(exam)
     return absents
 
@@ -2393,7 +2396,13 @@ def compute_total_scores(request):
     if who_auth(request) != 'prof': return HttpResponse( 'Incorrect login!' )
     student_list = StudentInfo.objects.order_by('rollno')
     do_not_compute_for_courses = ['CS213']
-    do_not_compute_for_students = ['24B1004', '24B0989', '210050102', '24B0956', '24B1001', '24B1087', '24B0910', '24B1030', '23B1054', '24B1050', '24B1053', '24B1017']
+    do_not_compute_for_students = []
+    # do_not_compute_for_students = ['24B1004', '24B0989', '210050102', '24B0956', '24B1001', '24B1087', '24B0910', '24B1030', '23B1054', '24B1050', '24B1053', '24B1017']
+    def missed_bucket(name):
+        if name in ['Midsem','TQ01','TQ02','Endsem','Daily']:
+            return 0
+        else:
+            return 1
     for student in student_list:
         if student.rollno in do_not_compute_for_students: continue
         absents = read_absents(student)
@@ -2401,27 +2410,31 @@ def compute_total_scores(request):
         for c in student.course.split(':'):
             if c in do_not_compute_for_courses: continue 
             exams = Exam.objects.filter( Q(course = c) )
-            missed   = 0.0
-            weighted = 0.0
-            calculation = []
+            missed = [0.0,0.0]
+            weighted = [0.0,0.0]
+            calculation = [[],[]]
+            max_marks = [0.0,0.0] 
             if exams:
                 for exam in exams:
+                    bucket_id = missed_bucket(exam.name)
                     if exam.name in absents[c]:
-                        missed += float(exam.weight)
+                        missed[bucket_id] += float(exam.weight)
                     total = 0.0
                     for qid in range(1,exam.num_q+1):
                         score = get_or_none( ExamMark, exam_id = exam.id, rollno=student.rollno, q=qid )
                         marks,_ = get_score(score)
                         total += float(marks)
                     exam_score = float(total)*float(exam.weight)/float(exam.total)
-                    weighted += exam_score
-                    calculation.append(f"({exam.total}/{exam.weight}){total}")
-            calculation = "+".join(calculation)
-            if missed > 0:
-                weighted = weighted*100/(100-missed)
-                calculation = f"100/(100-{missed})({calculation})"
-            weighted = round(weighted, 2)
-            scores += f"{c}:{calculation}={weighted}%,"
+                    weighted[bucket_id] += exam_score
+                    max_marks[bucket_id] += float(exam.weight)
+                    calculation[bucket_id].append(f"({exam.total}/{exam.weight}){total}")
+            for i in range(len(calculation)):
+                calculation[i] = "+".join(calculation[i])
+                if missed[i] > 0:
+                    weighted[i] = weighted[i]*max_marks[i]/(max_marks[i]-missed[i])
+                    calculation[i] = f"{max_marks[i]}/({max_marks[i]}-{missed[i]})({calculation[i]})"
+                weighted[i] = round(weighted[i], 2)
+                scores += f"{c}:{calculation[i]}={weighted[i]}%,"
         student.total_scores = scores
         student.save()
     return redirect( reverse( 'index' ) )
