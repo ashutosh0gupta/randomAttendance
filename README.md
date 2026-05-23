@@ -176,6 +176,9 @@ $ cd ~/
 $ git clone https://github.com/ashutosh0gupta/randomAttendance.git
 
 # Instruction for creating envoirnment
+```
+python3 -m venv ../Env/myenv
+```
 
 # Instruction for updating django project on server
 
