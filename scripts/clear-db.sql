@@ -4,3 +4,4 @@ delete from studenthome_exammark;
 delete from studenthome_studentanswers;
 delete from studenthome_studentinfo;
 delete from studenthome_switchseat;
+DELETE FROM auth_user WHERE password LIKE 'pbkdf2%';
