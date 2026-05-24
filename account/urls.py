@@ -8,5 +8,5 @@ urlpatterns = [
     # path('',views.index,name='profile-index'),
     path('login/', UserLoginView.as_view(), name='login'),
     path('logout/', UserLogoutView.as_view(), name='logout'),
-    path('success/',views.index,name='success')
+    # path('success/',views.index,name='success')
 ]

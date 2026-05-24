@@ -98,6 +98,6 @@ class UserLogoutView(View):
         print('logout initiated:')
 
 
-@login_required(login_url=reverse_lazy('login'))
-def index(request):
-    return render(request, 'account/success.html')
+# @login_required(login_url=reverse_lazy('login'))
+# def index(request):
+#     return render(request, 'account/success.html')
