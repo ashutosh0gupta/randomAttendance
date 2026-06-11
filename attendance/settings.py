@@ -110,6 +110,8 @@ DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 
 DB_USER_NAME = os.getenv('DB_USER_NAME')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_SERVER = os.getenv('DB_SERVER')
+DB_PORT = os.getenv('DB_PORT')
 
 DATABASES = {
     'default': {
@@ -117,8 +119,8 @@ DATABASES = {
         'NAME': 'attendance',
         'USER': DB_USER_NAME,
         'PASSWORD': DB_PASSWORD,
-        'HOST': 'localhost',
-        'PORT': 5432,
+        'HOST': DB_SERVER,
+        'PORT': DB_PORT,
     }
 }
 
