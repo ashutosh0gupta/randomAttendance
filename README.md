@@ -31,17 +31,18 @@ For taking random attendance in the class
   EMAIL_HOST_USER="<user-on-smtp-server>"
   EMAIL_HOST_PASSWORD="<password-of-the-user>"
   ```
-
+  
+  Important: Use the following shell command to generate a random django-secret-key for the above
+  ```
+   $tr -dc 'a-z0-9!@#$%^&*(-_=+)' < /dev/urandom | head -c50
+  ```
+  Initialize the db, which should create the file db.sqlite3
   ```
   $cd ~/randomAttendance
   $python3 manage.py makemigrations studenthome
   $python3 manage.py migrate
   ```
 
-* Use the following shell command to generate a random django-secret-key key
-  ```
-   $tr -dc 'a-z0-9!@#$%^&*(-_=+)' < /dev/urandom | head -c50
-  ```
 
 4. __Import student data into the db__
 
@@ -57,6 +58,11 @@ For taking random attendance in the class
  ```
   and /tmp/[rollno*].jpeg for each student .
  
+ * If you have used the installation before, we need to erase data from from earlier use
+   ```
+   ./utils/clear-db.sh
+   ```
+   
  * Start server of the application
 
    ```
@@ -64,10 +70,6 @@ For taking random attendance in the class
    $python3 manage.py runserver
    ```
     
- * Erase data from last semester
-   ```
-   ./utils/clear-db.sh
-   ```
  * Go to the following webpage in a browser. It will import the students from the csv file.
 
     http://127.0.0.1:8000/import/
@@ -83,27 +85,9 @@ For taking random attendance in the class
    $python3 manage.py runserver
    ```
 
-  - For attendance, go to the following webpage in a browser
+  - Go to the following webpage in a browser
 
      http://127.0.0.1:8000/
-
-  - Special pages
-
-     To see the details of a student     
-     http://127.0.0.1:8000/[student rollno]
-
-     Find a student who was never called
-     http://127.0.0.1:8000/never
-
-     To see the status of all the students
-     http://127.0.0.1:8000/all
-
-     To import students
-     http://127.0.0.1:8000/import
-
-  - Policy of choosing a random student
-
-  The policy is implemented by function pick_a_student in file ~/randomAttendance/studenthome/views.py
 
 
 # Setting up nginx and gunicorn
@@ -148,10 +132,12 @@ server{
 }
 ```
 
+Create python environment: [Tested for 3.12]
+```
+python3 -m venv <ABSOLUTE PATH TO APP>/Env/randomAttendance
+```
 
- - gcunicorn config file located at /etc/systemd/system/attendance.service
-
-TODO: find instructions for creating environment. Can we move Env inside the app folder?
+gcunicorn config file is located at /etc/systemd/system/attendance.service
 
 ```
 [Unit]
@@ -175,10 +161,6 @@ WantedBy=multi-user.target
 $ cd ~/
 $ git clone https://github.com/ashutosh0gupta/randomAttendance.git
 
-# Instruction for creating envoirnment
-```
-python3 -m venv ../Env/myenv
-```
 
 # Instruction for updating django project on server
 

@@ -2398,14 +2398,16 @@ def compute_total_scores(request):
     print("Computing scores")
     t = timezone.now()
     student_list = StudentInfo.objects.order_by('rollno')
-    do_not_compute_for_courses = ['CS213']
+    do_not_compute_for_courses = []
     do_not_compute_for_students = []
     # do_not_compute_for_students = ['24B1004', '24B0989', '210050102', '24B0956', '24B1001', '24B1087', '24B0910', '24B1030', '23B1054', '24B1050', '24B1053', '24B1017']
+    buckets = [['Midsem','TQ01','TQ02','Endsem','Daily']]
     def missed_bucket(name):
-        if name in ['Midsem','TQ01','TQ02','Endsem','Daily']:
-            return 0
-        else:
-            return 1
+        rval = len(buckets)
+        for i in len(buckets):
+            if name in buckets[i]: #['Midsem','TQ01','TQ02','Endsem','Daily']:
+                rval = 0
+        return rval
     for student in student_list:
         if student.rollno in do_not_compute_for_students: continue
         absents = read_absents(student)
@@ -2413,10 +2415,10 @@ def compute_total_scores(request):
         for c in student.course.split(':'):
             if c in do_not_compute_for_courses: continue 
             exams = Exam.objects.filter( Q(course = c) )
-            missed = [0.0,0.0]
-            weighted = [0.0,0.0]
-            calculation = [[],[]]
-            max_marks = [0.0,0.0] 
+            missed      = [0.0]*(len(buckets)+1) # [0.0,0.0]
+            weighted    = [0.0]*(len(buckets)+1)
+            calculation = [[] ]*(len(buckets)+1)
+            max_marks   = [0.0]*(len(buckets)+1)
             marks = ExamMark.objects.filter( Q(rollno = student.rollno) )
             if exams:
                 absent_count = 0
@@ -2444,12 +2446,13 @@ def compute_total_scores(request):
                     calculation[i] = f"{max_marks[i]}/({max_marks[i]}-{missed[i]})({calculation[i]})"
                 final_score += weighted[i]
             final_score = round(final_score, 2)
-            calculation = "+".join(calculation)
+            calculation = [ c for c in calculation if c != '']
+            calculation = " + ".join(calculation)
             scores += f"{c}:{calculation}={final_score}%"
             print(f"{student.rollno}:{final_score}")
             if sum(missed) >= 25:
                 # print(f'Some absents did not match for {student.rollno}:  {absents[c]}')
-                scores = f"{c}:MISSED MORE THAN 25%, FINAL SCORE CANNOT BE CALCULATED"
+                scores = f"{c}:MISSED >= 25%, FINAL SCORE CANNOT BE CALCULATED"
         student.total_scores = scores
         student.save()
     print(timezone.now()-t)
