@@ -1481,6 +1481,7 @@ class CreateExamRoom(SuccessMessageMixin,CreateView):
     fields= ['name','area','seats'] #q_fields
     template_name = 'studenthome/examroomcreate.html'
 
+    @transaction.atomic
     def get_context_data( self, **kwargs ):
         context = super(CreateExamRoom,self).get_context_data(**kwargs)
         context[ "is_auth" ] = (who_auth( self.request ) == "prof")
@@ -1498,8 +1499,8 @@ class CreateExamRoom(SuccessMessageMixin,CreateView):
         try:
             d = None
             u = who_auth(self.request)
-            if u == None:
-                return redirect( reverse("logout") )
+            # if u == None:
+            #     return redirect( reverse("logout") )
             if u != 'prof':
                 raise Exception( "Wrong kind of login!" )
             
