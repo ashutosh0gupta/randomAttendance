@@ -3,7 +3,7 @@ from django.db import models
 class Call(models.Model):
     call_choices = ('ABSENT', 'PRESENT')
     created_on   = models.DateTimeField(primary_key=True,auto_now_add=True)
-    rollno       = models.CharField(max_length=10)
+    rollno       = models.CharField(max_length=100)
     status       = models.CharField(max_length=200, default='ABSENT')
     prevCall     = models.ForeignKey('self',null=True,on_delete=models.CASCADE)
 
@@ -20,7 +20,7 @@ class StudentInfo(models.Model):
     #             ('BOTH'  , 'CS293-CS213') )   
     name        = models.CharField(max_length=100)
     imagePath   = models.CharField(max_length=200)
-    rollno      = models.CharField(primary_key=True,max_length=10)
+    rollno      = models.CharField(primary_key=True,max_length=100)
     username    = models.CharField(max_length=32,null=True)
     presentCount= models.IntegerField(default=0)
     absentCount = models.IntegerField(default=0)
@@ -88,7 +88,7 @@ class Question(models.Model):
 
 
 class StudentAnswers(models.Model):
-    rollno =  models.CharField(max_length=10)
+    rollno =  models.CharField(max_length=100)
     q = models.IntegerField(verbose_name="Question number",    default=0    )
     answer_time = models.DateTimeField(null=True)
     is_correct = models.BooleanField(verbose_name="Answer status", default=False)
@@ -105,7 +105,7 @@ class StudentAnswers(models.Model):
 
 
 class BioBreak(models.Model):
-    rollno = models.CharField(max_length=10)
+    rollno = models.CharField(max_length=100)
     area   = models.CharField(max_length=50,default="",null=True)
     room   = models.CharField(max_length=50,default="",null=True)
     seat   = models.CharField(max_length=50,default="",null=True)
@@ -128,7 +128,7 @@ class ExamRoom(models.Model):
     disabled = models.IntegerField( verbose_name="#Disabled seats", default=0    )
 
 class SwitchSeat(models.Model):
-    rollno = models.CharField(max_length=10)
+    rollno = models.CharField(max_length=100)
     room   = models.CharField(max_length=12)
     seat   = models.CharField(max_length=12)
     reason = models.TextField(verbose_name="Reason for move",max_length=100,null=True)
@@ -147,7 +147,7 @@ class SwitchSeat(models.Model):
 #--------------------------------------------------------
 
 class ExamAbsence(models.Model):
-    rollno        = models.CharField(max_length=10)
+    rollno        = models.CharField(max_length=100)
     exam_id       = models.IntegerField(verbose_name = "Exam id", default=0,null=True)
     reason        = models.TextField(verbose_name="Absence Reason",max_length=200,null=True)
     proofPath     = models.CharField(max_length=200)
@@ -156,7 +156,7 @@ class ExamMark(models.Model):
     #-------------------------------
     # Roll,Exam,Question
     #-------------------------------
-    rollno        = models.CharField(max_length=10)
+    rollno        = models.CharField(max_length=100)
     exam_id       = models.IntegerField(verbose_name = "Exam id", default=0,null=True)
     q             = models.IntegerField(verbose_name="Question Number", default=0    )
     #-------------------------------

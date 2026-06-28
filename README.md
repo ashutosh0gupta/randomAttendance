@@ -52,8 +52,8 @@ For taking random attendance in the class
  * Run ~/randomAttendance/scripts/asc-import.py which generates /tmp/output.csv in the following format
 
  ```
- 1,[rollno1],STUDENT NAME1,[rollno1].jpeg
- 2,[rollno2],STUDENT NAME2,[rollno2].jpeg
+ 1,[rollno1],STUDENT NAME1,[rollno1].jpeg,courename,No
+ 2,[rollno2],STUDENT NAME2,[rollno2].jpeg,courename,Yes
  ....
  ```
   and /tmp/[rollno*].jpeg for each student .

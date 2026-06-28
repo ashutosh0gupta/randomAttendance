@@ -310,6 +310,7 @@ def db_import(request):
     os.makedirs('studenthome/images/', exist_ok=True)
     course = "***"
     try:
+    # if(True):
         with open(csv_file) as f:
             reader = csv.reader(f)
             num_created = 1
@@ -335,7 +336,10 @@ def db_import(request):
                     #--------------------------------
                     # Copy photo to web reachable place
                     #--------------------------------
-                    shutil.copy('/tmp/'+row[3],'studenthome/images/'+salt+row[3])
+                    if( os.path.exists('/tmp/'+row[3]) ):
+                        shutil.copy('/tmp/'+row[3],'studenthome/images/'+salt+row[3])
+                    else:
+                        imported += f'Image not found for {row[1]}<br>'
                     #------------------------------------
                     # Colleact info for imported students
                     #------------------------------------                
