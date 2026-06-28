@@ -402,6 +402,7 @@ def create_local_users(request):
             is_active=True,
         ) )
         # sas.append( User( username=s.rollno,  password= passwd) )
+        logq.info( f'Creating local user for {s.rollno}!' )
         print( s.rollno + "," + passwd )
         created += s.rollno + "," + passwd+"<br>"
         num_created += 1
