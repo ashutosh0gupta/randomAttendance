@@ -397,7 +397,6 @@ def create_local_users(request):
         passwd = get_random_string(8)
         logq.info( f'Creating local user for {s.rollno}!' )
         encode_passwd = make_password(passwd)
-        logq.info( f'Creating passwod for {s.rollno}!' )
         sas.append( User(
             username=s.rollno,
             email=s.rollno+'@iitb.ac.in',
@@ -408,7 +407,7 @@ def create_local_users(request):
         print( s.rollno + "," + passwd )
         created += s.rollno + "," + passwd+"<br>"
         num_created += 1
-        if num_created > 100:
+        if num_created > 30:
             created += "---- More students to be processed; RUN AGAIN --<br>"
             break
     User.objects.bulk_create( sas )
