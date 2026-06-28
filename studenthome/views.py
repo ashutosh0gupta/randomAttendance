@@ -375,6 +375,7 @@ def db_import(request):
     logq.info( 'Import ran!' )
     return HttpResponse(imported+deleted)
 
+@transaction.atomic
 def create_local_users(request):
     u = who_auth(request)
     if u != 'prof':
@@ -405,7 +406,7 @@ def create_local_users(request):
     if created == '':
         created = 'No users were created! All already exist!'
     created += 'Save this passwords, you will not be able to see them again!'
-    logq.info( 'create local user ran!' )
+    logq.info( f'created {num_created} local users!' )
     return HttpResponse(created)
 
 class EditStudentInfo(UpdateView):
