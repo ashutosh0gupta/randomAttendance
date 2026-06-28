@@ -395,14 +395,16 @@ def create_local_users(request):
         # u = get_or_none( User, username=s.rollno )
         # if u == None: 
         passwd = get_random_string(8)
+        logq.info( f'Creating local user for {s.rollno}!' )
+        encode_passwd = make_password(passwd)
+        logq.info( f'Creating passwod for {s.rollno}!' )
         sas.append( User(
             username=s.rollno,
             email=s.rollno+'@iitb.ac.in',
-            password=make_password(passwd),
+            password=encode_passwd,
             is_active=True,
         ) )
         # sas.append( User( username=s.rollno,  password= passwd) )
-        logq.info( f'Creating local user for {s.rollno}!' )
         print( s.rollno + "," + passwd )
         created += s.rollno + "," + passwd+"<br>"
         num_created += 1
