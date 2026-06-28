@@ -381,27 +381,33 @@ def create_local_users(request):
     if u != 'prof':
         return HttpResponse( 'Incorrect login!' )
 
+    # get all usernames
+    usernames = User.objects.values_list('username', flat=True)
+
+    # find StudentInfo where rollno is not in usernames
+    result = StudentInfo.objects.exclude(rollno__in=usernames)
+    
     sas = []
     m = {}
     created = ''
     num_created = 1
-    for s in StudentInfo.objects.all():
-        u = get_or_none( User, username=s.rollno )
-        if u == None: 
-            passwd = get_random_string(8)
-            sas.append( User(
-                username=s.rollno,
-                email=s.rollno+'@iitb.ac.in',
-                password=make_password(passwd),
-                is_active=True,
-            ) )
-            # sas.append( User( username=s.rollno,  password= passwd) )
-            print( s.rollno + "," + passwd )
-            created += s.rollno + "," + passwd+"<br>"
-            num_created += 1
-            if num_created > 100:
-                created += "---- More students to be processed; RUN AGAIN --<br>"
-                break
+    for s in result:
+        # u = get_or_none( User, username=s.rollno )
+        # if u == None: 
+        passwd = get_random_string(8)
+        sas.append( User(
+            username=s.rollno,
+            email=s.rollno+'@iitb.ac.in',
+            password=make_password(passwd),
+            is_active=True,
+        ) )
+        # sas.append( User( username=s.rollno,  password= passwd) )
+        print( s.rollno + "," + passwd )
+        created += s.rollno + "," + passwd+"<br>"
+        num_created += 1
+        if num_created > 100:
+            created += "---- More students to be processed; RUN AGAIN --<br>"
+            break
     User.objects.bulk_create( sas )
     if created == '':
         created = 'No users were created! All already exist!'
