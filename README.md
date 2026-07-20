@@ -30,13 +30,17 @@ For taking random attendance in the class
   EMAIL_HOST="smtp.<your-smtp-server>"
   EMAIL_HOST_USER="<user-on-smtp-server>"
   EMAIL_HOST_PASSWORD="<password-of-the-user>"
+  DB_USER_NAME=<db name>
+  DB_PASSWORD=<db password>
+  DB_SERVER=<server>
+  DB_PORT=<port>
   ```
-  
+    
   Important: Use the following shell command to generate a random django-secret-key for the above
   ```
    $tr -dc 'a-z0-9!@#$%^&*(-_=+)' < /dev/urandom | head -c50
   ```
-  Initialize the db, which should create the file db.sqlite3
+  Initialize the db.
   ```
   $cd ~/randomAttendance
   $python3 manage.py makemigrations studenthome
@@ -47,7 +51,7 @@ For taking random attendance in the class
 4. __Import student data into the db__
 
  * Goto IITB ASC webpage with the list of students with default options
- * Save the page from the browser (tested only on chrome: click on More tools > Save pages .. ) to ~/tmp folder
+ * Save the page from the browser[Firefox] (tested only on chrome: click on More tools > Save pages .. ) to ~/tmp folder
     (Yes! literally save the page from the browser.)
  * Run ~/randomAttendance/scripts/asc-import.py which generates /tmp/output.csv in the following format
 
@@ -56,9 +60,9 @@ For taking random attendance in the class
  2,[rollno2],STUDENT NAME2,[rollno2].jpeg,courename,Yes
  ....
  ```
-  and /tmp/[rollno*].jpeg for each student .
+  and /tmp/[rollno*].jpeg for each student.
  
- * If you have used the installation before, we need to erase data from from earlier use
+ * If you have used the installation before, we need to erase data from earlier use
    ```
    ./utils/clear-db.sh
    ```
