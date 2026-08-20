@@ -45,7 +45,7 @@ def compute_dayhash():
 DAYHASH = compute_dayhash()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('IS_DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
