@@ -1,7 +1,7 @@
 import os
 from .settings import BASE_DIR
 
-MOUNT_SUB_URL="/course_vm/cs433"
+MOUNT_SUB_URL="/course_vm/cs213"
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_CONTENT_TYPE_NOSNIFF = True
