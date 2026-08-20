@@ -224,7 +224,7 @@ USE_TZ = True
 # SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # SESSION_COOKIE_AGE = 10000
 
-DEPLOY = False
+DEPLOY = os.environ.get('DEPLOY', 'False') == 'True'
 
 DEBUG= not DEPLOY
 
