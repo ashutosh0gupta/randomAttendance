@@ -24,17 +24,7 @@ For taking random attendance in the class
   3. __Initialize db__
 
   Write the following content in randomAttendance/attendance/.env
-  ```
-  SECRET_KEY="<django-secret-key>"
-  AUTH_LDAP_SERVER_URI="<your-ldap-server>"
-  EMAIL_HOST="smtp.<your-smtp-server>"
-  EMAIL_HOST_USER="<user-on-smtp-server>"
-  EMAIL_HOST_PASSWORD="<password-of-the-user>"
-  DB_USER_NAME=<db name>
-  DB_PASSWORD=<db password>
-  DB_SERVER=<server>
-  DB_PORT=<port>
-  ```
+  
     
   Important: Use the following shell command to generate a random django-secret-key for the above
   ```
