@@ -1,7 +1,5 @@
 db.sqlite3
 studenthome/images
-studenthome/migrations
-account/migrations
 attendance/__pycache__/
 studenthome/__pycache__/
 studenthome/templatetags/__pycache__/
