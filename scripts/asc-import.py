@@ -27,6 +27,9 @@ else:
     jpeg_dir= path_dir + '/Welcome to ASC !_files/'
     # jpeg_dir= path_dir + '/Welcome to ASC !_files/CourseList_data'
     in_file = path_dir + '/Welcome to ASC !_files/CourseList.html'
+    
+jpeg_dir= '/tmp/ds/CS213_files'
+in_file = '/tmp/ds/CS213_files/CourseList_KLga.html'
 
 out_file = os.path.expanduser(dump_dir+'output.csv')
 output = open(out_file,'w+')
