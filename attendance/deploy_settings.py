@@ -20,14 +20,11 @@ CSRF_TRUSTED_ORIGINS = [
 
 
 STATIC_URL = MOUNT_SUB_URL+'/static/'
-# STATIC_URL = '/course_vm/cs433/static/'
 STATIC_ROOT = os.path.join(BASE_DIR,'static')
-#STATICFILES_DIRS = [(os.path.join(BASE_DIR, 'static')),]
 
 
 
 MEDIA_URL = MOUNT_SUB_URL+'/images/'
-# MEDIA_URL = '/course_vm/cs433/images/'
 MEDIA_ROOT = 'studenthome/images'
 
 
