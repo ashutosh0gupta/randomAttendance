@@ -21,9 +21,11 @@ def pull_files( src, dest ):
     print(cmd)
     returned_value = os.system(cmd) 
 
+#'source ./Env/randomAttendance/bin/Activate && cd randomAttendance && python manage.py dumpdata --indent 2 > backup.json'
+    
 pull_files( '/var/log/nginx/access.log', './tmp/' )
 
-pull_files( '~/randomAttendance/db.sqlite3', './old-dbs/random-'+date+'-db.sqlite3' )
+pull_files( '~/randomAttendance/backup.json', './old-dbs/random-'+date+'-db.json' )
 pull_files( '~/randomAttendance/debug.error.log', './tmp/random-debug.error.log' )
 pull_files( '~/randomAttendance/debug.log', './tmp/random-debug.log' )
 

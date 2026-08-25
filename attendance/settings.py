@@ -228,10 +228,10 @@ DEPLOY = os.environ.get('DEPLOY', 'False') == 'True'
 
 DEBUG= not DEPLOY
 
+MOUNT_SUB_URL=''
 if(DEPLOY == True):
     from .deploy_settings import *     
 else:
-    MOUNT_SUB_URL=''
     STATIC_URL = '/'+MOUNT_SUB_URL+'static/'
     # STATIC_ROOT = os.path.join(BASE_DIR,'static')
     # STATICFILES_DIRS = ['']

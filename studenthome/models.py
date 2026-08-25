@@ -103,7 +103,11 @@ class StudentAnswers(models.Model):
     ans3 = models.BooleanField( verbose_name = "Answer given 3" , default=False)
     ans4 = models.BooleanField( verbose_name = "Answer given 4" , default=False)
 
-
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['rollno', 'q'], name='unique_roll_q')
+        ]
+        
 class BioBreak(models.Model):
     rollno = models.CharField(max_length=100)
     area   = models.CharField(max_length=50,default="",null=True)
